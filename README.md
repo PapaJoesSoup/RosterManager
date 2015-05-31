@@ -1,5 +1,5 @@
 RosterManager  
-Kerbal Space Program Addon.  Manages all kerbals in a give save game.
+Kerbal Space Program Addon.  Manages all kerbals in a given save game.
 
 License:  CC BY-NC-SA 4.0
 
