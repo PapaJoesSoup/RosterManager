@@ -79,14 +79,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ChangeLog.txt" />
-    <Content Include="Images\Icon_Off_24.png" />
-    <Content Include="Images\Icon_Off_38.png" />
-    <Content Include="Images\Icon_On_24.png" />
-    <Content Include="Images\Icon_On_38.png" />
-    <Content Include="Images\IconS_Off_24.png" />
-    <Content Include="Images\IconS_Off_38.png" />
-    <Content Include="Images\IconS_On_24.png" />
-    <Content Include="Images\IconS_On_38.png" />
+    <Content Include="Textures\Icon_Off_24.png" />
+    <Content Include="Textures\Icon_Off_38.png" />
+    <Content Include="Textures\Icon_On_24.png" />
+    <Content Include="Textures\Icon_On_38.png" />
     <Content Include="PluginData\RosterManager\config.xml">
       <SubType>Designer</SubType>
     </Content>
