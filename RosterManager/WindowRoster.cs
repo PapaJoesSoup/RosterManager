@@ -10,6 +10,8 @@ namespace RosterManager
     internal static class WindowRoster
     {
         // Standard Window vars
+        internal static float windowWidth = 700;
+        internal static float windowHeight = 330;
         internal static Rect Position = new Rect(0, 0, 0, 0);
         internal static bool ShowWindow = false;
         internal static string ToolTip = "";
@@ -191,7 +193,7 @@ namespace RosterManager
                     CreateKerbalViewer();
                 else if (SelectedKerbal != null)
                 {
-                    GUILayout.Label("Kerbal Manager", RMStyle.LabelStyleBoldCenter, GUILayout.Width(580));
+                    GUILayout.Label("Kerbal Manager", RMStyle.LabelStyleBoldCenter, GUILayout.Width(680));
                     DisplayTabButtons();
                     DisplaySelectedTab();
                 }
@@ -252,10 +254,10 @@ namespace RosterManager
                 GUILayout.Label("Gender", GUILayout.Width(50));
                 GUILayout.Label("Profession", GUILayout.Width(65));
                 GUILayout.Label("Skill", GUILayout.Width(30));
-                GUILayout.Label("Status", GUILayout.Width(125));
+                GUILayout.Label("Status", GUILayout.Width(225));
                 GUILayout.EndHorizontal();
 
-                ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(580));
+                ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
                 List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
                 // Support for DeepFreeze
                 if (InstalledMods.IsDFInstalled)
@@ -284,7 +286,7 @@ namespace RosterManager
                                 {
                                     if (crewMember == kerbal)
                                     {
-                                        rosterDetails = thisVessel.GetName().Replace("(unloaded)", "");
+                                        rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
                                     }
                                 }
@@ -327,7 +329,7 @@ namespace RosterManager
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
                         GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(65));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
-                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(125));
+                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(225));
 
                         if (!RMSettings.RealismMode || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                             GUI.enabled = true;
@@ -867,7 +869,7 @@ namespace RosterManager
                 return true;
             else if (isAssign && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                 return true;
             else if (isDead && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                 return true;
@@ -914,19 +916,23 @@ namespace RosterManager
             bool _found = false;
             foreach (Vessel thisVessel in FlightGlobals.Vessels)
             {
-                List<Part> cryoParts = (from p in thisVessel.parts where p.name.Contains("cryofreezer") select p).ToList();
-                foreach (Part pPart in cryoParts)
+                List<ProtoPartSnapshot> cryoParts = (from p in thisVessel.protoVessel.protoPartSnapshots where p.partName.Contains("cryofreezer") select p).ToList();
+                foreach (ProtoPartSnapshot pPart in cryoParts)
                 {
-                    List<PartModule> cryoModules = (from PartModule m in pPart.Modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
-                    foreach (PartModule pMmodule in cryoModules)
+                    List<ProtoPartModuleSnapshot> cryoModules = (from ProtoPartModuleSnapshot m in pPart.modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
+                    foreach (ProtoPartModuleSnapshot pMmodule in cryoModules)
                     {
-                        foreach (BaseEvent thisEvent in pMmodule.Events)
+                        ConfigNode cryoNode = pMmodule.moduleValues;
                         {
-                            if (thisEvent.guiName.Contains(kerbal.name))
+                            if (cryoNode.HasValue("FrozenCrew"))
                             {
-                                _found = true;
-                                rosterDetails = "Frozen - " + thisVessel.GetName().Replace("(unloaded)", "");
-                                break;
+                                string FrozenCrew = cryoNode.GetValue("FrozenCrew");
+                                if (FrozenCrew.Contains(kerbal.name))
+                                {
+                                    _found = true;
+                                    rosterDetails = "Frozen - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                    break;
+                                }
                             }
                         }
                     }
