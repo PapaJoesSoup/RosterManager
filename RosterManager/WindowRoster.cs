@@ -73,7 +73,7 @@ namespace RosterManager
         // Editor Tab bools
 
         internal static bool _ShowAttributesTab = true;
-        internal static bool _ShowProfessionTab = false;
+        internal static bool _ShowSchedulingTab = false;
         internal static bool _ShowTrainingTab = false;
         internal static bool _ShowHistoryTab = false;
         internal static bool _ShowMedicalTab = false;
@@ -92,17 +92,17 @@ namespace RosterManager
                 _ShowAttributesTab = value;
             }
         }
-        internal static bool ShowProfessionTab
+        internal static bool ShowSchedulingTab
         {
             get
             {
-                return _ShowProfessionTab; 
+                return _ShowSchedulingTab; 
             }
             set
             {
                 if (value)
                     ResetTabs();
-                _ShowProfessionTab = value;
+                _ShowSchedulingTab = value;
             }
         }
         internal static bool ShowTrainingTab
@@ -192,7 +192,7 @@ namespace RosterManager
                 else if (SelectedKerbal != null)
                 {
                     GUILayout.Label("Kerbal Manager", RMStyle.LabelStyleBoldCenter, GUILayout.Width(580));
-                    DisplayEditorTabButtons();
+                    DisplayTabButtons();
                     DisplaySelectedTab();
                 }
                 else
@@ -443,25 +443,13 @@ namespace RosterManager
             GUILayout.EndHorizontal();
         }
 
-        private static void DisplayEditorTabButtons()
+        private static void DisplayTabButtons()
         {
             GUILayout.BeginHorizontal();
-
             var AttributeStyle = ShowAttributesTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
             if (GUILayout.Button("Attributes", AttributeStyle, GUILayout.Height(20)))
             {
                 ShowAttributesTab = true;
-            }
-            GUI.enabled = true;
-            var ProfessionStyle = ShowProfessionTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-            if (GUILayout.Button("Professions", ProfessionStyle, GUILayout.Height(20)))
-            {
-                ShowProfessionTab = true;
-            }
-            var HistoryStyle = ShowHistoryTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-            if (GUILayout.Button("History", HistoryStyle, GUILayout.Height(20)))
-            {
-                ShowHistoryTab = true;
             }
             var TrainingStyle = ShowTrainingTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
             if (GUILayout.Button("Training", TrainingStyle, GUILayout.Height(20)))
@@ -472,6 +460,16 @@ namespace RosterManager
             if (GUILayout.Button("Medical", MedicalStyle, GUILayout.Height(20)))
             {
                 ShowMedicalTab = true;
+            }
+            var ProfessionStyle = ShowSchedulingTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+            if (GUILayout.Button("Scheduling", ProfessionStyle, GUILayout.Height(20)))
+            {
+                ShowSchedulingTab = true;
+            }
+            var HistoryStyle = ShowHistoryTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+            if (GUILayout.Button("History", HistoryStyle, GUILayout.Height(20)))
+            {
+                ShowHistoryTab = true;
             }
             var RecordStyle = ShowRecordsTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
             if (GUILayout.Button("Records", RecordStyle, GUILayout.Height(20)))
@@ -542,12 +540,12 @@ namespace RosterManager
              GUILayout.EndHorizontal();
         }
 
-        private static void DisplayProfessionTab()
+        private static void DisplaySchedulingTab()
         {
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-            GUILayout.Label("Edit Kerbal's Profession(s)", RMStyle.LabelStyleBold);
+            GUILayout.Label("Kerbal Scheduling", RMStyle.LabelStyleBold);
             GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
@@ -557,7 +555,7 @@ namespace RosterManager
 
             GUILayout.BeginHorizontal();
             label = "Apply";
-            toolTip = "Applies the Profession changes made to this Kerbal.";
+            toolTip = "Applies the scheduling changes made to this Kerbal.";
             if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
             {
                 RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
@@ -893,8 +891,8 @@ namespace RosterManager
         {
             if (ShowAttributesTab)
                 DisplayAttributesTab();
-            else if (ShowProfessionTab)
-                DisplayProfessionTab();
+            else if (ShowSchedulingTab)
+                DisplaySchedulingTab();
             else if (ShowHistoryTab)
                 DisplayHistoryTab();
             else if (ShowTrainingTab)
@@ -907,7 +905,7 @@ namespace RosterManager
 
         private static void ResetTabs()
         {
-            _ShowAttributesTab = _ShowProfessionTab = _ShowHistoryTab = _ShowTrainingTab = _ShowMedicalTab = _ShowRecordsTab = false;
+            _ShowAttributesTab = _ShowSchedulingTab = _ShowHistoryTab = _ShowTrainingTab = _ShowMedicalTab = _ShowRecordsTab = false;
         }
 
         private static string GetFrozenDetials(ProtoCrewMember kerbal)
