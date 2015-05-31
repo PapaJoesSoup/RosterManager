@@ -1,0 +1,47 @@
+RM_Windows
+{
+	DebuggerPosition
+	{
+		x = 71
+		y = 248
+		width = 520
+		height = 354
+	}
+	SettingsPosition
+	{
+		x = 137
+		y = 102
+		width = 395
+		height = 335
+	}
+	RosterPosition
+	{
+		x = 992
+		y = 60
+		width = 600
+		height = 330
+	}
+}
+RM_Settings
+{
+	LockSettings = False
+	EnableHighlighting = True
+	ShowToolTips = True
+	SettingsToolTips = True
+	RosterToolTips = True
+	DebuggerToolTips = True
+	ShowDebugger = False
+	EnableBlizzyToolbar = False
+	VerboseLogging = False
+	AutoDebug = False
+	DebugLogPath = \Plugins\PluginData\
+	ErrorLogLength = 1000
+	SaveLogOnExit = False
+	EnableKerbalRename = True
+	RenameWithProfession = True
+}
+RM_Hidden
+{
+	SourcePartColor = red
+	TargetPartColor = green
+}

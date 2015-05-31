@@ -274,7 +274,7 @@ namespace RosterManager
                             labelStyle = RMStyle.LabelStyle;
 
                         // What vessel is this Kerbal Assigned to?
-                        string rosterStatus = "";
+                        string rosterDetails = "";
                         if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                         {
                             foreach (Vessel thisVessel in FlightGlobals.Vessels)
@@ -284,7 +284,7 @@ namespace RosterManager
                                 {
                                     if (crewMember == kerbal)
                                     {
-                                        rosterStatus = thisVessel.name.Replace("(unloaded)", "");
+                                        rosterDetails = thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
                                     }
                                 }
@@ -293,13 +293,13 @@ namespace RosterManager
                         else if (InstalledMods.IsDFInstalled && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                         {
                             // This kerbal could be frozen.  Lets find out...
-                            string vesselName = GetFrozenDetials(kerbal);
+                            rosterDetails = GetFrozenDetials(kerbal);
                             labelStyle = RMStyle.LabelStyleCyan;
                         }
                         else
                         {
                             // Since the kerbal has no vessel assignment, lets show what their status...
-                            rosterStatus = kerbal.rosterStatus.ToString();
+                            rosterDetails = kerbal.rosterStatus.ToString();
                         }
                         string buttonText = string.Empty;
                         string buttonToolTip = string.Empty;
@@ -327,7 +327,7 @@ namespace RosterManager
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
                         GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(65));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
-                        GUILayout.Label(rosterStatus, labelStyle, GUILayout.Width(125));
+                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(125));
 
                         if (!RMSettings.RealismMode || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                             GUI.enabled = true;

@@ -88,11 +88,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="PluginData\RMSettings.dat" />
     <None Include="RosterManager.version" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PluginData\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\RosterManager\Plugins\"</PostBuildEvent>
