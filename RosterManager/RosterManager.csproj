@@ -83,15 +83,15 @@
     <Content Include="Textures\Icon_Off_38.png" />
     <Content Include="Textures\Icon_On_24.png" />
     <Content Include="Textures\Icon_On_38.png" />
-    <Content Include="PluginData\RosterManager\config.xml">
-      <SubType>Designer</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="RosterManager.version" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PluginData\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
