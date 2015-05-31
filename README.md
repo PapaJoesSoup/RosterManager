@@ -1,4 +1,4 @@
-RosterManager
+RosterManager  
 Kerbal Space Program Addon.  Manages all kerbals in a give save game.
 
 ============
