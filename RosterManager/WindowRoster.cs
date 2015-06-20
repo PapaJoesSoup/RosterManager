@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using System.IO;
+using DF;
 
 namespace RosterManager
 {
@@ -248,22 +249,53 @@ namespace RosterManager
         {
             try
             {
+                string buttonToolTip = string.Empty;
+                GUIStyle hdrlabelStyle = new GUIStyle(GUI.skin.label);
+                hdrlabelStyle.fontStyle = FontStyle.Bold;
                 GUILayout.BeginVertical();
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Name", GUILayout.Width(140));
-                GUILayout.Label("Gender", GUILayout.Width(50));
-                GUILayout.Label("Profession", GUILayout.Width(65));
-                GUILayout.Label("Skill", GUILayout.Width(30));
-                GUILayout.Label("Status", GUILayout.Width(225));
+                GUILayout.Label("", hdrlabelStyle, GUILayout.Width(5));
+                buttonToolTip = "Click to sort.  Click again to sort the opposite direction.";
+                if (GUILayout.Button(new GUIContent("Name", buttonToolTip), hdrlabelStyle, GUILayout.Width(150)))
+                    SortRosterList("Name");
+                Rect rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                if (GUILayout.Button(new GUIContent("|Gender", buttonToolTip), hdrlabelStyle, GUILayout.Width(50)))
+                    SortRosterList("Gender");
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                if (GUILayout.Button(new GUIContent("|Profession", buttonToolTip), hdrlabelStyle, GUILayout.Width(75)))
+                    SortRosterList("Profession");
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                if (GUILayout.Button(new GUIContent("|Skill", buttonToolTip), hdrlabelStyle, GUILayout.Width(35)))
+                    SortRosterList("Skill");
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                if (GUILayout.Button(new GUIContent("|Experience", buttonToolTip), hdrlabelStyle, GUILayout.Width(75)))
+                    SortRosterList("Experience");
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                if (GUILayout.Button(new GUIContent("|Status", buttonToolTip), hdrlabelStyle, GUILayout.Width(200)))
+                    SortRosterList("Status");
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
                 GUILayout.EndHorizontal();
 
                 ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
-                List<ProtoCrewMember> AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-                // Support for DeepFreeze
-                if (InstalledMods.IsDFInstalled)
-                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-
-                foreach (ProtoCrewMember kerbal in AllCrew)
+                foreach (ProtoCrewMember kerbal in RMAddon.AllCrew)
                 {
                     if (CanDisplayKerbal(kerbal))
                     {
@@ -292,7 +324,7 @@ namespace RosterManager
                                 }
                             }
                         }
-                        else if (InstalledMods.IsDFInstalled && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+                        else if (InstalledMods.IsDFInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                         {
                             // This kerbal could be frozen.  Lets find out...
                             rosterDetails = GetFrozenDetials(kerbal);
@@ -304,12 +336,11 @@ namespace RosterManager
                             rosterDetails = kerbal.rosterStatus.ToString();
                         }
                         string buttonText = string.Empty;
-                        string buttonToolTip = string.Empty;
                         GUILayout.BeginHorizontal();
                         buttonText = kerbal.name;
                         buttonToolTip = "Opens the Edit section for this kerbal.";
                         GUIStyle btnStyle = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? RMStyle.ButtonStyleLeft : RMStyle.ButtonToggledStyleLeft;
-                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), btnStyle, GUILayout.MaxWidth(140)))
+                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), btnStyle, GUILayout.Width(160)))
                         {
                             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                             {
@@ -323,89 +354,92 @@ namespace RosterManager
                                 gender = ProtoCrewMember.Gender.Male;
                             }
                         }
-                        Rect rect = GUILayoutUtility.GetLastRect();
+                        rect = GUILayoutUtility.GetLastRect();
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
-                        GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(65));
-                        GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(30));
-                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(225));
+                        GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(75));
+                        GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
+                        GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
+                        GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(240));
 
-                        if (!RMSettings.RealismMode || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
-                            GUI.enabled = true;
-                        else
-                            GUI.enabled = false;
 
-                        buttonText = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel";
-                        if (GUI.enabled)
-                            buttonToolTip = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit this Kerbal's characteristics" : "Cancel any changes to this Kerbal";
-                        else
-                            buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
+                        //if (!RMSettings.RealismMode || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                        //    GUI.enabled = true;
+                        //else
+                        //    GUI.enabled = false;
 
-                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60)))
-                        {
-                            if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
-                            {
-                                SelectedKerbal = new ModKerbal(kerbal, false);
-                                SetProfessionFlag();
-                            }
-                            else
-                            {
-                                SelectedKerbal = null;
-                            }
-                        }
-                        rect = GUILayoutUtility.GetLastRect();
-                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
+                        //buttonText = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit" : "Cancel";
+                        //if (GUI.enabled)
+                        //    buttonToolTip = (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal) ? "Edit this Kerbal's characteristics" : "Cancel any changes to this Kerbal";
+                        //else
+                        //    buttonToolTip = "Kerbal is not available at this time.\r\nEditing is disabled";
 
-                        if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && FlightGlobals.ActiveVessel != null && !RMAddon.VesselIsFull(FlightGlobals.ActiveVessel))
-                        {
-                            GUI.enabled = true;
-                            buttonText = "Add";
-                            buttonToolTip = "Adds a kerbal to the Active Vessel,\r\nin the first available seat.";
-                        }
-                        else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
-                        {
-                            GUI.enabled = true;
-                            buttonText = "Respawn";
-                            buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
-                        }
-                        else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
-                        {
-                            GUI.enabled = true;
-                            buttonText = "Remove";
-                            buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
-                        }
-                        else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && (RMSettings.RealismMode && !RMAddon.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
-                        {
-                            GUI.enabled = false;
-                            buttonText = "Add";
-                            buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
-                        }
-                        else
-                        {
-                            GUI.enabled = false;
-                            buttonText = "--";
-                            buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
-                        }
+                        //if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60)))
+                        //{
+                        //    if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
+                        //    {
+                        //        SelectedKerbal = new ModKerbal(kerbal, false);
+                        //        SetProfessionFlag();
+                        //    }
+                        //    else
+                        //    {
+                        //        SelectedKerbal = null;
+                        //    }
+                        //}
 
-                        if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(60)))
-                        {
-                            if (buttonText == "Add")
-                                RMAddon.AddCrewMember(kerbal, FlightGlobals.ActiveVessel);
-                            else if (buttonText == "Respawn")
-                                RMAddon.RespawnKerbal(kerbal);
-                            else if (buttonText == "Remove")
-                            {
-                                // get part...
-                                Part part = RMAddon.FindKerbalPart(kerbal);
-                                if (part != null)
-                                    RMAddon.RemoveCrewMember(kerbal, part);
-                            }
-                        }
-                        rect = GUILayoutUtility.GetLastRect();
-                        if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
+                        //rect = GUILayoutUtility.GetLastRect();
+                        //if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        //    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
+
+                    //    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && FlightGlobals.ActiveVessel != null && !RMAddon.VesselIsFull(FlightGlobals.ActiveVessel))
+                    //    {
+                    //        GUI.enabled = true;
+                    //        buttonText = "Add";
+                    //        buttonToolTip = "Adds a kerbal to the Active Vessel,\r\nin the first available seat.";
+                    //    }
+                    //    else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+                    //    {
+                    //        GUI.enabled = true;
+                    //        buttonText = "Respawn";
+                    //        buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
+                    //    }
+                    //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                    //    {
+                    //        GUI.enabled = true;
+                    //        buttonText = "Remove";
+                    //        buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+                    //    }
+                    //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && (RMSettings.RealismMode && !RMAddon.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                    //    {
+                    //        GUI.enabled = false;
+                    //        buttonText = "Add";
+                    //        buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
+                    //    }
+                    //    else
+                    //    {
+                    //        GUI.enabled = false;
+                    //        buttonText = "--";
+                    //        buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
+                    //    }
+
+                    //    if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(70)))
+                    //    {
+                    //        if (buttonText == "Add")
+                    //            RMAddon.AddCrewMember(kerbal, FlightGlobals.ActiveVessel);
+                    //        else if (buttonText == "Respawn")
+                    //            RMAddon.RespawnKerbal(kerbal);
+                    //        else if (buttonText == "Remove")
+                    //        {
+                    //            // get part...
+                    //            Part part = RMAddon.FindKerbalPart(kerbal);
+                    //            if (part != null)
+                    //                RMAddon.RemoveCrewMember(kerbal, part);
+                    //        }
+                    //    }
+                    //    rect = GUILayoutUtility.GetLastRect();
+                    //    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    //        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
                         GUILayout.EndHorizontal();
                         GUI.enabled = true;
                     }
@@ -481,296 +515,6 @@ namespace RosterManager
             GUILayout.EndHorizontal();
         }
 
-        private static void DisplayAttributesTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal", RMStyle.LabelStyleBold);
-            if (RMSettings.EnableKerbalRename)
-            {
-                GUILayout.BeginHorizontal();
-                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
-                GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
-                GUILayout.EndHorizontal();
-            }
-            else
-                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-            if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-            {
-                DisplaySelectProfession();
-            }
-            DisplaySelectGender();
-            SelectedKerbal.Gender = gender;
-
-            GUILayout.Label("Skill");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Courage");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Stupidity");
-            SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
-
-            SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-                {
-                    SelectedKerbal.Title = KerbalProfession;
-                }
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-             GUILayout.EndHorizontal();
-        }
-
-        private static void DisplaySchedulingTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label("Kerbal Scheduling", RMStyle.LabelStyleBold);
-            GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies the scheduling changes made to this Kerbal.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplayHistoryTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label("Kerbal Flight History", RMStyle.LabelStyleBold);
-            GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies any flight history changes made to this Kerbal.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplayTrainingTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label("Kerbal Training", RMStyle.LabelStyleBold);
-            GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies any changes made to this Kerbal's training.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplayMedicalTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal", RMStyle.LabelStyleBold);
-            if (RMSettings.EnableKerbalRename)
-            {
-                GUILayout.BeginHorizontal();
-                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
-                GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
-                GUILayout.EndHorizontal();
-            }
-            else
-                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-            if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-            {
-                DisplaySelectProfession();
-            }
-            DisplaySelectGender();
-            SelectedKerbal.Gender = gender;
-
-            GUILayout.Label("Skill");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Courage");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Stupidity");
-            SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
-
-            SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-                {
-                    SelectedKerbal.Title = KerbalProfession;
-                }
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplayRecordsTab()
-        {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label(SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal", RMStyle.LabelStyleBold);
-            if (RMSettings.EnableKerbalRename)
-            {
-                GUILayout.BeginHorizontal();
-                SelectedKerbal.Name = GUILayout.TextField(SelectedKerbal.Name, GUILayout.MaxWidth(300));
-                GUILayout.Label(" - (" + SelectedKerbal.Kerbal.experienceTrait.Title + ")");
-                GUILayout.EndHorizontal();
-            }
-            else
-                GUILayout.Label(SelectedKerbal.Name + " - (" + SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
-
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-            if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-            {
-                DisplaySelectProfession();
-            }
-            DisplaySelectGender();
-            SelectedKerbal.Gender = gender;
-
-            GUILayout.Label("Skill");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Courage");
-            SelectedKerbal.Courage = GUILayout.HorizontalSlider(SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
-
-            GUILayout.Label("Stupidity");
-            SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
-
-            SelectedKerbal.Badass = GUILayout.Toggle(SelectedKerbal.Badass, "Badass");
-
-            GUILayout.BeginHorizontal();
-            label = "Apply";
-            toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
-            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
-            {
-                if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-                {
-                    SelectedKerbal.Title = KerbalProfession;
-                }
-                RMAddon.saveMessage = SelectedKerbal.SubmitChanges();
-                if (string.IsNullOrEmpty(RMAddon.saveMessage))
-                    SelectedKerbal = null;
-            }
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
-            {
-                SelectedKerbal = null;
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplaySelectGender()
-        {
-            GUILayout.BeginHorizontal();
-            bool isMale = ProtoCrewMember.Gender.Male == gender ? true : false;
-            GUILayout.Label("Gender:", GUILayout.Width(80));
-            isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(70));
-            isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString(), GUILayout.Width(80));
-            gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
-            GUILayout.EndHorizontal();
-        }
-
         private static void SetProfessionFlag()
         {
             if (SelectedKerbal.Title == "Pilot")
@@ -791,37 +535,6 @@ namespace RosterManager
                 isEngineer = false;
                 isScientist = true;
             }
-        }
-
-        private static void DisplaySelectProfession()
-        {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Profession:", GUILayout.Width(80));
-            isPilot = GUILayout.Toggle(isPilot, "Pilot", GUILayout.Width(70));
-            if (isPilot)
-                isEngineer = isScientist = false;
-            else
-            {
-                if (!isEngineer && !isScientist)
-                    isPilot = true;
-            }
-            isEngineer = GUILayout.Toggle(isEngineer, "Engineer", GUILayout.Width(80));
-            if (isEngineer)
-                isPilot = isScientist = false;
-            else
-            {
-                if (!isPilot && !isScientist)
-                    isEngineer = true;
-            }
-            isScientist = GUILayout.Toggle(isScientist, "Scientist", GUILayout.Width(80));
-            if (isScientist)
-                isPilot = isEngineer = false;
-            else
-            {
-                if (!isPilot && !isEngineer)
-                    isScientist = true;
-            }
-            GUILayout.EndHorizontal();
         }
 
         private static void DisplayRosterFilter()
@@ -869,7 +582,7 @@ namespace RosterManager
                 return true;
             else if (isAssign && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
+            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                 return true;
             else if (isDead && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                 return true;
@@ -892,17 +605,17 @@ namespace RosterManager
         internal static void DisplaySelectedTab()
         {
             if (ShowAttributesTab)
-                DisplayAttributesTab();
+                TabAttributes.Display();
             else if (ShowSchedulingTab)
-                DisplaySchedulingTab();
+                TabScheduling.Display();
             else if (ShowHistoryTab)
-                DisplayHistoryTab();
+                TabHistory.Display();
             else if (ShowTrainingTab)
-                DisplayTrainingTab();
+                TabTraining.Display();
             else if (ShowMedicalTab)
-                DisplayMedicalTab();
+                TabMedical.Display();
             else if (ShowRecordsTab)
-                DisplayRecordsTab();
+                TabRecords.Display();
         }
 
         private static void ResetTabs()
@@ -910,41 +623,164 @@ namespace RosterManager
             _ShowAttributesTab = _ShowSchedulingTab = _ShowHistoryTab = _ShowTrainingTab = _ShowMedicalTab = _ShowRecordsTab = false;
         }
 
+        internal static Dictionary<string, KerbalInfo> GetFrozenKerbals()
+        {
+            if (DFInterface.IsDFInstalled)
+            {
+                IDFInterface IDF = DFInterface.GetFrozenKerbals();
+                return IDF.FrozenKerbals;
+            }
+            else
+                return new Dictionary<string, KerbalInfo>();
+        }
+
         private static string GetFrozenDetials(ProtoCrewMember kerbal)
         {
             string rosterDetails = "";
-            bool _found = false;
-            foreach (Vessel thisVessel in FlightGlobals.Vessels)
-            {
-                List<ProtoPartSnapshot> cryoParts = (from p in thisVessel.protoVessel.protoPartSnapshots where p.partName.Contains("cryofreezer") select p).ToList();
-                foreach (ProtoPartSnapshot pPart in cryoParts)
-                {
-                    List<ProtoPartModuleSnapshot> cryoModules = (from ProtoPartModuleSnapshot m in pPart.modules where m.moduleName.Contains("DeepFreezer") select m).ToList();
-                    foreach (ProtoPartModuleSnapshot pMmodule in cryoModules)
-                    {
-                        ConfigNode cryoNode = pMmodule.moduleValues;
-                        {
-                            if (cryoNode.HasValue("FrozenCrew"))
-                            {
-                                string FrozenCrew = cryoNode.GetValue("FrozenCrew");
-                                if (FrozenCrew.Contains(kerbal.name))
-                                {
-                                    _found = true;
-                                    rosterDetails = "Frozen - " + thisVessel.GetName().Replace("(unloaded)", "");
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if (_found) break;
-                }
-            }
-            if (!_found)
-            {
+            if (RMAddon.FrozenKerbals.ContainsKey(kerbal.name))
+                rosterDetails = "Frozen - " + (RMAddon.FrozenKerbals[kerbal.name]).vesselName.Replace("(unloaded)", "");
+            else
                 rosterDetails = "Frozen";
-            }
+
             return rosterDetails;
         }
 
+        internal static void DisplaySelectProfession()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("Profession:", GUILayout.Width(80));
+            isPilot = GUILayout.Toggle(isPilot, "Pilot", GUILayout.Width(70));
+            if (isPilot)
+                isEngineer = isScientist = false;
+            else
+            {
+                if (!isEngineer && !isScientist)
+                    isPilot = true;
+            }
+            isEngineer = GUILayout.Toggle(isEngineer, "Engineer", GUILayout.Width(80));
+            if (isEngineer)
+                isPilot = isScientist = false;
+            else
+            {
+                if (!isPilot && !isScientist)
+                    isEngineer = true;
+            }
+            isScientist = GUILayout.Toggle(isScientist, "Scientist", GUILayout.Width(80));
+            if (isScientist)
+                isPilot = isEngineer = false;
+            else
+            {
+                if (!isPilot && !isEngineer)
+                    isScientist = true;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        internal static void DisplaySelectGender()
+        {
+            GUILayout.BeginHorizontal();
+            bool isMale = ProtoCrewMember.Gender.Male == gender ? true : false;
+            GUILayout.Label("Gender:", GUILayout.Width(80));
+            isMale = GUILayout.Toggle(isMale, ProtoCrewMember.Gender.Male.ToString(), GUILayout.Width(70));
+            isMale = GUILayout.Toggle(!isMale, ProtoCrewMember.Gender.Female.ToString(), GUILayout.Width(80));
+            gender = isMale ? ProtoCrewMember.Gender.Female : ProtoCrewMember.Gender.Male;
+            GUILayout.EndHorizontal();
+        }
+
+        internal static void DisplayEditActionButtons(ref Rect rect, ref string label, ref string toolTip)
+        {
+            GUILayout.BeginHorizontal();
+            label = "Apply";
+            toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
+            if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
+            {
+                if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
+                {
+                    WindowRoster.SelectedKerbal.Title = WindowRoster.KerbalProfession;
+                }
+                RMAddon.saveMessage = WindowRoster.SelectedKerbal.SubmitChanges();
+                if (string.IsNullOrEmpty(RMAddon.saveMessage))
+                    WindowRoster.SelectedKerbal = null;
+            }
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+            if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
+            {
+                WindowRoster.SelectedKerbal = null;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        internal static void SortRosterList(string sort)
+        {
+            if (sort == "Name")
+                if (RMAddon.AllCrewSort != "Name-A")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Name-A";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.name descending select k).ToList();
+                    RMAddon.AllCrewSort = "Name-D";
+                }
+            else if (sort == "Gender")
+                if (RMAddon.AllCrewSort != "Gender-A")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.gender descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Gender-A";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.gender, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Gender-D";
+                }
+            else if (sort == "Profession")
+                if (RMAddon.AllCrewSort != "Profession-A")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceTrait.Title, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Profession-A";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceTrait.Title descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Profession-D";
+                }
+            else if (sort == "Skill")
+                if (RMAddon.AllCrewSort != "Skill-D")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceLevel descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Skill-D";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceLevel, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Skill-A";
+                }
+
+            else if (sort == "Experience")
+                if (RMAddon.AllCrewSort != "Experience-D")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experience descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Experience-D";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experience descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Experience-A";
+                }
+                else if (sort == "Status")
+                if (RMAddon.AllCrewSort != "Status-A")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus, k.type, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Status-A";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus descending, k.type descending, k.name select k).ToList();
+                    RMAddon.AllCrewSort = "Status-D";
+                }
+        }
     }
 }

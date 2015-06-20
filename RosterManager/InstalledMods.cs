@@ -35,7 +35,7 @@ namespace RosterManager
         internal static bool IsModInstalled(string assemblyName)
         {
             Assembly assembly = (from a in assemblies
-                            where a.FullName.Contains(assemblyName)
+                            where a.FullName.StartsWith(assemblyName)
                             select a).SingleOrDefault();
             return assembly != null;
         }

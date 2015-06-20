@@ -27,6 +27,7 @@ namespace RosterManager
         internal static GUIStyle LabelStyleYellow;
         internal static GUIStyle LabelStyleGreen;
         internal static GUIStyle LabelStyleCyan;
+        internal static GUIStyle LabelStyleHdrSort;
         internal static GUIStyle ToolTipStyle;
         internal static GUIStyle ScrollStyle;
 
@@ -48,14 +49,14 @@ namespace RosterManager
 
             ButtonStyle = new GUIStyle(GUI.skin.button);
             ButtonStyle.normal.textColor = Color.white;
-            ButtonStyle.hover.textColor = Color.blue;
+            ButtonStyle.hover.textColor = Color.white;
             ButtonStyle.fontSize = 14;
             ButtonStyle.fontStyle = FontStyle.Normal;
 
             ButtonToggledStyle = new GUIStyle(GUI.skin.button);
             ButtonToggledStyle.normal.textColor = Color.green;
             ButtonToggledStyle.fontSize = 14;
-            ButtonToggledStyle.hover.textColor = Color.blue;
+            ButtonToggledStyle.hover.textColor = Color.white;
             ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
             ButtonToggledStyle.fontStyle = FontStyle.Normal;
 
@@ -131,6 +132,9 @@ namespace RosterManager
 
             LabelStyleCyan = new GUIStyle(LabelStyle);
             LabelStyleCyan.normal.textColor = Color.cyan;
+
+            LabelStyleHdrSort = new GUIStyle(GUI.skin.label);
+            LabelStyleHdrSort.fontStyle = FontStyle.Bold;
 
             ToolTipStyle = new GUIStyle(GUI.skin.label);
             ToolTipStyle.alignment = TextAnchor.MiddleLeft;

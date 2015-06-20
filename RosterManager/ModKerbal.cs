@@ -17,6 +17,8 @@ namespace RosterManager
         public string Name;
         public string Title;
         public ProtoCrewMember.Gender Gender;
+        public int Skill;
+        public float Experience;
 
         public ModKerbal(ProtoCrewMember kerbal, bool isNew)
         {
@@ -27,7 +29,10 @@ namespace RosterManager
             Badass = kerbal.isBadass;
             Title = kerbal.experienceTrait.Title;
             Gender = kerbal.gender;
+            Skill = kerbal.experienceLevel;
+            Experience = kerbal.experience;
             IsNew = isNew;
+            
         }
 
         public string SubmitChanges()
@@ -74,6 +79,8 @@ namespace RosterManager
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;
+            Kerbal.experienceLevel = Skill;
+            Kerbal.experience = Experience;
         }
 
         private bool NameExists()

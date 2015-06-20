@@ -59,6 +59,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\KSPAssemblies\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="DFInterface">
+      <HintPath>..\..\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\DFInterface.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\KSPAssemblies\Managed\UnityEngine.dll</HintPath>
@@ -66,6 +69,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstalledMods.cs" />
+    <Compile Include="ModMedical.cs" />
+    <Compile Include="ModRecords.cs" />
+    <Compile Include="ModSchedule.cs" />
+    <Compile Include="TabAttributes.cs" />
+    <Compile Include="TabHistory.cs" />
+    <Compile Include="TabMedical.cs" />
+    <Compile Include="TabRecords.cs" />
+    <Compile Include="TabScheduling.cs" />
+    <Compile Include="TabTraining.cs" />
     <Compile Include="WindowDebugger.cs" />
     <Compile Include="RMStyle.cs" />
     <Compile Include="ModKerbal.cs" />
@@ -78,23 +90,26 @@
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ChangeLog.txt" />
-    <Content Include="Textures\Icon_Off_24.png" />
-    <Content Include="Textures\Icon_Off_38.png" />
-    <Content Include="Textures\Icon_On_24.png" />
-    <Content Include="Textures\Icon_On_38.png" />
+    <Content Include="Distribution\ChangeLog.txt" />
+    <Content Include="Distribution\GameData\RosterManager\Plugins\DFInterface.dll" />
+    <Content Include="Distribution\GameData\RosterManager\Plugins\RosterManager.dll" />
+    <Content Include="Distribution\GameData\RosterManager\Textures\Icon_Off_24.png" />
+    <Content Include="Distribution\GameData\RosterManager\Textures\Icon_Off_38.png" />
+    <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_24.png" />
+    <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_38.png" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PluginData\RMSettings.dat" />
-    <None Include="RosterManager.version" />
+    <None Include="Distribution\GameData\RosterManager\Plugins\PluginData\RMSettings.dat" />
+    <None Include="Distribution\GameData\RosterManager\RosterManager.version" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\RosterManager\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\RosterManager\Plugins\"
+copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\RosterManager\RosterManager\Distribution\GameData\RosterManager\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

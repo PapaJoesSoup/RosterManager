@@ -4,6 +4,7 @@ using System.Linq;
 using System.IO;
 using System.Text;
 using UnityEngine;
+using DF;
 
 namespace RosterManager
 {
@@ -26,6 +27,11 @@ namespace RosterManager
         internal static Vector2 ToolTipPos;
         internal static string toolTip;
 
+        internal static List<ProtoCrewMember> AllCrew;
+        internal static string AllCrewSort = "";
+
+        // DeepFreeze Frozen Crew interface
+        internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
 
         #endregion
 
@@ -265,6 +271,11 @@ namespace RosterManager
                         RMRoster_Blizzy.TexturePath = WindowRoster.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
                     else
                         RMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
+
+                    RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
+                    AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+                    if (InstalledMods.IsDFInstalled)
+                        AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
                 }
 
             }
