@@ -4,7 +4,11 @@ Kerbal Space Program Addon.  Manages all kerbals in a given save game.  Adds gam
 License:  CC-BY-NC-SA 4.0
 
 ============
-Version 0.1.0.0 xx Jun 2015 - Initial alpha release
+Version 0.1.0.1 23 Jun 2015 - KSP 1.0.3 and DeepFreeze compatability
+ - Updated DFInterface.dll to latest version
+ - updated KSP assembly references to KSP ver 1.0.3
+
+Version 0.1.0.0 20 Jun 2015 - Initial alpha release
  - Roster interface based on Roster window from Ship Manifest, but greatly enhanced (sorting, more detail)
  - In flight controls removed. These will stay in Ship Manifest.  Roster Manager will not be visible in Flight scene.
  - Kerbal manager Tab buttons for various areas to manage.
