@@ -30,6 +30,7 @@ namespace RosterManager
 
             // Begin Tab contents.
             FlightLog thisLog = WindowRoster.SelectedKerbal.Kerbal.flightLog;
+
             foreach (FlightLog.Entry thisEntry in thisLog.Entries)
             {
                 GUILayout.Label(thisEntry.flight.ToString() + " - " + thisEntry.target + " - " + thisEntry.type);

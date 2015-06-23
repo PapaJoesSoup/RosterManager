@@ -52,19 +52,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\KSPAssemblies\Managed\Assembly-CSharp.dll</HintPath>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\KSPAssemblies\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="DFInterface">
       <HintPath>..\..\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\DFInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\KSPAssemblies\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -97,6 +96,7 @@
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_Off_38.png" />
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_24.png" />
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_38.png" />
+    <Content Include="Distribution\Installation Notes.txt" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

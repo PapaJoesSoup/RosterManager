@@ -30,7 +30,9 @@ namespace RosterManager
 
             // Begin Tab contents.
 
-            
+            if (GUILayout.Button("Enter Notes", GUILayout.Width(100)))
+            {
+            }
             
             //End Tab contents
             GUILayout.EndScrollView();

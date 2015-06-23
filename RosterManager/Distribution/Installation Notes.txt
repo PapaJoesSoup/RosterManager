@@ -1,0 +1,57 @@
+Thanks for downloading Roster Manager!
+
+Roster Manager manages your roster of kerbals.  It will add a great deal of gameplay improvements, and control over your kerbals.
+
+----------------
+Current Version 0.1.0.0 - Release 20 Jun, 2015 - Initial Alpha Release.
+----------------
+
+---------
+Download: Kerbalstuff - https://kerbalstuff.com/mod/931/Roster%20Manager
+          Github - https://github.com/PapaJoesSoup/RosterManager/releases
+---------
+
+NOTE:  RM has no dependencies on other mods.  If installed, Roster Manager can use:
+	- Toolbar.
+	- DeepFreeze
+	- Module Manager  
+
+
+--------------------
+Installation steps: 
+--------------------
+
+1.  Remove any previous installation of RosterManager from your GameData folder.
+2.  Overwrite your GameData folder with the contents of the archive.  
+
+------------
+What's New:
+------------
+
+
+----------
+License:  CC BY-NC-SA 4.0
+----------
+
+http://creativecommons.org/licenses/by-nc-sa/4.0/.
+
+---------------
+Source code:  http://github.com/PapaJoesSoup/RosterManager
+---------------
+
+---------------
+WIKI:  http://github.com/PapaJoesSoup/RosterManager/wiki
+---------------
+
+---------------
+Features:
+---------------
+
+ 
+------------------------------
+Realism Configuration:
+------------------------------
+
+This area is subject to change.   I'm going to be rethinking how I organize this to make it easier to manage and to use.
+
+
