@@ -53,22 +53,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="DFInterface, Version=0.3.5712.8487, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\ksp-win-1-0-4\KSP_win\GameData\REPOSoftTech\DeepFreeze\Plugins\DFInterface.dll</HintPath>
+      <HintPath>..\..\DeepFreeze\Source\bin\Debug\DFInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\KSPAssemblies\Managed\1.0.3\UnityEngine.dll</HintPath>
+      <HintPath>..\..\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstalledMods.cs" />
+    <Compile Include="KerbalLifeSpanInfo.cs" />
+    <Compile Include="LifeSpan.cs" />
+    <Compile Include="LifeSpanAddon.cs" />
     <Compile Include="ModMedical.cs" />
     <Compile Include="ModRecords.cs" />
     <Compile Include="ModSchedule.cs" />
@@ -98,6 +101,7 @@
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_24.png" />
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_38.png" />
     <Content Include="Distribution\Installation Notes.txt" />
+    <Content Include="ChangeLog.txt" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -109,8 +113,28 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-4\KSP_win\GameData\RosterManager\Plugins\"
-copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\RosterManager\RosterManager\Distribution\GameData\RosterManager\Plugins\"</PostBuildEvent>
+    <PostBuildEvent>set /p KSP_DIR=&lt;"$(ProjectDir)ksp_dir.txt"
+
+xcopy "$(TargetPath)" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
+
+xcopy "$(TargetDir)$(ProjectName).pdb" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
+
+cd "$(TargetDir)"
+"C:\Program Files (x86)\mono\bin\mono.exe" "C:\Program Files (x86)\mono\lib\mono\4.5\pdb2mdb.exe" "$(TargetFileName)"
+xcopy "$(TargetDir)$(ProjectName).dll.mdb" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
+
+where /q "C:\7za\:7za.exe"
+if %25ERRORLEVEL%25 == 1 (
+   echo Cannot find 7-zip to package build
+) else (
+   echo Packaging build
+  ) 
+if exist "$(SolutionDir)$(ProjectName).zip" del "$(SolutionDir)$(ProjectName).zip"
+   
+c:\7za\7za a -tzip -r  "$(SolutionDir)$(ProjectName).zip" "$(SolutionDir)$(ProjectName)\Distribution\GameData"
+c:\7za\7za d -r  -x!REPOSoftTech.png "$(SolutionDir)$(ProjectName).zip" "*.ddsified" "*.pdb" "*.mdb"
+xcopy /E /Y "$(SolutionDir)$(ProjectName)\Distribution\GameData" "%25KSP_DIR%25\GameData"
+</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

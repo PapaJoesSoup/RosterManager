@@ -37,7 +37,7 @@ namespace RosterManager
                     return "";
             }
         }
-        
+
         // Gender var
         internal static ProtoCrewMember.Gender gender = ProtoCrewMember.Gender.Male;
 
@@ -87,7 +87,7 @@ namespace RosterManager
         {
             get
             {
-                return _ShowAttributesTab; 
+                return _ShowAttributesTab;
             }
             set
             {
@@ -100,7 +100,7 @@ namespace RosterManager
         {
             get
             {
-                return _ShowSchedulingTab; 
+                return _ShowSchedulingTab;
             }
             set
             {
@@ -113,7 +113,7 @@ namespace RosterManager
         {
             get
             {
-                return _ShowTrainingTab; 
+                return _ShowTrainingTab;
             }
             set
             {
@@ -126,7 +126,7 @@ namespace RosterManager
         {
             get
             {
-                return _ShowHistoryTab; 
+                return _ShowHistoryTab;
             }
             set
             {
@@ -139,7 +139,7 @@ namespace RosterManager
         {
             get
             {
-                return _ShowMedicalTab; 
+                return _ShowMedicalTab;
             }
             set
             {
@@ -223,15 +223,7 @@ namespace RosterManager
                             Utilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-
-                    if (RMSettings.RenameWithProfession)
-                    {
-                        string toolTip = "This action resets all renamed Kerbals to their KSP default professions.\r\nIt removes any non printing chars used to maintain a specific profession.\r\nUse this when you wish to revert a game save to be compatabile with KerbalStats\r\n or some other mod that creates custom professions.";
-                        if (GUILayout.Button(new GUIContent("Reset Professions", toolTip)))
-                        {
-                            ResetKerbalProfessions();
-                        }
-                    }
+                                        
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 30 - ScrollViewerPosition.y);
@@ -394,54 +386,54 @@ namespace RosterManager
                         //if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         //    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
 
-                    //    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && FlightGlobals.ActiveVessel != null && !RMAddon.VesselIsFull(FlightGlobals.ActiveVessel))
-                    //    {
-                    //        GUI.enabled = true;
-                    //        buttonText = "Add";
-                    //        buttonToolTip = "Adds a kerbal to the Active Vessel,\r\nin the first available seat.";
-                    //    }
-                    //    else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
-                    //    {
-                    //        GUI.enabled = true;
-                    //        buttonText = "Respawn";
-                    //        buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
-                    //    }
-                    //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
-                    //    {
-                    //        GUI.enabled = true;
-                    //        buttonText = "Remove";
-                    //        buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
-                    //    }
-                    //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && (RMSettings.RealismMode && !RMAddon.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
-                    //    {
-                    //        GUI.enabled = false;
-                    //        buttonText = "Add";
-                    //        buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
-                    //    }
-                    //    else
-                    //    {
-                    //        GUI.enabled = false;
-                    //        buttonText = "--";
-                    //        buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
-                    //    }
+                        //    if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available && FlightGlobals.ActiveVessel != null && !RMAddon.VesselIsFull(FlightGlobals.ActiveVessel))
+                        //    {
+                        //        GUI.enabled = true;
+                        //        buttonText = "Add";
+                        //        buttonToolTip = "Adds a kerbal to the Active Vessel,\r\nin the first available seat.";
+                        //    }
+                        //    else if ((kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+                        //    {
+                        //        GUI.enabled = true;
+                        //        buttonText = "Respawn";
+                        //        buttonToolTip = "Brings a Kerbal back to life.\r\nWill then become available.";
+                        //    }
+                        //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && ((RMSettings.RealismMode && RMAddon.IsPreLaunch) || !RMSettings.RealismMode) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned && FlightGlobals.ActiveVessel.GetVesselCrew().Contains(kerbal))
+                        //    {
+                        //        GUI.enabled = true;
+                        //        buttonText = "Remove";
+                        //        buttonToolTip = "Removes a Kerbal from the active vessel.\r\nWill then become available.";
+                        //    }
+                        //    else if (HighLogic.LoadedScene != GameScenes.SPACECENTER && (RMSettings.RealismMode && !RMAddon.IsPreLaunch) && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+                        //    {
+                        //        GUI.enabled = false;
+                        //        buttonText = "Add";
+                        //        buttonToolTip = "Add Disabled.  Realism Settings are preventing this action.\r\nTo add a Kerbal, Change your realism Settings.";
+                        //    }
+                        //    else
+                        //    {
+                        //        GUI.enabled = false;
+                        //        buttonText = "--";
+                        //        buttonToolTip = "Kerbal is not available (" + kerbal.rosterStatus + ").\r\nCurrent status does not allow any action.";
+                        //    }
 
-                    //    if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(70)))
-                    //    {
-                    //        if (buttonText == "Add")
-                    //            RMAddon.AddCrewMember(kerbal, FlightGlobals.ActiveVessel);
-                    //        else if (buttonText == "Respawn")
-                    //            RMAddon.RespawnKerbal(kerbal);
-                    //        else if (buttonText == "Remove")
-                    //        {
-                    //            // get part...
-                    //            Part part = RMAddon.FindKerbalPart(kerbal);
-                    //            if (part != null)
-                    //                RMAddon.RemoveCrewMember(kerbal, part);
-                    //        }
-                    //    }
-                    //    rect = GUILayoutUtility.GetLastRect();
-                    //    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    //        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
+                        //    if (GUILayout.Button(new GUIContent(buttonText, buttonToolTip), GUILayout.Width(70)))
+                        //    {
+                        //        if (buttonText == "Add")
+                        //            RMAddon.AddCrewMember(kerbal, FlightGlobals.ActiveVessel);
+                        //        else if (buttonText == "Respawn")
+                        //            RMAddon.RespawnKerbal(kerbal);
+                        //        else if (buttonText == "Remove")
+                        //        {
+                        //            // get part...
+                        //            Part part = RMAddon.FindKerbalPart(kerbal);
+                        //            if (part != null)
+                        //                RMAddon.RemoveCrewMember(kerbal, part);
+                        //        }
+                        //    }
+                        //    rect = GUILayoutUtility.GetLastRect();
+                        //    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        //        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
                         GUILayout.EndHorizontal();
                         GUI.enabled = true;
                     }
@@ -468,7 +460,7 @@ namespace RosterManager
                 while (!kerbalFound)
                 {
                     SelectedKerbal = ModKerbal.CreateKerbal();
-                    if (SelectedKerbal.Title == KerbalProfession && SelectedKerbal.Gender == gender)
+                    if (SelectedKerbal.Trait == KerbalProfession && SelectedKerbal.Gender == gender)
                         kerbalFound = true;
                 }
                 OnCreate = false;
@@ -519,13 +511,13 @@ namespace RosterManager
 
         private static void SetProfessionFlag()
         {
-            if (SelectedKerbal.Title == "Pilot")
+            if (SelectedKerbal.Trait == "Pilot")
             {
                 isPilot = true;
                 isEngineer = false;
                 isScientist = false;
             }
-            else if (SelectedKerbal.Title == "Engineer")
+            else if (SelectedKerbal.Trait == "Engineer")
             {
                 isPilot = false;
                 isEngineer = true;
@@ -545,41 +537,41 @@ namespace RosterManager
             GUILayout.Label("Kerbal Filter:", GUILayout.Width(90));
             isAll = GUILayout.Toggle(isAll, "All", GUILayout.Width(50));
             if (isAll)
-                isAssign = isAvail = isDead = isFrozen = false;
+                isAssign = isAvail = isDead = false;
             else
             {
-                if (!isAssign && !isAvail && !isDead && !isFrozen)
+                if (!isAssign && !isAvail && !isDead)
                     isAll = true;
             }
             isAssign = GUILayout.Toggle(isAssign, "Assigned", GUILayout.Width(80));
             if (isAssign)
-                isAll = isAvail = isDead = isFrozen = false;
+                isAll = isAvail = isDead = false;
             else
             {
-                if (!isAll && !isAvail && !isDead && !isFrozen)
+                if (!isAll && !isAvail && !isDead)
                     isAssign = true;
             }
             isAvail = GUILayout.Toggle(isAvail, "Available", GUILayout.Width(80));
             if (isAvail)
-                isAll = isAssign = isDead = isFrozen = false;
+                isAll = isAssign = isDead = false;
             else
             {
-                if (!isAll && !isAssign && !isDead && !isFrozen)
+                if (!isAll && !isAssign && !isDead)
                     isAvail = true;
             }
             isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(100));
             if (isDead)
-                isAll = isAssign = isAvail = isFrozen = false;
+                isAll = isAssign = isAvail = false;
             else
             {
-                if (!isAll && !isAssign && !isAvail && !isFrozen)
+                if (!isAll && !isAssign && !isAvail)
                     isDead = true;
             }
             if (DFInterface.IsDFInstalled)
             {
                 isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(100));
                 if (isFrozen)
-                    isAll = isAssign = isAvail = isDead = false;
+                    isAll = isAll = isAvail = isDead = false;
                 else
                 {
                     if (!isAll && !isAssign && !isAvail && !isDead)
@@ -593,19 +585,22 @@ namespace RosterManager
         {
             if (isAll)
                 return true;
-            else if (isAssign && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
+            else if (isAssign &&
+                (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
+                || (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew)))
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
+            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                 return true;
-            else if (isDead && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+            else if (isDead && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Crew)
+                || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                 return true;
-            else if (isFrozen && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
+            else if (isFrozen && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew))
                 return true;
             else
                 return false;
         }
 
-        private static void ResetKerbalProfessions()
+        internal static void ResetKerbalProfessions()
         {
             foreach (ProtoCrewMember kerbal in HighLogic.CurrentGame.CrewRoster.Crew)
             {
@@ -653,7 +648,10 @@ namespace RosterManager
         {
             string rosterDetails = "";
             if (RMAddon.FrozenKerbals.ContainsKey(kerbal.name))
-                rosterDetails = "Frozen - " + (RMAddon.FrozenKerbals[kerbal.name]).vesselName.Replace("(unloaded)", "");
+                if (RMAddon.FrozenKerbals[kerbal.name].vesselName != null)
+                    rosterDetails = "Frozen - " + (RMAddon.FrozenKerbals[kerbal.name]).vesselName.Replace("(unloaded)", "");
+                else
+                    rosterDetails = "Frozen";
             else
                 rosterDetails = "Frozen";
 
@@ -709,9 +707,9 @@ namespace RosterManager
             toolTip = "Applies the changes made to this Kerbal.\r\nDesired Name and Profession will be Retained after save.";
             if (GUILayout.Button(new GUIContent(label, toolTip), GUILayout.MaxWidth(50)))
             {
-                if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
+                if (RMSettings.EnableKerbalRename)
                 {
-                    WindowRoster.SelectedKerbal.Title = WindowRoster.KerbalProfession;
+                    WindowRoster.SelectedKerbal.Trait = WindowRoster.KerbalProfession;
                 }
                 RMAddon.saveMessage = WindowRoster.SelectedKerbal.SubmitChanges();
                 if (string.IsNullOrEmpty(RMAddon.saveMessage))

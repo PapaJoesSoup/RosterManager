@@ -68,7 +68,7 @@ namespace RosterManager
             string label = "";
             string toolTip = "";
 
-            GUILayout.Label("Kerbal Training:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+            GUILayout.Label("Kerbal Training:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
             
             DisplayTabButtons();
             DisplaySelectedTab(ref rect, ref label, ref toolTip);

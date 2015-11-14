@@ -20,7 +20,8 @@ namespace RosterManager
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-            GUILayout.Label("Kerbal Records:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+            GUILayout.Label("Kerbal Records:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {

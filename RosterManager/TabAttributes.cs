@@ -26,17 +26,17 @@ namespace RosterManager
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Name:", GUILayout.Width(80));
                 WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(300));
-                GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.experienceTrait.Title + ")");
+                GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.trait + ")");
                 GUILayout.EndHorizontal();
             }
             else
-                GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
+                GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {
                 GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
             }
-            if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
+            if (RMSettings.EnableKerbalRename)
             {
                 WindowRoster.DisplaySelectProfession();
             }

@@ -1,3 +1,9 @@
+Version x.x.x.x xx Nov 2015 - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
+ - Up to date with DeepFreeze Mod integration.
+ - Fixed Filter tab at top of GUI, and added Frozen filter (if DeepFreeze is installed)
+ - WIP changes (not active):
+   - Added KerbalLifeSpanInfo including Age and lifespan for each kerbal. To be tracked and added to config node in the persistent.sfs file.
+
 Version 0.1.0.1 23 Jun 2015 - 1.0.3 and DeepFreeze compatability
  - Updated DFInterface.dll to latest version
  - updated KSP assembly references to KSP ver 1.0.3

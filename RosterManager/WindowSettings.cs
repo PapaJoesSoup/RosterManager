@@ -113,20 +113,11 @@ namespace RosterManager
             GUILayout.EndHorizontal();
 
             label = "Enable Kerbal Renaming";
-            toolTip = "Allows renaming a Kerbal.  The Profession may change when the kerbal is renamed.";
+            toolTip = "Allows renaming a Kerbal.";
             RMSettings.EnableKerbalRename = GUILayout.Toggle(RMSettings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            if (!RMSettings.EnableKerbalRename)
-                GUI.enabled = false;
-            GUILayout.BeginHorizontal();
-            label = "Rename and Keep Profession (Experimental)";
-            toolTip = "When On, SM will remember the selected profesison when Kerbal is Renamed.\r\nAdds non printing chars to Kerbal name in your game save.\r\n(Should be no issue, but use at your own risk.)";
-            GUILayout.Space(20);
-            RMSettings.RenameWithProfession = GUILayout.Toggle(RMSettings.RenameWithProfession, new GUIContent(label, toolTip), GUILayout.Width(300));
-            GUILayout.EndHorizontal();
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);                        
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);

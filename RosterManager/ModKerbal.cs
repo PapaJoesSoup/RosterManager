@@ -14,8 +14,8 @@ namespace RosterManager
         public float Stupidity;
         public float Courage;
         public bool Badass;
-        public string Name;
-        public string Title;
+        public string Name;        
+        public string Trait;
         public ProtoCrewMember.Gender Gender;
         public int Skill;
         public float Experience;
@@ -27,11 +27,11 @@ namespace RosterManager
             Stupidity = kerbal.stupidity;
             Courage = kerbal.courage;
             Badass = kerbal.isBadass;
-            Title = kerbal.experienceTrait.Title;
+            Trait = kerbal.trait;            
             Gender = kerbal.gender;
             Skill = kerbal.experienceLevel;
             Experience = kerbal.experience;
-            IsNew = isNew;
+            IsNew = isNew;            
         }
 
         public string SubmitChanges()
@@ -64,16 +64,11 @@ namespace RosterManager
         {
             if (RMSettings.EnableKerbalRename)
                 Kerbal.name = Name;
-            if (RMSettings.EnableKerbalRename && RMSettings.RenameWithProfession)
-                KerbalRoster.SetExperienceTrait(Kerbal);
-            if (Title != Kerbal.experienceTrait.Title)
-            {
-                while (Kerbal.experienceTrait.Title != Title)
-                {
-                    Kerbal.name = Name += char.ConvertFromUtf32(1);
-                    KerbalRoster.SetExperienceTrait(Kerbal);
-                }
-            }
+            // remove old save game hack for backwards compatability...
+            Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+            // New trait management is easy!
+            if (RMSettings.EnableKerbalRename)
+                KerbalRoster.SetExperienceTrait(Kerbal, Trait);            
             Kerbal.gender = Gender;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;

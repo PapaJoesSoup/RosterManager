@@ -40,8 +40,7 @@ namespace RosterManager
         internal static bool EnableBlizzyToolbar = false; // off by default
         internal static bool VerboseLogging = false;
         internal static string ErrorLogLength = "1000";
-        internal static bool EnableKerbalRename = false;
-        internal static bool RenameWithProfession = false;
+        internal static bool EnableKerbalRename = false;        
         internal static bool AutoDebug = false;
         internal static bool SaveLogOnExit = false;
 
@@ -104,8 +103,7 @@ namespace RosterManager
             prevShowDebugger = WindowDebugger.ShowWindow;
             prevVerboseLogging = VerboseLogging;
             prevEnableHighlighting = EnableHighlighting;
-            prevEnableKerbalRename = EnableKerbalRename;
-            prevRenameWithProfession = RenameWithProfession;
+            prevEnableKerbalRename = EnableKerbalRename;            
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
@@ -126,8 +124,7 @@ namespace RosterManager
             WindowDebugger.ShowWindow = prevShowDebugger;
             VerboseLogging = prevVerboseLogging;
             EnableHighlighting = prevEnableHighlighting;
-            EnableKerbalRename = prevEnableKerbalRename;
-            RenameWithProfession = prevRenameWithProfession;
+            EnableKerbalRename = prevEnableKerbalRename;            
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
             SaveLogOnExit = prevSaveLogOnExit;
@@ -185,8 +182,7 @@ namespace RosterManager
             DebugLogPath = SettingsNode.HasValue("DebugLogPath") ? SettingsNode.GetValue("DebugLogPath") : DebugLogPath;
             ErrorLogLength = SettingsNode.HasValue("ErrorLogLength") ? SettingsNode.GetValue("ErrorLogLength") : ErrorLogLength;
             SaveLogOnExit = SettingsNode.HasValue("SaveLogOnExit") ? bool.Parse(SettingsNode.GetValue("SaveLogOnExit")) : SaveLogOnExit;
-            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;
-            RenameWithProfession = SettingsNode.HasValue("RenameWithProfession") ? bool.Parse(SettingsNode.GetValue("RenameWithProfession")) : RenameWithProfession;
+            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;            
 
 
             // Hidden Settings
@@ -238,8 +234,7 @@ namespace RosterManager
             WriteValue(SettingsNode, "DebugLogPath", DebugLogPath);
             WriteValue(SettingsNode, "ErrorLogLength", ErrorLogLength);
             WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
-            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
-            WriteValue(SettingsNode, "RenameWithProfession", RenameWithProfession);
+            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);            
 
             // Hidden Settings
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);

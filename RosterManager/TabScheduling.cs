@@ -21,7 +21,7 @@ namespace RosterManager
             string label = "";
             string toolTip = "";
             GUILayout.Label("Kerbal Scheduling", RMStyle.LabelStyleBold);
-            GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+            GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {

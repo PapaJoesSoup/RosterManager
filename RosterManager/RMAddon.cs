@@ -47,6 +47,7 @@ namespace RosterManager
                 {
                     DontDestroyOnLoad(this);
                     RMSettings.ApplySettings();
+                    WindowRoster.ResetKerbalProfessions();
                     Utilities.LogMessage("RosterManagerAddon.Awake Active...", "info", RMSettings.VerboseLogging);
 
                     if (RMSettings.EnableBlizzyToolbar)
@@ -275,7 +276,11 @@ namespace RosterManager
                     RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                     AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
                     if (InstalledMods.IsDFInstalled)
+                    {
                         AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+                        AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
+                    }
+                        
                 }
 
             }
@@ -340,14 +345,14 @@ namespace RosterManager
             try
             {
                 step = "0 - Start";
-                RMStyle.SetupGUI();
+                RMStyle.SetupGUI(); 
 
                 if (WindowDebugger.ShowWindow)
                     WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, "Roster Manager -  Debug Console - Ver. " + RMSettings.CurVersion, GUILayout.MinHeight(20));
 
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
-                    if (WindowSettings.ShowWindow)
+                    if (WindowSettings.ShowWindow) 
                     {
                         step = "4 - Show Settings";
                         WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, "Roster Manager Settings", GUILayout.MinHeight(20));
