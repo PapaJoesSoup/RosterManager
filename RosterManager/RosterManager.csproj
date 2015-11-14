@@ -58,8 +58,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\KSPAssemblies\Managed\1.0.3\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="DFInterface">
-      <HintPath>..\..\ShipManifest\ShipManifest\Distribution\GameData\ShipManifest\Plugins\DFInterface.dll</HintPath>
+    <Reference Include="DFInterface, Version=0.3.5712.8487, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\ksp-win-1-0-4\KSP_win\GameData\REPOSoftTech\DeepFreeze\Plugins\DFInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
@@ -108,7 +109,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-2\KSP_win\GameData\RosterManager\Plugins\"
+    <PostBuildEvent>copy /Y "$(TargetPath)" "E:\KSP\ksp-win-1-0-4\KSP_win\GameData\RosterManager\Plugins\"
 copy /Y "$(TargetPath)" "E:\KSP\Mods\PJS\Git\Source\RosterManager\RosterManager\Distribution\GameData\RosterManager\Plugins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

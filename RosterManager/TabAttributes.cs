@@ -20,16 +20,17 @@ namespace RosterManager
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-            GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Edit a Kerbal", RMStyle.LabelStyleBold);
+            GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Kerbal Attributes", RMStyle.LabelStyleBold);
             if (RMSettings.EnableKerbalRename)
             {
                 GUILayout.BeginHorizontal();
-                WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.MaxWidth(300));
+                GUILayout.Label("Name:", GUILayout.Width(80));
+                WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(300));
                 GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.experienceTrait.Title + ")");
                 GUILayout.EndHorizontal();
             }
             else
-                GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+                GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {
@@ -43,10 +44,10 @@ namespace RosterManager
             WindowRoster.SelectedKerbal.Gender = WindowRoster.gender;
 
             GUILayout.Label("Courage");
-            WindowRoster.SelectedKerbal.Courage = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Courage, 0, 1, GUILayout.MaxWidth(300));
+            WindowRoster.SelectedKerbal.Courage = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Courage, 0, 1, GUILayout.Width(300));
 
             GUILayout.Label("Stupidity");
-            WindowRoster.SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Stupidity, 0, 1, GUILayout.MaxWidth(300));
+            WindowRoster.SelectedKerbal.Stupidity = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Stupidity, 0, 1, GUILayout.Width(300));
 
             WindowRoster.SelectedKerbal.Badass = GUILayout.Toggle(WindowRoster.SelectedKerbal.Badass, "Badass");
 

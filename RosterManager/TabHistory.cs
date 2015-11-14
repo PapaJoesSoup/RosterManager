@@ -20,8 +20,7 @@ namespace RosterManager
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-            GUILayout.Label("Kerbal Flight History", RMStyle.LabelStyleBold);
-            GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
+            GUILayout.Label("Kerbal Flight History:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {

@@ -9,9 +9,56 @@ namespace RosterManager
 {
     class TabTraining
     {
+        #region Properties
         internal static bool ShowToolTips = true;
         internal static string ToolTip = "";
         internal static bool ToolTipActive = true;
+
+        internal static bool _ShowExperienceTab = true;
+        internal static bool _ShowTeamTab = false;
+        internal static bool _ShowQualificationTab = false;
+
+        internal static bool ShowExperienceTab
+        {
+            get
+            {
+                return _ShowExperienceTab;
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _ShowExperienceTab = value;
+            }
+        }
+        internal static bool ShowTeamTab
+        {
+            get
+            {
+                return _ShowTeamTab;
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _ShowTeamTab = value;
+            }
+        }
+        internal static bool ShowQualificationTab
+        {
+            get
+            {
+                return _ShowQualificationTab;
+            }
+            set
+            {
+                if (value)
+                    ResetTabs();
+                _ShowQualificationTab = value;
+            }
+        }
+        #endregion
+
         private static Vector2 ScrollDetailsPosition = Vector2.zero;
 
         internal static void Display()
@@ -20,9 +67,58 @@ namespace RosterManager
             Rect rect = new Rect();
             string label = "";
             string toolTip = "";
-            GUILayout.Label("Kerbal Training", RMStyle.LabelStyleBold);
-            GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
 
+            GUILayout.Label("Kerbal Training:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Title + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+            
+            DisplayTabButtons();
+            DisplaySelectedTab(ref rect, ref label, ref toolTip);
+
+            GUILayout.EndScrollView();
+
+            WindowRoster.DisplayEditActionButtons(ref rect, ref label, ref toolTip);
+        }
+
+        #region Tab management
+        private static void DisplayTabButtons()
+        {
+            GUILayout.BeginHorizontal();
+            var ExperienceStyle = ShowExperienceTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+            if (GUILayout.Button("Experience", ExperienceStyle, GUILayout.Height(20)))
+            {
+                ShowExperienceTab = true;
+            }
+            var TeamStyle = ShowTeamTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+            if (GUILayout.Button("Team", TeamStyle, GUILayout.Height(20)))
+            {
+                ShowTeamTab = true;
+            }
+            var QualificationStyle = ShowQualificationTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+            if (GUILayout.Button("Qualification", QualificationStyle, GUILayout.Height(20)))
+            {
+                ShowQualificationTab = true;
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        internal static void DisplaySelectedTab(ref Rect rect, ref string label, ref string toolTip)
+        {
+            if (ShowExperienceTab)
+                TabExperienceDisplay(ref rect, ref label, ref toolTip);
+            else if (ShowQualificationTab)
+                TabQualificationDisplay(ref rect, ref label, ref toolTip);
+            else if (ShowTeamTab)
+                TabTeamDisplay(ref rect, ref label, ref toolTip);
+        }
+
+        private static void ResetTabs()
+        {
+            _ShowExperienceTab = _ShowExperienceTab = _ShowTeamTab = _ShowQualificationTab = false;
+        }
+        #endregion
+
+        #region Tab Display
+        private static void TabExperienceDisplay(ref Rect rect, ref string label, ref string toolTip)
+        {
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {
                 GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
@@ -50,10 +146,17 @@ namespace RosterManager
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
             GUILayout.Label(WindowRoster.SelectedKerbal.Experience.ToString() + " / 99999");
             GUILayout.EndHorizontal();
-
-            GUILayout.EndScrollView();
-
-            WindowRoster.DisplayEditActionButtons(ref rect, ref label, ref toolTip);
         }
+
+        private static void TabTeamDisplay(ref Rect rect, ref string label, ref string toolTip)
+        {
+
+        }
+
+        private static void TabQualificationDisplay(ref Rect rect, ref string label, ref string toolTip)
+        {
+
+        }
+        #endregion
     }
 }

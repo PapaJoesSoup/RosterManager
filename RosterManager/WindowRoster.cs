@@ -46,6 +46,7 @@ namespace RosterManager
         internal static bool isAssign = false;
         internal static bool isAvail = false;
         internal static bool isDead = false;
+        internal static bool isFrozen = false;
 
         internal static bool OnCreate = false;
         internal static bool resetRosterSize
@@ -238,6 +239,7 @@ namespace RosterManager
                 }
                 GUILayout.EndVertical();
                 GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+                RMSettings.RepositionWindows("WindowRoster");
             }
             catch (Exception ex)
             {
@@ -543,35 +545,46 @@ namespace RosterManager
             GUILayout.Label("Kerbal Filter:", GUILayout.Width(90));
             isAll = GUILayout.Toggle(isAll, "All", GUILayout.Width(50));
             if (isAll)
-                isAssign = isAvail = isDead = false;
+                isAssign = isAvail = isDead = isFrozen = false;
             else
             {
-                if (!isAssign && !isAvail && !isDead)
+                if (!isAssign && !isAvail && !isDead && !isFrozen)
                     isAll = true;
             }
             isAssign = GUILayout.Toggle(isAssign, "Assigned", GUILayout.Width(80));
             if (isAssign)
-                isAll = isAvail = isDead = false;
+                isAll = isAvail = isDead = isFrozen = false;
             else
             {
-                if (!isAll && !isAvail && !isDead)
+                if (!isAll && !isAvail && !isDead && !isFrozen)
                     isAssign = true;
             }
             isAvail = GUILayout.Toggle(isAvail, "Available", GUILayout.Width(80));
             if (isAvail)
-                isAll = isAssign = isDead = false;
+                isAll = isAssign = isDead = isFrozen = false;
             else
             {
-                if (!isAll && !isAssign && !isDead)
+                if (!isAll && !isAssign && !isDead && !isFrozen)
                     isAvail = true;
             }
             isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(100));
             if (isDead)
-                isAll = isAssign = isAvail = false;
+                isAll = isAssign = isAvail = isFrozen = false;
             else
             {
-                if (!isAll && !isAssign && !isAvail)
+                if (!isAll && !isAssign && !isAvail && !isFrozen)
                     isDead = true;
+            }
+            if (DFInterface.IsDFInstalled)
+            {
+                isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(100));
+                if (isFrozen)
+                    isAll = isAssign = isAvail = isDead = false;
+                else
+                {
+                    if (!isAll && !isAssign && !isAvail && !isDead)
+                        isFrozen = true;
+                }
             }
             GUILayout.EndHorizontal();
         }
@@ -584,7 +597,9 @@ namespace RosterManager
                 return true;
             else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned)
                 return true;
-            else if (isDead && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+            else if (isDead && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Unowned) || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+                return true;
+            else if (isFrozen && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
                 return true;
             else
                 return false;

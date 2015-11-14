@@ -32,7 +32,6 @@ namespace RosterManager
             Skill = kerbal.experienceLevel;
             Experience = kerbal.experience;
             IsNew = isNew;
-            
         }
 
         public string SubmitChanges()

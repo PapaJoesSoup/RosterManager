@@ -278,22 +278,31 @@ namespace RosterManager
             configNode.AddValue(ValueName, value.ToString());
         }
 
-        private static void RepositionWindows()
+        internal static void RepositionWindows(string window = "All")
         {
-            if (WindowDebugger.Position.xMax > Screen.currentResolution.width)
-                WindowDebugger.Position.x = Screen.currentResolution.width - WindowDebugger.Position.width;
-            if (WindowDebugger.Position.yMax > Screen.currentResolution.height)
-                WindowDebugger.Position.y = Screen.currentResolution.height - WindowDebugger.Position.height;
+            if (window == "All" || window == "WindowDebugger")
+            {
+                if (WindowDebugger.Position.xMax > Screen.currentResolution.width)
+                    WindowDebugger.Position.x = Screen.currentResolution.width - WindowDebugger.Position.width;
+                if (WindowDebugger.Position.yMax > Screen.currentResolution.height)
+                    WindowDebugger.Position.y = Screen.currentResolution.height - WindowDebugger.Position.height;
+            }
 
-            if (WindowSettings.Position.xMax > Screen.currentResolution.width)
-                WindowSettings.Position.x = Screen.currentResolution.width - WindowSettings.Position.width;
-            if (WindowSettings.Position.yMax > Screen.currentResolution.height)
-                WindowSettings.Position.y = Screen.currentResolution.height - WindowSettings.Position.height;
+            if (window == "All" || window == "WindowSettings")
+            {
+                if (WindowSettings.Position.xMax > Screen.currentResolution.width)
+                    WindowSettings.Position.x = Screen.currentResolution.width - WindowSettings.Position.width;
+                if (WindowSettings.Position.yMax > Screen.currentResolution.height)
+                    WindowSettings.Position.y = Screen.currentResolution.height - WindowSettings.Position.height;
+            }
 
-            if (WindowRoster.Position.xMax > Screen.currentResolution.width)
-                WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
-            if (WindowRoster.Position.yMax > Screen.currentResolution.height)
-                WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
+            if (window == "All" || window == "WindowRoster")
+            {
+                if (WindowRoster.Position.xMax > Screen.currentResolution.width)
+                    WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
+                if (WindowRoster.Position.yMax > Screen.currentResolution.height)
+                    WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
+            }
         }
 
         #endregion

@@ -59,6 +59,7 @@ namespace RosterManager
 
             GUILayout.EndVertical();
             GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+            RMSettings.RepositionWindows("WindowDebugger");
         }
 
         internal static void Savelog()
