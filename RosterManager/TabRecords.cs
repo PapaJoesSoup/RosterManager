@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using System.IO;
+﻿using UnityEngine;
 
 namespace RosterManager
 {
-    class TabRecords
+    internal class TabRecords
     {
         internal static bool ShowToolTips = true;
         internal static string ToolTip = "";
@@ -22,7 +17,6 @@ namespace RosterManager
             string toolTip = "";
             GUILayout.Label("Kerbal Records:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
-
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {
                 GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
@@ -33,7 +27,7 @@ namespace RosterManager
             if (GUILayout.Button("Enter Notes", GUILayout.Width(100)))
             {
             }
-            
+
             //End Tab contents
             GUILayout.EndScrollView();
 

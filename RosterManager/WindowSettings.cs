@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using KSP.IO;
+﻿using UnityEngine;
 
 namespace RosterManager
 {
@@ -18,6 +13,7 @@ namespace RosterManager
         internal static string ToolTip = "";
 
         private static Vector2 ScrollViewerPosition = Vector2.zero;
+
         internal static void Display(int windowId)
         {
             // Reset Tooltip active flag...
@@ -117,11 +113,48 @@ namespace RosterManager
             RMSettings.EnableKerbalRename = GUILayout.Toggle(RMSettings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);                        
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            label = "Enable Salaries";
+            toolTip = "Enable Kerbal Salaries.";
+            RMSettings.EnableSalaries = GUILayout.Toggle(RMSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            if (!RMSettings.EnableSalaries)
+                GUI.enabled = false;
+            DisplaySelectSalaryPeriod();
             GUI.enabled = true;
+        }
+
+        internal static void DisplaySelectSalaryPeriod()
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("SalaryPeriod:", GUILayout.Width(80));
+            RMSettings.SalaryPeriodisMonthly = GUILayout.Toggle(RMSettings.SalaryPeriodisMonthly, "Monthly", GUILayout.Width(70));
+            if (RMSettings.SalaryPeriodisMonthly)
+            {
+                RMSettings.SalaryPeriodisYearly = false;
+            }
+            else
+            {
+                if (!RMSettings.SalaryPeriodisYearly)
+                {
+                    RMSettings.SalaryPeriodisMonthly = true;
+                    RMSettings.SalaryPeriod = "Monthly";
+                }
+            }
+            RMSettings.SalaryPeriodisYearly = GUILayout.Toggle(RMSettings.SalaryPeriodisYearly, "Yearly", GUILayout.Width(80));
+            if (RMSettings.SalaryPeriodisYearly)
+                RMSettings.SalaryPeriodisMonthly = false;
+            else
+            {
+                if (!RMSettings.SalaryPeriodisMonthly)
+                {
+                    RMSettings.SalaryPeriodisYearly = true;
+                    RMSettings.SalaryPeriod = "Yearly";
+                }
+            }
+            GUILayout.EndHorizontal();
         }
 
         private static void DisplayToolTips()
@@ -184,7 +217,7 @@ namespace RosterManager
             bool isEnabled = (!RMSettings.LockSettings);
             // Realism Mode
             GUI.enabled = isEnabled;
-            GUIContent guiLabel = new GUIContent("Enable Realism Mode","Turns on/off Realism Mode.\r\nWhen ON, causes changes in the interface and limits\r\nyour freedom to things that would not be 'Realistic'.\r\nWhen Off, Allows Fills, Dumps, Repeating Science, instantaneous Xfers, Crew Xfers anywwhere, etc.");
+            GUIContent guiLabel = new GUIContent("Enable Realism Mode", "Turns on/off Realism Mode.\r\nWhen ON, causes changes in the interface and limits\r\nyour freedom to things that would not be 'Realistic'.\r\nWhen Off, Allows Fills, Dumps, Repeating Science, instantaneous Xfers, Crew Xfers anywwhere, etc.");
             RMSettings.RealismMode = GUILayout.Toggle(RMSettings.RealismMode, guiLabel, GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -192,13 +225,13 @@ namespace RosterManager
 
             // LockSettings Mode
             GUI.enabled = isEnabled;
-            guiLabel = new GUIContent("Lock Settings  (If set ON, disable in config file)","Locks the settings in this section so they cannot be altered in game.\r\nTo turn off Locking you MUST edit the Config.xml file.");
+            guiLabel = new GUIContent("Lock Settings  (If set ON, disable in config file)", "Locks the settings in this section so they cannot be altered in game.\r\nTo turn off Locking you MUST edit the Config.xml file.");
             RMSettings.LockSettings = GUILayout.Toggle(RMSettings.LockSettings, guiLabel, GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
         }
 
-        #endregion
+        #endregion Settings Window (GUI)
     }
 }

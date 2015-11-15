@@ -1,9 +1,4 @@
-﻿using KSP.IO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace RosterManager
 {
@@ -59,7 +54,6 @@ namespace RosterManager
             ButtonToggledStyle.hover.textColor = Color.white;
             ButtonToggledStyle.normal.background = ButtonToggledStyle.onActive.background;
             ButtonToggledStyle.fontStyle = FontStyle.Normal;
-
 
             ButtonStyleLeft = new GUIStyle(GUI.skin.button);
             ButtonStyleLeft.normal.textColor = Color.white;
@@ -143,7 +137,6 @@ namespace RosterManager
             ToolTipStyle.normal.textColor = Color.yellow;
 
             ScrollStyle = new GUIStyle(GUI.skin.box);
-
         }
     }
 }

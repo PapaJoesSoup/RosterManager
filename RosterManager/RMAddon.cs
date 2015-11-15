@@ -1,10 +1,8 @@
+using DF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-using System.Text;
 using UnityEngine;
-using DF;
 
 namespace RosterManager
 {
@@ -20,11 +18,13 @@ namespace RosterManager
 
         // Toolbar Integration.
         private static IButton RMRoster_Blizzy = null;
+
         private static ApplicationLauncherButton RMRoster_Stock = null;
         internal static bool frameErrTripped = false;
 
         // Tooltip vars
         internal static Vector2 ToolTipPos;
+
         internal static string toolTip;
 
         internal static List<ProtoCrewMember> AllCrew;
@@ -33,15 +33,14 @@ namespace RosterManager
         // DeepFreeze Frozen Crew interface
         internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
 
-        #endregion
+        #endregion Properties
 
-        
         #region Event handlers
 
         // Addon state event handlers
         internal void Awake()
         {
-            try 
+            try
             {
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
@@ -76,6 +75,7 @@ namespace RosterManager
                 Utilities.LogMessage("Error in:  RosterManagerAddon.Awake.  Error:  " + ex.ToString(), "Error", true);
             }
         }
+
         internal void Start()
         {
             Utilities.LogMessage("RosterManagerAddon.Start.", "Info", RMSettings.VerboseLogging);
@@ -91,6 +91,7 @@ namespace RosterManager
                 Utilities.LogMessage("Error in:  RosterManagerAddon.Start.  " + ex.ToString(), "Error", true);
             }
         }
+
         internal void OnGUI()
         {
             //Debug.Log("[RosterManager]:  RosterManagerAddon.OnGUI");
@@ -99,19 +100,18 @@ namespace RosterManager
                 Display();
 
                 Utilities.ShowToolTips();
-
             }
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  RosterManagerAddon.OnGUI.  " + ex.ToString(), "Error", true);
             }
         }
+
         internal void Update()
         {
             try
             {
                 CheckForToolbarTypeToggle();
-
             }
             catch (Exception ex)
             {
@@ -123,7 +123,8 @@ namespace RosterManager
             }
         }
 
-        void DummyVoid() { }
+        private void DummyVoid()
+        { }
 
         //Vessel state handlers
         internal void OnDestroy()
@@ -160,7 +161,6 @@ namespace RosterManager
                 WindowRoster.SelectedKerbal = null;
                 WindowRoster.ToolTip = "";
                 //Settings.ShowRoster = false;
-
             }
             catch (Exception ex)
             {
@@ -195,7 +195,6 @@ namespace RosterManager
                         RMRoster_Blizzy.Visible = true;
                     }
                 }
-
             }
             else if (!RMSettings.EnableBlizzyToolbar && RMSettings.prevEnableBlizzyToolbar)
             {
@@ -235,13 +234,13 @@ namespace RosterManager
                     if (WindowRoster.ShowWindow)
                         RMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
                 }
-
             }
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  RosterManagerAddon.OnGUIAppLauncherReady.  " + ex.ToString(), "Error", true);
             }
         }
+
         private void OnGUIAppLauncherDestroyed()
         {
             //Debug.Log("[RosterManager]:  RosterManagerAddon.OnGUIAppLauncherDestroyed");
@@ -280,9 +279,7 @@ namespace RosterManager
                         AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
                         AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
                     }
-                        
                 }
-
             }
             catch (Exception ex)
             {
@@ -290,7 +287,7 @@ namespace RosterManager
             }
         }
 
-        #endregion
+        #endregion Event handlers
 
         #region Action Methods
 
@@ -304,7 +301,6 @@ namespace RosterManager
                     {
                         if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                         {
-                            
                             RMRoster_Blizzy = ToolbarManager.Instance.add("RosterManager", "Roster");
                             RMRoster_Blizzy.TexturePath = WindowSettings.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
                             RMRoster_Blizzy.ToolTip = "Roster Manager Roster Window";
@@ -345,14 +341,14 @@ namespace RosterManager
             try
             {
                 step = "0 - Start";
-                RMStyle.SetupGUI(); 
+                RMStyle.SetupGUI();
 
                 if (WindowDebugger.ShowWindow)
                     WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, "Roster Manager -  Debug Console - Ver. " + RMSettings.CurVersion, GUILayout.MinHeight(20));
 
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
-                    if (WindowSettings.ShowWindow) 
+                    if (WindowSettings.ShowWindow)
                     {
                         step = "4 - Show Settings";
                         WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, "Roster Manager Settings", GUILayout.MinHeight(20));
@@ -378,7 +374,7 @@ namespace RosterManager
             }
         }
 
-        #endregion
+        #endregion Action Methods
 
         #region Highlighting methods
 
@@ -407,7 +403,6 @@ namespace RosterManager
         {
             try
             {
-
                 if (part != null)
                 {
                     part.SetHighlightColor(color);
@@ -421,7 +416,7 @@ namespace RosterManager
             }
         }
 
-        #endregion
+        #endregion Highlighting methods
 
         internal static bool CrewPartIsFull(Part part)
         {
@@ -512,6 +507,7 @@ namespace RosterManager
                 }
             }
         }
+
         internal static void AddCrewMember(ProtoCrewMember pKerbal, Part part)
         {
             part.AddCrewmember(pKerbal);
@@ -548,7 +544,6 @@ namespace RosterManager
                 else return false;
             }
         }
-
     }
 
     internal class RosterManagerModule : PartModule

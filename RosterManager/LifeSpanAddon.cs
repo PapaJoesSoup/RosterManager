@@ -1,13 +1,12 @@
-﻿using System;
+﻿using DF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
-using DF;
 
 namespace RosterManager
 {
-    class LifeSpanAddon : MonoBehaviour
+    internal class LifeSpanAddon : MonoBehaviour
     {
         private static LifeSpanAddon _Instance;
 
@@ -24,16 +23,24 @@ namespace RosterManager
             get
             {
                 return _Instance;
-            } 
+            }
         }
 
         public static bool KilledOneYet = false;
         public static Vessel vssl;
         private System.Random rnd = new System.Random();  // Random seed for setting Kerbals ages
+        private System.Random gen = new System.Random();  // Random seed for deciding when a kerbal dies of old age. Do we need two seeds?
+
+        //** WIP marker
         //Make these two const settings fields.
         private const int minimum_Age = 25;
+
         private const int maximum_Age = 75;
-        private System.Random gen = new System.Random();
+
+        private const double SalaryTimeYearRealCalendar = 60 * 60 * 24 * 365;
+        private const double SalaryTimeMonthRealCalendar = SalaryTimeYearRealCalendar / 12;
+        private const double SalaryTimeYearKerbalCalendar = 60 * 60 * 6 * 426;
+        private const double SalaryTimeMonthKerbalCalendar = SalaryTimeYearKerbalCalendar / 12;
 
         protected LifeSpanAddon()
         {
@@ -45,31 +52,32 @@ namespace RosterManager
         {
             Utilities.LogMessage("RosterManagerLifeSpanAddon Awake...", "info", RMSettings.VerboseLogging);
             GameEvents.onKerbalAdded.Add(onKerbalAdded);
-            GameEvents.onKerbalRemoved.Add(onKerbalRemoved);            
+            GameEvents.onKerbalRemoved.Add(onKerbalRemoved);
         }
 
         private void Start()
         {
             Utilities.LogMessage("RosterManagerLifeSpanAddon Startup...", "info", RMSettings.VerboseLogging);
-            checkDatabase();            
+            checkDatabase();
             KilledOneYet = false;
         }
 
         public void Update()
         {
+            //** WIP marker
             //This is Experimental CODE!!
-            
+
             if (HighLogic.LoadedScene == GameScenes.FLIGHT)
             {
                 if (FlightGlobals.ActiveVessel != null)
                 {
                     foreach (ProtoCrewMember crew in FlightGlobals.ActiveVessel.GetVesselCrew().ToList())
                     {
-                        KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeSpan.KerbalLifeSpans.FirstOrDefault(a => a.Key == crew.name);
+                        KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == crew.name);
                         kerbal.Value.vesselID = FlightGlobals.ActiveVessel.id;
                         kerbal.Value.vesselName = FlightGlobals.ActiveVessel.vesselName;
                     }
-                    /*        
+                    /*
                     if (FlightGlobals.ActiveVessel.vesselType == VesselType.EVA)
                     {
                         if (!KilledOneYet) //Only Kill One
@@ -97,7 +105,7 @@ namespace RosterManager
                                     {
                                         ScreenMessages.PostScreenMessage("After a long life you Kerbal has died of old age.", 15.0f, ScreenMessageStyle.UPPER_CENTER);
                                     }
-                                    kblEVAs[0].isRagdoll = true;  //Works briefly....                                   
+                                    kblEVAs[0].isRagdoll = true;  //Works briefly....
                                     kerbal.Die();
                                     //if (kerbal.KerbalRef != null)
                                     //{
@@ -108,10 +116,9 @@ namespace RosterManager
                                     //{
                                     //    if (vssl.GetComponent<ModuleCommand>() == null)
                                     //        vssl.gameObject.AddComponent<ModuleCommand>();
-                                    //}                                    
+                                    //}
                                     KilledOneYet = true;
                                 }
-
                             }
                         }
                     }
@@ -128,22 +135,20 @@ namespace RosterManager
             }
             foreach (ProtoCrewMember crew in CrewList)
             {
-                // If they are not Dead status. or they are Dead status and they are unowned (frozen) or tourist (comatose) - We update their Life stats.
-                if (crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead 
-                    || (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && ( crew.type == ProtoCrewMember.KerbalType.Unowned || crew.type == ProtoCrewMember.KerbalType.Tourist)))
+                // If they are not Dead or they are Dead status and they are unowned (frozen) or tourist (comatose) - We update their Life stats.
+                if (crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead
+                    || (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && (crew.type == ProtoCrewMember.KerbalType.Unowned || crew.type == ProtoCrewMember.KerbalType.Tourist)))
                 {
                     updateKerbal(crew, true);
                 }
             }
         }
 
-
-
         private void OnDestroy()
         {
             Utilities.LogMessage("RosterManagerLifeSpanAddon OnDestroy...", "info", RMSettings.VerboseLogging);
             GameEvents.onKerbalAdded.Remove(onKerbalAdded);
-            GameEvents.onKerbalRemoved.Remove(onKerbalRemoved);            
+            GameEvents.onKerbalRemoved.Remove(onKerbalRemoved);
         }
 
         private void onKerbalAdded(ProtoCrewMember crew)
@@ -177,7 +182,7 @@ namespace RosterManager
         {
             double currentTime = Planetarium.GetUniversalTime();
             //First find them in the internal Dictionary.
-            KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeSpan.KerbalLifeSpans.FirstOrDefault(a => a.Key == crew.name);
+            KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == crew.name);
             //If not found and addifNotFound is true create a new entry
             if (kerbal.Value == null && addifNotFound)
             {
@@ -191,26 +196,33 @@ namespace RosterManager
                 kerballifeinfo.age = dice_minage;
                 double dice_maxage = rnd.Next(maximum_Age - 5, maximum_Age + 5); // Randomly set their age.
                 kerballifeinfo.lifespan = dice_maxage;
-                LifeSpan.Instance.kerbalLifeSpan.KerbalLifeSpans.Add(crew.name, kerballifeinfo);
+                LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.Add(crew.name, kerballifeinfo);
                 kerballifeinfo.timelastBirthday = currentTime;
+                kerballifeinfo.timelastsalary = currentTime;
+                kerballifeinfo.salary = RMSettings.DefaultSalary;
                 if (DFInterface.IsDFInstalled)
                 {
                     if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
                     {
                         if (RMAddon.FrozenKerbals.ContainsKey(crew.name))
-                        {                           
+                        {
                             kerballifeinfo.timeDFFrozen = RMAddon.FrozenKerbals[crew.name].lastUpdate;
-                        }                            
+                        }
                     }
                 }
             }
 
             //If found update their entry
             if (kerbal.Value != null)
-            {                               
-                if (kerbal.Value.lastUpdate - currentTime > 360)
+            {
+                //** WIP marker
+                if (currentTime - kerbal.Value.lastUpdate > 360)  // Only update every 6 minutes. Should this be a constant or setting?
                 {
                     checkAge(crew, kerbal, currentTime);
+                    if (RMSettings.EnableSalaries)
+                    {
+                        checkSalary(crew, kerbal, currentTime);
+                    }
                     kerbal.Value.lastUpdate = currentTime;
                     kerbal.Value.experienceTraitName = crew.experienceTrait.Title;
                     kerbal.Value.type = crew.type;
@@ -226,7 +238,8 @@ namespace RosterManager
 
         public void checkAge(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double currentTime)
         {
-            //Calculate and update their age in seconds?? or years?? or what?? TBD.
+            //** WIP marker
+            //Calculate and update their age in seconds?? or years?? or what??
             //If they are DeepFreeze Frozen - They Don't Age, until they are thawed.
             if (DFInterface.IsDFInstalled)
             {
@@ -260,11 +273,11 @@ namespace RosterManager
             double birthdayTimeDiff = currentTime - kerbal.Value.timelastBirthday;
             if (GameSettings.KERBIN_TIME)
             {
-
                 double years = birthdayTimeDiff / 60 / 60 / 6 / 426;
                 if (years >= 1)
                 {
-                    //It's their Birthday!!!!
+                    //** WIP marker
+                    //It's their Birthday!!!! Screen Message?
                     kerbal.Value.age += years;
                     kerbal.Value.timelastBirthday = currentTime;
                 }
@@ -274,7 +287,8 @@ namespace RosterManager
                 double years = birthdayTimeDiff / 60 / 60 / 24 / 365;
                 if (years >= 1)
                 {
-                    //It's their Birthday!!!!
+                    //** WIP marker
+                    //It's their Birthday!!!! Screen Message?
                     kerbal.Value.age += years;
                     kerbal.Value.timelastBirthday = currentTime;
                 }
@@ -283,7 +297,8 @@ namespace RosterManager
             if (kerbal.Value.lifespan - 2 <= kerbal.Value.age)
             {
                 int percentage = 20;
-                //Set random range based on:- if age is less than lifespan have 20% chance of death, if age is = or up to 2 years greater than lifespan have 40% chance of death. 
+                //** WIP marker
+                //Set random range based on:- if age is less than lifespan have 20% chance of death, if age is = or up to 2 years greater than lifespan have 40% chance of death.
                 // if age is > than 2 years past lifespan have 60% chance of death. If age is > than 4 years past lifespan have 80% chance of death.
                 if (kerbal.Value.age < kerbal.Value.lifespan)
                     percentage = 20;
@@ -296,11 +311,14 @@ namespace RosterManager
                 if (gen.Next(100) < percentage)
                 {
                     //Their Time has Come.
-                    // Screen Message
+                    //** WIP marker
                     if (crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead && (crew.type != ProtoCrewMember.KerbalType.Unowned || crew.type != ProtoCrewMember.KerbalType.Tourist))
                     {
+                        Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckAge " + crew.name + " died from old age.", "info", RMSettings.VerboseLogging);
+                        ScreenMessages.PostScreenMessage(crew.name + " died at the old age of " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_RIGHT);
                         crew.rosterStatus = ProtoCrewMember.RosterStatus.Dead;
-                        // set Repawn?  
+                        //** WIP marker
+                        // set ReSpawn?
                         if (HighLogic.CurrentGame.Parameters.Difficulty.MissingCrewsRespawn == true)
                         {
                             crew.StartRespawnPeriod();
@@ -310,13 +328,53 @@ namespace RosterManager
             }
         }
 
+        public void checkSalary(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double currentTime)
+        {
+            //** WIP marker
+            double SalaryTimeSpan = SalaryTimeMonthRealCalendar;
+            if (GameSettings.KERBIN_TIME)
+            {
+                if (RMSettings.SalaryPeriodisYearly)
+                    SalaryTimeSpan = SalaryTimeYearKerbalCalendar;
+                else
+                    SalaryTimeSpan = SalaryTimeMonthKerbalCalendar;
+            }
+            else
+            {
+                if (RMSettings.SalaryPeriodisYearly)
+                    SalaryTimeSpan = SalaryTimeYearRealCalendar;
+            }
+            if (currentTime - kerbal.Value.timelastsalary >= SalaryTimeSpan) // Salary Due??
+            {
+                //Pay Salary
+                if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
+                {
+                    if (Funding.CanAfford((float)kerbal.Value.salary))
+                    {
+                        Funding.Instance.AddFunds(-kerbal.Value.salary, TransactionReasons.CrewRecruited);
+                        kerbal.Value.timelastsalary = currentTime;
+                        Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary paid " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
+                        ScreenMessages.PostScreenMessage("Paid " + crew.name + " salary of " + kerbal.Value.salary.ToString(), 5.0f, ScreenMessageStyle.UPPER_RIGHT);
+                    }
+                    else
+                    {
+                        Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary unable to pay " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
+                        ScreenMessages.PostScreenMessage("Insufficient funds to pay " + crew.name + " salary at this time", 5.0f, ScreenMessageStyle.UPPER_RIGHT);
+                        //** WIP marker
+                        // They should go on strike or something??? Become a Tourist for a period of time??
+                        return;
+                    }
+                }
+            }
+        }
+
         public void removeKerbal(ProtoCrewMember crew)
         {
             //First find them in the internal Dictionary.
-            if (LifeSpan.Instance.kerbalLifeSpan.KerbalLifeSpans.ContainsKey(crew.name))
+            if (LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.ContainsKey(crew.name))
             {
                 //Then remove them.
-                LifeSpan.Instance.kerbalLifeSpan.KerbalLifeSpans.Remove(crew.name);
+                LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.Remove(crew.name);
             }
         }
     }

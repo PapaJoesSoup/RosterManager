@@ -1,9 +1,13 @@
 Version x.x.x.x xx Nov 2015 - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
  - Up to date with DeepFreeze Mod integration.
  - Fixed Filter tab at top of GUI, and added Frozen filter (if DeepFreeze is installed)
+ - Added Salaries option to Settings, also in settings you can set salaries to be paid monthly or yearly.
+ - Salaries are set via Training - Experience Tab in the GUI. Default value is 10000 funds.
+ - Salaries are deducted monthly or yearly, but if you do not have enough funds only a message is issued 
+   - To be expanded, crew go on leave/strike if they are not paid. Currently Salary doesn't change, but should go up based on experience, training, etc.
  - WIP changes (not active):
    - Added KerbalLifeSpanInfo including Age and lifespan for each kerbal. To be tracked and added to config node in the persistent.sfs file.
-
+ 
 Version 0.1.0.1 23 Jun 2015 - 1.0.3 and DeepFreeze compatability
  - Updated DFInterface.dll to latest version
  - updated KSP assembly references to KSP ver 1.0.3

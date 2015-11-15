@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
-
-namespace RosterManager
+﻿namespace RosterManager
 {
-    class ModSchedule
+    internal class ModSchedule
     {
         internal ProtoCrewMember Kerbal;
 
@@ -21,12 +14,10 @@ namespace RosterManager
 
         internal void Load()
         {
-
         }
 
         internal void Save()
         {
-
         }
     }
 }

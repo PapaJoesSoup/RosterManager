@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using UnityEngine;
-
-namespace RosterManager
+﻿namespace RosterManager
 {
     public class ModMedical
     {
@@ -22,12 +15,10 @@ namespace RosterManager
 
         internal void Load()
         {
-
         }
 
         internal void Save()
         {
-
         }
     }
 }

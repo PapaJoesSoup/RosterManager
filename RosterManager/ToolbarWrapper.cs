@@ -23,19 +23,15 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-﻿using System;
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
-
 
 namespace RosterManager
 {
-
-
-
     /**********************************************************\
     *          --- DO NOT EDIT BELOW THIS COMMENT ---          *
     *                                                          *
@@ -47,8 +43,6 @@ namespace RosterManager
     *                                                          *
     *          --- DO NOT EDIT BELOW THIS COMMENT ---          *
     \**********************************************************/
-
-
 
     /// <summary>
     /// The global tool bar manager.
@@ -338,7 +332,7 @@ namespace RosterManager
         Vector2 Draw(Vector2 position);
     }
 
-    #endregion
+    #endregion interfaces
 
     #region events
 
@@ -404,7 +398,7 @@ namespace RosterManager
     /// <param name="e">An event describing the mouse pointer leaving.</param>
     public delegate void MouseLeaveHandler(MouseLeaveEvent e);
 
-    #endregion
+    #endregion events
 
     #region visibility
 
@@ -455,7 +449,7 @@ namespace RosterManager
         }
     }
 
-    #endregion
+    #endregion visibility
 
     #region drawable
 
@@ -537,7 +531,7 @@ namespace RosterManager
         }
     }
 
-    #endregion
+    #endregion drawable
 
     #region private implementations
 
@@ -670,6 +664,7 @@ namespace RosterManager
                 return visibility_;
             }
         }
+
         private IVisibility visibility_;
 
         public bool EffectivelyVisible
@@ -712,9 +707,9 @@ namespace RosterManager
                 if (value != null)
                 {
                     functionDrawable = Activator.CreateInstance(types.functionDrawableType, new object[] {
-						new Action(() => value.Update()),
-						new Func<Vector2, Vector2>((pos) => value.Draw(pos))
-					});
+                        new Action(() => value.Update()),
+                        new Func<Vector2, Vector2>((pos) => value.Draw(pos))
+                    });
                 }
                 types.button.drawableProperty.SetValue(realButton, functionDrawable, null);
                 drawable_ = value;
@@ -724,6 +719,7 @@ namespace RosterManager
                 return drawable_;
             }
         }
+
         private IDrawable drawable_;
 
         public event ClickHandler OnClick;
@@ -889,5 +885,5 @@ namespace RosterManager
         }
     }
 
-    #endregion
+    #endregion private implementations
 }

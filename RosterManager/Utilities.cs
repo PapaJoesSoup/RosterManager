@@ -1,8 +1,6 @@
-using KSP.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace RosterManager
@@ -14,6 +12,7 @@ namespace RosterManager
         internal static Vector2 DebugScrollPosition = Vector2.zero;
 
         private static List<string> _errors = new List<string>();
+
         internal static List<string> Errors
         {
             get { return _errors; }
@@ -62,7 +61,7 @@ namespace RosterManager
             if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
                 ToolTip = WindowSettings.ToolTip;
 
-            // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.  
+            // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.
             // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with onGUI callback functions)
             RMAddon.toolTip = ToolTip;
         }
@@ -81,11 +80,10 @@ namespace RosterManager
 
         internal static string SetActiveTooltip(Rect rect, Rect WindowPosition, string toolTip, ref bool toolTipActive, float xOffset, float yOffset)
         {
-
             if (!toolTipActive && rect.Contains(Event.current.mousePosition))
             {
                 toolTipActive = true;
-                // Since we are using GUILayout, the curent mouse position returns a position with reference to the source Details viewer. 
+                // Since we are using GUILayout, the curent mouse position returns a position with reference to the source Details viewer.
                 // Add the height of GUI elements already drawn to y offset to get the correct screen position
                 if (rect.Contains(Event.current.mousePosition))
                 {

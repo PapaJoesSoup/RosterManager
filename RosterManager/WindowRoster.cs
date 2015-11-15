@@ -1,10 +1,8 @@
+using DF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
-using System.IO;
-using DF;
 
 namespace RosterManager
 {
@@ -12,6 +10,7 @@ namespace RosterManager
     {
         // Standard Window vars
         internal static float windowWidth = 700;
+
         internal static float windowHeight = 330;
         internal static Rect Position = new Rect(0, 0, 0, 0);
         internal static bool ShowWindow = false;
@@ -21,8 +20,10 @@ namespace RosterManager
 
         //Profession vars
         internal static bool isPilot = false;
+
         internal static bool isEngineer = false;
         internal static bool isScientist = false;
+
         internal static string KerbalProfession
         {
             get
@@ -43,12 +44,14 @@ namespace RosterManager
 
         //Kerbal List Filter vars
         internal static bool isAll = true;
+
         internal static bool isAssign = false;
         internal static bool isAvail = false;
         internal static bool isDead = false;
         internal static bool isFrozen = false;
 
         internal static bool OnCreate = false;
+
         internal static bool resetRosterSize
         {
             get
@@ -61,6 +64,7 @@ namespace RosterManager
         }
 
         private static ModKerbal _selectedKerbal;
+
         internal static ModKerbal SelectedKerbal
         {
             get { return _selectedKerbal; }
@@ -96,6 +100,7 @@ namespace RosterManager
                 _ShowAttributesTab = value;
             }
         }
+
         internal static bool ShowSchedulingTab
         {
             get
@@ -109,6 +114,7 @@ namespace RosterManager
                 _ShowSchedulingTab = value;
             }
         }
+
         internal static bool ShowTrainingTab
         {
             get
@@ -122,6 +128,7 @@ namespace RosterManager
                 _ShowTrainingTab = value;
             }
         }
+
         internal static bool ShowHistoryTab
         {
             get
@@ -135,6 +142,7 @@ namespace RosterManager
                 _ShowHistoryTab = value;
             }
         }
+
         internal static bool ShowMedicalTab
         {
             get
@@ -148,6 +156,7 @@ namespace RosterManager
                 _ShowMedicalTab = value;
             }
         }
+
         internal static bool ShowRecordsTab
         {
             get
@@ -163,9 +172,9 @@ namespace RosterManager
         }
 
         private static Vector2 ScrollViewerPosition = Vector2.zero;
+
         internal static void Display(int windowId)
         {
-
             // Reset Tooltip active flag...
             ToolTipActive = false;
 
@@ -223,7 +232,7 @@ namespace RosterManager
                             Utilities.LogMessage(string.Format(" opening Settings Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                         }
                     }
-                                        
+
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 30 - ScrollViewerPosition.y);
@@ -357,7 +366,6 @@ namespace RosterManager
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
                         GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(240));
 
-
                         //if (!RMSettings.RealismMode || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                         //    GUI.enabled = true;
                         //else
@@ -441,7 +449,6 @@ namespace RosterManager
 
                 GUILayout.EndVertical();
                 GUILayout.EndScrollView();
-
             }
             catch (Exception ex)
             {
@@ -537,41 +544,41 @@ namespace RosterManager
             GUILayout.Label("Kerbal Filter:", GUILayout.Width(90));
             isAll = GUILayout.Toggle(isAll, "All", GUILayout.Width(50));
             if (isAll)
-                isAssign = isAvail = isDead = false;
+                isAssign = isAvail = isDead = isFrozen = false;
             else
             {
-                if (!isAssign && !isAvail && !isDead)
+                if (!isAssign && !isAvail && !isDead && !isFrozen)
                     isAll = true;
             }
             isAssign = GUILayout.Toggle(isAssign, "Assigned", GUILayout.Width(80));
             if (isAssign)
-                isAll = isAvail = isDead = false;
+                isAll = isAvail = isDead = isFrozen = false;
             else
             {
-                if (!isAll && !isAvail && !isDead)
+                if (!isAll && !isAvail && !isDead && !isFrozen)
                     isAssign = true;
             }
             isAvail = GUILayout.Toggle(isAvail, "Available", GUILayout.Width(80));
             if (isAvail)
-                isAll = isAssign = isDead = false;
+                isAll = isAssign = isDead = isFrozen = false;
             else
             {
-                if (!isAll && !isAssign && !isDead)
+                if (!isAll && !isAssign && !isDead && !isFrozen)
                     isAvail = true;
             }
             isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(100));
             if (isDead)
-                isAll = isAssign = isAvail = false;
+                isAll = isAssign = isAvail = isFrozen = false;
             else
             {
-                if (!isAll && !isAssign && !isAvail)
+                if (!isAll && !isAssign && !isAvail && !isFrozen)
                     isDead = true;
             }
             if (DFInterface.IsDFInstalled)
             {
                 isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(100));
                 if (isFrozen)
-                    isAll = isAll = isAvail = isDead = false;
+                    isAll = isAssign = isAvail = isDead = false;
                 else
                 {
                     if (!isAll && !isAssign && !isAvail && !isDead)
@@ -771,7 +778,6 @@ namespace RosterManager
                     RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceLevel, k.name select k).ToList();
                     RMAddon.AllCrewSort = "Skill-A";
                 }
-
             else if (sort == "Experience")
                 if (RMAddon.AllCrewSort != "Experience-D")
                 {
@@ -783,7 +789,7 @@ namespace RosterManager
                     RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experience descending, k.name select k).ToList();
                     RMAddon.AllCrewSort = "Experience-A";
                 }
-                else if (sort == "Status")
+            else if (sort == "Status")
                 if (RMAddon.AllCrewSort != "Status-A")
                 {
                     RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus, k.type, k.name select k).ToList();

@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using UnityEngine;
 
 namespace RosterManager
 {
@@ -14,11 +10,13 @@ namespace RosterManager
         public float Stupidity;
         public float Courage;
         public bool Badass;
-        public string Name;        
+        public string Name;
         public string Trait;
         public ProtoCrewMember.Gender Gender;
         public int Skill;
         public float Experience;
+        public double Salary;
+        public string Notes;
 
         public ModKerbal(ProtoCrewMember kerbal, bool isNew)
         {
@@ -27,11 +25,20 @@ namespace RosterManager
             Stupidity = kerbal.stupidity;
             Courage = kerbal.courage;
             Badass = kerbal.isBadass;
-            Trait = kerbal.trait;            
+            Trait = kerbal.trait;
             Gender = kerbal.gender;
             Skill = kerbal.experienceLevel;
             Experience = kerbal.experience;
-            IsNew = isNew;            
+            try
+            {
+                Salary = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords[kerbal.name].salary;
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  RosterManagerModKerbal. " + ex.ToString(), "Error", true);
+                Salary = 0;
+            }
+            IsNew = isNew;
         }
 
         public string SubmitChanges()
@@ -68,13 +75,21 @@ namespace RosterManager
             Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
             // New trait management is easy!
             if (RMSettings.EnableKerbalRename)
-                KerbalRoster.SetExperienceTrait(Kerbal, Trait);            
+                KerbalRoster.SetExperienceTrait(Kerbal, Trait);
             Kerbal.gender = Gender;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
             Kerbal.isBadass = Badass;
             Kerbal.experienceLevel = Skill;
             Kerbal.experience = Experience;
+            try
+            {
+                LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords[Kerbal.name].salary = Salary;
+            }
+            catch (Exception ex)
+            {
+                Utilities.LogMessage("Error in:  RosterManagerModKerbal.SyncKerbal. Unable to save Salary. " + ex.ToString(), "Error", true);
+            }
         }
 
         private bool NameExists()

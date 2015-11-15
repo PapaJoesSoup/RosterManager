@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using System.IO;
+﻿using UnityEngine;
 
 namespace RosterManager
 {
-    class TabTraining
+    internal class TabTraining
     {
         #region Properties
+
         internal static bool ShowToolTips = true;
         internal static string ToolTip = "";
         internal static bool ToolTipActive = true;
@@ -31,6 +27,7 @@ namespace RosterManager
                 _ShowExperienceTab = value;
             }
         }
+
         internal static bool ShowTeamTab
         {
             get
@@ -44,6 +41,7 @@ namespace RosterManager
                 _ShowTeamTab = value;
             }
         }
+
         internal static bool ShowQualificationTab
         {
             get
@@ -57,7 +55,8 @@ namespace RosterManager
                 _ShowQualificationTab = value;
             }
         }
-        #endregion
+
+        #endregion Properties
 
         private static Vector2 ScrollDetailsPosition = Vector2.zero;
 
@@ -69,7 +68,7 @@ namespace RosterManager
             string toolTip = "";
 
             GUILayout.Label("Kerbal Training:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
-            
+
             DisplayTabButtons();
             DisplaySelectedTab(ref rect, ref label, ref toolTip);
 
@@ -79,6 +78,7 @@ namespace RosterManager
         }
 
         #region Tab management
+
         private static void DisplayTabButtons()
         {
             GUILayout.BeginHorizontal();
@@ -114,9 +114,11 @@ namespace RosterManager
         {
             _ShowExperienceTab = _ShowExperienceTab = _ShowTeamTab = _ShowQualificationTab = false;
         }
-        #endregion
+
+        #endregion Tab management
 
         #region Tab Display
+
         private static void TabExperienceDisplay(ref Rect rect, ref string label, ref string toolTip)
         {
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
@@ -124,7 +126,7 @@ namespace RosterManager
                 GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
             }
 
-            GUILayout.Label("", GUILayout.Width(10));
+            //GUILayout.Label("", GUILayout.Width(10));
             GUILayout.Label("Skill");
             GUILayout.BeginHorizontal();
             GUILayout.Label("", GUILayout.Width(10));
@@ -146,17 +148,30 @@ namespace RosterManager
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
             GUILayout.Label(WindowRoster.SelectedKerbal.Experience.ToString() + " / 99999");
             GUILayout.EndHorizontal();
+
+            if (RMSettings.EnableSalaries)
+            {
+                GUILayout.Label("Salary");
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("", GUILayout.Width(10));
+                GUILayout.Label("0", GUILayout.Width(10));
+                WindowRoster.SelectedKerbal.Salary = (int)GUILayout.HorizontalSlider((float)WindowRoster.SelectedKerbal.Salary, 0, 100000, GUILayout.Width(300));
+                rect = GUILayoutUtility.GetLastRect();
+                if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+                GUILayout.Label(WindowRoster.SelectedKerbal.Salary.ToString() + " / 100,000 " + RMSettings.SalaryPeriod);
+                GUILayout.EndHorizontal();
+            }
         }
 
         private static void TabTeamDisplay(ref Rect rect, ref string label, ref string toolTip)
         {
-
         }
 
         private static void TabQualificationDisplay(ref Rect rect, ref string label, ref string toolTip)
         {
-
         }
-        #endregion
+
+        #endregion Tab Display
     }
 }

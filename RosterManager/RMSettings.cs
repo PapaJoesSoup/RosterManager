@@ -1,15 +1,11 @@
-using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
-using KSP.IO;
 
 namespace RosterManager
 {
-    internal  static class RMSettings
+    internal static class RMSettings
     {
         #region Properties
 
@@ -25,27 +21,37 @@ namespace RosterManager
         // Persisted properties
         // Realism Options
         internal static bool RealismMode = true;
+
         internal static bool LockSettings = false;
 
         //Highlighting Options
         internal static bool EnableHighlighting = true;
+
         internal static string SourcePartColor = "red";
         internal static string TargetPartColor = "green";
 
         // Tooltip Options
         internal static bool ShowToolTips = true;
 
-
         //Configuration options
         internal static bool EnableBlizzyToolbar = false; // off by default
+
         internal static bool VerboseLogging = false;
         internal static string ErrorLogLength = "1000";
-        internal static bool EnableKerbalRename = false;        
+        internal static bool EnableKerbalRename = false;
         internal static bool AutoDebug = false;
         internal static bool SaveLogOnExit = false;
+        internal static bool EnableSalaries = false;
+        internal static double DefaultSalary = 10000;
+
+        //SalaryPeriod vars
+        internal static bool SalaryPeriodisMonthly = true;
+        internal static bool SalaryPeriodisYearly = false;
+        internal static string SalaryPeriod = "Monthly";        
 
         // Non user managed Internal options
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
+
         internal static string DebugLogPath = "\\Plugins\\PluginData\\";
         // End Persisted Properties
 
@@ -53,6 +59,7 @@ namespace RosterManager
 
         // Realism settings
         internal static bool prevRealismMode = false;
+
         internal static bool prevLockSettings = false;
 
         // Highlighting Settings
@@ -60,24 +67,26 @@ namespace RosterManager
 
         // Tooltip Settings
         internal static bool prevShowToolTips = true;
+
         internal static bool prevSettingsToolTips = true;
         internal static bool prevRosterToolTips = true;
         internal static bool prevDebuggerToolTips = true;
 
         // Configuration Settings
         internal static bool prevEnableBlizzyToolbar = false;
+
         internal static bool prevShowDebugger = false;
         internal static bool prevVerboseLogging = false;
         internal static string prevErrorLogLength = "1000";
         internal static bool prevSaveLogOnExit = true;
         internal static bool prevEnableKerbalRename = false;
-        internal static bool prevRenameWithProfession = false;
-
+        internal static bool prevEnableSalaries = false;
+        internal static string prevSalaryPeriod = "Month";
 
         // Internal properties for plugin management.  Not persisted, not user managed.
         internal static Dictionary<string, Color> Colors;
 
-        #endregion
+        #endregion Properties
 
         #region Methods
 
@@ -103,7 +112,9 @@ namespace RosterManager
             prevShowDebugger = WindowDebugger.ShowWindow;
             prevVerboseLogging = VerboseLogging;
             prevEnableHighlighting = EnableHighlighting;
-            prevEnableKerbalRename = EnableKerbalRename;            
+            prevEnableKerbalRename = EnableKerbalRename;
+            prevEnableSalaries = EnableSalaries;
+            prevSalaryPeriod = SalaryPeriod;
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
@@ -124,7 +135,9 @@ namespace RosterManager
             WindowDebugger.ShowWindow = prevShowDebugger;
             VerboseLogging = prevVerboseLogging;
             EnableHighlighting = prevEnableHighlighting;
-            EnableKerbalRename = prevEnableKerbalRename;            
+            EnableKerbalRename = prevEnableKerbalRename;
+            EnableSalaries = prevEnableSalaries;
+            SalaryPeriod = prevSalaryPeriod;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
             SaveLogOnExit = prevSaveLogOnExit;
@@ -182,13 +195,29 @@ namespace RosterManager
             DebugLogPath = SettingsNode.HasValue("DebugLogPath") ? SettingsNode.GetValue("DebugLogPath") : DebugLogPath;
             ErrorLogLength = SettingsNode.HasValue("ErrorLogLength") ? SettingsNode.GetValue("ErrorLogLength") : ErrorLogLength;
             SaveLogOnExit = SettingsNode.HasValue("SaveLogOnExit") ? bool.Parse(SettingsNode.GetValue("SaveLogOnExit")) : SaveLogOnExit;
-            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;            
-
+            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;
+            EnableSalaries = SettingsNode.HasValue("EnableSalaries") ? bool.Parse(SettingsNode.GetValue("EnableSalaries")) : EnableSalaries;
+            SalaryPeriod = SettingsNode.HasValue("SalaryPeriod") ? SettingsNode.GetValue("SalaryPeriod") : "Monthly";
+            //***WIP Place holder.
+            //How do we do string value validation in settings file? Month and Year only supported. default Month.
+            
+            if (SalaryPeriod == "Yearly")
+            {
+                SalaryPeriodisMonthly = false;
+                SalaryPeriodisYearly = true;
+            }
+            else
+            {
+                SalaryPeriodisMonthly = true;
+                SalaryPeriodisYearly = false;
+            }
 
             // Hidden Settings
             // Hidden Highlighting
             SourcePartColor = HiddenNode.HasValue("SourcePartColor") ? HiddenNode.GetValue("SourcePartColor") : SourcePartColor;
             TargetPartColor = HiddenNode.HasValue("TargetPartColor") ? HiddenNode.GetValue("TargetPartColor") : TargetPartColor;
+            //Hidden salaries
+            DefaultSalary = HiddenNode.HasValue("DefaultSalary") ? double.Parse(HiddenNode.GetValue("DefaultSalary")) : DefaultSalary;
             //Hidden sound
 
             // Okay, set the Settings loaded flag
@@ -196,7 +225,6 @@ namespace RosterManager
 
             // Lets make sure that the windows can be seen on the screen. (supports different resolutions)
             RepositionWindows();
-
         }
 
         internal static void SaveSettings()
@@ -234,11 +262,14 @@ namespace RosterManager
             WriteValue(SettingsNode, "DebugLogPath", DebugLogPath);
             WriteValue(SettingsNode, "ErrorLogLength", ErrorLogLength);
             WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
-            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);            
+            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
+            WriteValue(SettingsNode, "EnableSalaries", EnableSalaries);
+            WriteValue(SettingsNode, "SalaryPeriod", SalaryPeriod);
 
             // Hidden Settings
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
             WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
+            WriteValue(HiddenNode, "DefaultSalary", DefaultSalary);
 
             if (!Directory.Exists(SETTINGS_PATH))
                 Directory.CreateDirectory(SETTINGS_PATH);
@@ -300,6 +331,6 @@ namespace RosterManager
             }
         }
 
-        #endregion
+        #endregion Methods
     }
 }

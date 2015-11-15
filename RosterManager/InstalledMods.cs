@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 
 namespace RosterManager
@@ -17,6 +15,7 @@ namespace RosterManager
                 return IsModInstalled("ShipManifest");
             }
         }
+
         internal static bool IsCLSInstalled
         {
             get
@@ -24,6 +23,7 @@ namespace RosterManager
                 return IsModInstalled("ConnectedLivingSpace");
             }
         }
+
         internal static bool IsDFInstalled
         {
             get
@@ -35,8 +35,8 @@ namespace RosterManager
         internal static bool IsModInstalled(string assemblyName)
         {
             Assembly assembly = (from a in assemblies
-                            where a.FullName.StartsWith(assemblyName)
-                            select a).SingleOrDefault();
+                                 where a.FullName.StartsWith(assemblyName)
+                                 select a).SingleOrDefault();
             return assembly != null;
         }
     }

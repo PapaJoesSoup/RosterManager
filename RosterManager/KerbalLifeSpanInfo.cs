@@ -1,68 +1,66 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace RosterManager
 {
-    internal class KerbalLifeSpan
+    internal class KerbalLifeRecord
     {
         // This class stores the Kerbal LifeSpan config node.
         // which includes the following Dictionaries
         // KerbalLifeSpans - all known kerbals in the current save game
-        
-        public const string configNodeName = "KerbalLifeSpan";
-        
-        internal Dictionary<string, KerbalLifeInfo> KerbalLifeSpans { get; private set; }
-        
-        internal KerbalLifeSpan()
+
+        public const string configNodeName = "KerbalLifeRecords";
+
+        internal Dictionary<string, KerbalLifeInfo> KerbalLifeRecords { get; private set; }
+
+        internal KerbalLifeRecord()
         {
-            KerbalLifeSpans = new Dictionary<string, KerbalLifeInfo>();            
+            KerbalLifeRecords = new Dictionary<string, KerbalLifeInfo>();
         }
 
         internal void Load(ConfigNode node)
         {
-            KerbalLifeSpans.Clear();
-            
+            KerbalLifeRecords.Clear();
+
             if (node.HasNode(configNodeName))
             {
-                ConfigNode KerbalLifeSpanNode = node.GetNode(configNodeName);
-                                
-                var kerbalNodes = KerbalLifeSpanNode.GetNodes(KerbalLifeInfo.ConfigNodeName);
+                ConfigNode KerbalLifeRecordNode = node.GetNode(configNodeName);
+
+                var kerbalNodes = KerbalLifeRecordNode.GetNodes(KerbalLifeInfo.ConfigNodeName);
                 foreach (ConfigNode kerbalNode in kerbalNodes)
                 {
                     if (kerbalNode.HasValue("kerbalName"))
                     {
                         string id = kerbalNode.GetValue("kerbalName");
-                        Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeSpan Loading kerbal = " + id, "info", RMSettings.VerboseLogging);                        
+                        Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeRecord Loading kerbal = " + id, "info", RMSettings.VerboseLogging);
                         KerbalLifeInfo kerballifeinfo = KerbalLifeInfo.Load(kerbalNode);
-                        KerbalLifeSpans[id] = kerballifeinfo;
+                        KerbalLifeRecords[id] = kerballifeinfo;
                     }
-                }                               
+                }
             }
-            Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeSpan Loading Completed", "info", RMSettings.VerboseLogging);            
+            Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeRecord Loading Completed", "info", RMSettings.VerboseLogging);
         }
 
         internal void Save(ConfigNode node)
         {
-            ConfigNode kerballifespanNode;
+            ConfigNode kerbalLifeRecordNode;
             if (node.HasNode(configNodeName))
             {
-                kerballifespanNode = node.GetNode(configNodeName);
+                kerbalLifeRecordNode = node.GetNode(configNodeName);
             }
             else
             {
-                kerballifespanNode = node.AddNode(configNodeName);
-            }                       
+                kerbalLifeRecordNode = node.AddNode(configNodeName);
+            }
 
-            foreach (var entry in KerbalLifeSpans)
+            foreach (var entry in KerbalLifeRecords)
             {
-                ConfigNode kerbalNode = entry.Value.Save(kerballifespanNode);                
-                Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeSpan Saving kerbal = " + entry.Key, "info", RMSettings.VerboseLogging);
+                ConfigNode kerbalNode = entry.Value.Save(kerbalLifeRecordNode);
+                Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeRecord Saving kerbal = " + entry.Key, "info", RMSettings.VerboseLogging);
                 kerbalNode.AddValue("kerbalName", entry.Key);
             }
-            Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeSpan Saving Completed", "info", RMSettings.VerboseLogging);            
-        }                
+            Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeRecord Saving Completed", "info", RMSettings.VerboseLogging);
+        }
     }
 
     internal class KerbalLifeInfo
@@ -74,14 +72,17 @@ namespace RosterManager
         public ProtoCrewMember.KerbalType type;
         public Guid vesselID;
         public string vesselName;
-        public uint partID;
-        public int seatIdx;
-        public string seatName;
+        public uint partID;  //Probably not required - currently not used.
+        public int seatIdx;  //Probably not required - currently not used.
+        public string seatName;  //Probably not required - currently not used.
         public string experienceTraitName;
         public double age;  //Their current age
         public double lifespan;  //Their lifespan in years
         public double timelastBirthday;  //Game time of their last birthday
         public double timeDFFrozen;  //Game time they were DeepFreeze Frozen
+        public double salary;  //Their Salary
+        public double timelastsalary; //Game Time they were last paid
+        public string notes; //Their notes
 
         public KerbalLifeInfo(double currentTime)
         {
@@ -104,7 +105,7 @@ namespace RosterManager
             catch (Exception ex)
             {
                 info.vesselID = Guid.Empty;
-                Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeInfo error loading vesselID " + ex, "Error", RMSettings.VerboseLogging);                
+                Utilities.LogMessage("RosterManagerLifeSpan.KerbalLifeInfo error loading vesselID " + ex, "Error", RMSettings.VerboseLogging);
             }
             info.partID = GetNodes.GetNodeValue(node, "partID", (uint)0);
             info.vesselName = GetNodes.GetNodeValue(node, "VesselName", " ");
@@ -115,6 +116,8 @@ namespace RosterManager
             info.lifespan = GetNodes.GetNodeValue(node, "lifespan", 75.0d);
             info.timelastBirthday = GetNodes.GetNodeValue(node, "timelastBirthday", lastUpdate);
             info.timeDFFrozen = GetNodes.GetNodeValue(node, "timeDFFrozen", 0d);
+            info.salary = GetNodes.GetNodeValue(node, "salary", 0d);
+            info.timelastsalary = GetNodes.GetNodeValue(node, "timelastsalary", lastUpdate);
 
             return info;
         }
@@ -135,9 +138,12 @@ namespace RosterManager
             node.AddValue("lifespan", lifespan);
             node.AddValue("timelastBirthday", timelastBirthday);
             node.AddValue("timeDFFrozen", timeDFFrozen);
+            node.AddValue("salary", salary);
+            node.AddValue("timelastsalary", timelastsalary);
+            node.AddValue("notes", notes);
 
             return node;
-        }        
+        }
     }
 
     internal class GetNodes

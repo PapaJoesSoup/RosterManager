@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
-using System.IO;
+﻿using UnityEngine;
 
 namespace RosterManager
 {
-    class TabAttributes
+    internal class TabAttributes
     {
         internal static bool ShowToolTips = true;
         internal static string ToolTip = "";
@@ -21,6 +16,7 @@ namespace RosterManager
             string label = "";
             string toolTip = "";
             GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Kerbal Attributes", RMStyle.LabelStyleBold);
+
             if (RMSettings.EnableKerbalRename)
             {
                 GUILayout.BeginHorizontal();
@@ -30,7 +26,9 @@ namespace RosterManager
                 GUILayout.EndHorizontal();
             }
             else
+            {
                 GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
+            }
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {
@@ -55,6 +53,5 @@ namespace RosterManager
 
             WindowRoster.DisplayEditActionButtons(ref rect, ref label, ref toolTip);
         }
-
     }
 }
