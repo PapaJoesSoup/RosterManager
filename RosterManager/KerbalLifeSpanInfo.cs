@@ -81,6 +81,9 @@ namespace RosterManager
         public double timelastBirthday;  //Game time of their last birthday
         public double timeDFFrozen;  //Game time they were DeepFreeze Frozen
         public double salary;  //Their Salary
+        public bool salaryContractDispute; //If their salary is in dispute (ie.Unpaid)
+        public double owedSalary; //Backpay they are owed
+        public int salaryContractDisputePeriods; //Number of salary periods contract has been in dispute
         public double timelastsalary; //Game Time they were last paid
         public string notes; //Their notes
 
@@ -118,6 +121,10 @@ namespace RosterManager
             info.timeDFFrozen = GetNodes.GetNodeValue(node, "timeDFFrozen", 0d);
             info.salary = GetNodes.GetNodeValue(node, "salary", 0d);
             info.timelastsalary = GetNodes.GetNodeValue(node, "timelastsalary", lastUpdate);
+            info.salaryContractDispute = GetNodes.GetNodeValue(node, "salaryContractDispute", false);
+            info.owedSalary = GetNodes.GetNodeValue(node, "owedSalary", 0d);
+            info.salaryContractDisputePeriods = GetNodes.GetNodeValue(node, "salaryContractDisputePeriods", 0);
+
 
             return info;
         }
@@ -141,6 +148,9 @@ namespace RosterManager
             node.AddValue("salary", salary);
             node.AddValue("timelastsalary", timelastsalary);
             node.AddValue("notes", notes);
+            node.AddValue("salaryContractDispute", salaryContractDispute);
+            node.AddValue("owedSalary", owedSalary);
+            node.AddValue("salaryContractDisputePeriods", salaryContractDisputePeriods);
 
             return node;
         }
@@ -148,6 +158,19 @@ namespace RosterManager
 
     internal class GetNodes
     {
+        internal static bool GetNodeValue(ConfigNode confignode, string fieldname, bool defaultValue)
+        {
+            bool newValue;
+            if (confignode.HasValue(fieldname) && bool.TryParse(confignode.GetValue(fieldname), out newValue))
+            {
+                return newValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
         public static int GetNodeValue(ConfigNode confignode, string fieldname, int defaultValue)
         {
             int newValue;

@@ -114,7 +114,9 @@ namespace RosterManager
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-            label = "Enable Salaries";
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                GUI.enabled = false;
+            label = "Enable Salaries (career game only)";
             toolTip = "Enable Kerbal Salaries.";
             RMSettings.EnableSalaries = GUILayout.Toggle(RMSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();

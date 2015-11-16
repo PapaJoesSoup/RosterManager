@@ -43,6 +43,8 @@ namespace RosterManager
         internal static bool SaveLogOnExit = false;
         internal static bool EnableSalaries = false;
         internal static double DefaultSalary = 10000;
+        internal static int Minimum_Age = 25;
+        internal static int Maximum_Age = 75;
 
         //SalaryPeriod vars
         internal static bool SalaryPeriodisMonthly = true;
@@ -218,6 +220,9 @@ namespace RosterManager
             TargetPartColor = HiddenNode.HasValue("TargetPartColor") ? HiddenNode.GetValue("TargetPartColor") : TargetPartColor;
             //Hidden salaries
             DefaultSalary = HiddenNode.HasValue("DefaultSalary") ? double.Parse(HiddenNode.GetValue("DefaultSalary")) : DefaultSalary;
+            //Hidden Age
+            Minimum_Age = HiddenNode.HasValue("MinimumAge") ? int.Parse(HiddenNode.GetValue("MinimumAge")) : Minimum_Age;
+            Maximum_Age = HiddenNode.HasValue("MaximumAge") ? int.Parse(HiddenNode.GetValue("MaximumAge")) : Maximum_Age;
             //Hidden sound
 
             // Okay, set the Settings loaded flag
@@ -270,6 +275,8 @@ namespace RosterManager
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
             WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
             WriteValue(HiddenNode, "DefaultSalary", DefaultSalary);
+            WriteValue(HiddenNode, "MinimumAge", Minimum_Age);
+            WriteValue(HiddenNode, "MaximumAge", Maximum_Age);
 
             if (!Directory.Exists(SETTINGS_PATH))
                 Directory.CreateDirectory(SETTINGS_PATH);
