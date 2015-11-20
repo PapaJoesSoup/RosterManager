@@ -72,8 +72,8 @@ namespace RosterManager
             string label = "";
             string toolTip = "";
 
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(10));
-            GUILayout.Label("Configuraton", GUILayout.Height(10));
+            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+            GUILayout.Label("Configuraton");
             GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
 
             if (!ToolbarManager.ToolbarAvailable)
@@ -114,17 +114,37 @@ namespace RosterManager
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
+            label = "Enable Kerbal Aging";
+            toolTip = "Your Kerbals will age and eventually die from old age.";
+            RMSettings.EnableAging = GUILayout.Toggle(RMSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
             if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
                 GUI.enabled = false;
             label = "Enable Salaries (career game only)";
-            toolTip = "Enable Kerbal Salaries.";
+            toolTip = "Kerbals must be paid Salaries.";
             RMSettings.EnableSalaries = GUILayout.Toggle(RMSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
             if (!RMSettings.EnableSalaries)
                 GUI.enabled = false;
             DisplaySelectSalaryPeriod();
+
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                GUI.enabled = false;
+
+            label = "Charge funds for Profession Change";
+            toolTip = "Charge funds for changing a Kerbal's profession.";
+            RMSettings.ChangeProfessionCharge = GUILayout.Toggle(RMSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+                        
             GUI.enabled = true;
         }
 
