@@ -17,18 +17,27 @@ namespace RosterManager
             string toolTip = "";
             GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Kerbal Attributes", RMStyle.LabelStyleBold);
 
+            GUILayout.BeginHorizontal();
             if (RMSettings.EnableKerbalRename)
             {
-                GUILayout.BeginHorizontal();
+                
                 GUILayout.Label("Name:", GUILayout.Width(80));
-                WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(300));
+                WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(230));
                 GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.trait + ")");
-                GUILayout.EndHorizontal();
+                if (RMSettings.EnableAging)
+                {
+                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.Age);
+                }                
             }
             else
             {
                 GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
+                if (RMSettings.EnableAging)
+                {
+                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.Age);
+                }
             }
+            GUILayout.EndHorizontal();
 
             if (!string.IsNullOrEmpty(RMAddon.saveMessage))
             {

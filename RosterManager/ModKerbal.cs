@@ -12,10 +12,12 @@ namespace RosterManager
         public bool Badass;
         public string Name;
         public string Trait;
+        public ProtoCrewMember.KerbalType Type;
         public ProtoCrewMember.Gender Gender;
         public int Skill;
         public float Experience;
         public double Salary;
+        public double Age;
         public string Notes;
 
         public ModKerbal(ProtoCrewMember kerbal, bool isNew)
@@ -32,11 +34,13 @@ namespace RosterManager
             try
             {
                 Salary = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords[kerbal.name].salary;
+                Age = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords[Kerbal.name].age;
             }
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  RosterManagerModKerbal. " + ex.ToString(), "Error", true);
                 Salary = 0;
+                Age = 0;
             }
             IsNew = isNew;
         }

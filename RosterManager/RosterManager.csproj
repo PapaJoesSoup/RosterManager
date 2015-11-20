@@ -81,6 +81,7 @@
     <Compile Include="TabRecords.cs" />
     <Compile Include="TabScheduling.cs" />
     <Compile Include="TabTraining.cs" />
+    <Compile Include="WindowContractDispute.cs" />
     <Compile Include="WindowDebugger.cs" />
     <Compile Include="RMStyle.cs" />
     <Compile Include="ModKerbal.cs" />
@@ -101,7 +102,6 @@
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_24.png" />
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_38.png" />
     <Content Include="Distribution\Installation Notes.txt" />
-    <Content Include="ChangeLog.txt" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

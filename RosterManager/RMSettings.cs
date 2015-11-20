@@ -43,8 +43,12 @@ namespace RosterManager
         internal static bool SaveLogOnExit = false;
         internal static bool EnableSalaries = false;
         internal static double DefaultSalary = 10000;
+        internal static bool EnableAging = false;
         internal static int Minimum_Age = 25;
         internal static int Maximum_Age = 75;
+        internal static int MaxContractDisputePeriods = 3;
+        internal static bool ChangeProfessionCharge = false;
+        internal static double ChangeProfessionCost = 10000;
 
         //SalaryPeriod vars
         internal static bool SalaryPeriodisMonthly = true;
@@ -84,6 +88,8 @@ namespace RosterManager
         internal static bool prevEnableKerbalRename = false;
         internal static bool prevEnableSalaries = false;
         internal static string prevSalaryPeriod = "Month";
+        internal static bool prevEnableAging = false;
+        internal static bool prevChangeProfessionCharge = false;        
 
         // Internal properties for plugin management.  Not persisted, not user managed.
         internal static Dictionary<string, Color> Colors;
@@ -117,6 +123,7 @@ namespace RosterManager
             prevEnableKerbalRename = EnableKerbalRename;
             prevEnableSalaries = EnableSalaries;
             prevSalaryPeriod = SalaryPeriod;
+            prevEnableAging = EnableAging;
             prevLockSettings = LockSettings;
             prevEnableBlizzyToolbar = EnableBlizzyToolbar;
             prevSaveLogOnExit = SaveLogOnExit;
@@ -124,6 +131,7 @@ namespace RosterManager
             prevSettingsToolTips = WindowSettings.ShowToolTips;
             prevRosterToolTips = WindowRoster.ShowToolTips;
             prevDebuggerToolTips = WindowDebugger.ShowToolTips;
+            prevChangeProfessionCharge = ChangeProfessionCharge;            
 
             // sounds
 
@@ -139,6 +147,7 @@ namespace RosterManager
             EnableHighlighting = prevEnableHighlighting;
             EnableKerbalRename = prevEnableKerbalRename;
             EnableSalaries = prevEnableSalaries;
+            EnableAging = prevEnableAging;
             SalaryPeriod = prevSalaryPeriod;
             LockSettings = prevLockSettings;
             EnableBlizzyToolbar = prevEnableBlizzyToolbar;
@@ -147,6 +156,7 @@ namespace RosterManager
             WindowSettings.ShowToolTips = prevSettingsToolTips;
             WindowRoster.ShowToolTips = prevRosterToolTips;
             WindowDebugger.ShowToolTips = prevDebuggerToolTips;
+            ChangeProfessionCharge = prevChangeProfessionCharge;            
 
             //debugger Settings
             prevErrorLogLength = ErrorLogLength;
@@ -199,10 +209,7 @@ namespace RosterManager
             SaveLogOnExit = SettingsNode.HasValue("SaveLogOnExit") ? bool.Parse(SettingsNode.GetValue("SaveLogOnExit")) : SaveLogOnExit;
             EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;
             EnableSalaries = SettingsNode.HasValue("EnableSalaries") ? bool.Parse(SettingsNode.GetValue("EnableSalaries")) : EnableSalaries;
-            SalaryPeriod = SettingsNode.HasValue("SalaryPeriod") ? SettingsNode.GetValue("SalaryPeriod") : "Monthly";
-            //***WIP Place holder.
-            //How do we do string value validation in settings file? Month and Year only supported. default Month.
-            
+            SalaryPeriod = SettingsNode.HasValue("SalaryPeriod") ? SettingsNode.GetValue("SalaryPeriod") : "Monthly";            
             if (SalaryPeriod == "Yearly")
             {
                 SalaryPeriodisMonthly = false;
@@ -210,19 +217,26 @@ namespace RosterManager
             }
             else
             {
+                SalaryPeriod = "Monthly";
                 SalaryPeriodisMonthly = true;
                 SalaryPeriodisYearly = false;
             }
-
+            EnableAging = SettingsNode.HasValue("EnableAging") ? bool.Parse(SettingsNode.GetValue("EnableAging")) : EnableAging;
+            ChangeProfessionCharge = SettingsNode.HasValue("ChangeProfessionCharge") ? bool.Parse(SettingsNode.GetValue("ChangeProfessionCharge")) : ChangeProfessionCharge;
+            
             // Hidden Settings
             // Hidden Highlighting
             SourcePartColor = HiddenNode.HasValue("SourcePartColor") ? HiddenNode.GetValue("SourcePartColor") : SourcePartColor;
             TargetPartColor = HiddenNode.HasValue("TargetPartColor") ? HiddenNode.GetValue("TargetPartColor") : TargetPartColor;
             //Hidden salaries
             DefaultSalary = HiddenNode.HasValue("DefaultSalary") ? double.Parse(HiddenNode.GetValue("DefaultSalary")) : DefaultSalary;
+            ChangeProfessionCost = HiddenNode.HasValue("ChangeProfessionCost") ? double.Parse(HiddenNode.GetValue("ChangeProfessionCost")) : ChangeProfessionCost;
+
             //Hidden Age
             Minimum_Age = HiddenNode.HasValue("MinimumAge") ? int.Parse(HiddenNode.GetValue("MinimumAge")) : Minimum_Age;
             Maximum_Age = HiddenNode.HasValue("MaximumAge") ? int.Parse(HiddenNode.GetValue("MaximumAge")) : Maximum_Age;
+            //Contracts
+            MaxContractDisputePeriods = HiddenNode.HasValue("MaxContractDisputePeriods") ? int.Parse(HiddenNode.GetValue("MaxContractDisputePeriods")) : MaxContractDisputePeriods;
             //Hidden sound
 
             // Okay, set the Settings loaded flag
@@ -270,13 +284,17 @@ namespace RosterManager
             WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
             WriteValue(SettingsNode, "EnableSalaries", EnableSalaries);
             WriteValue(SettingsNode, "SalaryPeriod", SalaryPeriod);
+            WriteValue(SettingsNode, "EnableAging", EnableAging);
+            WriteValue(SettingsNode, "ChangeProfessionCharge", ChangeProfessionCharge);
 
             // Hidden Settings
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
             WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
             WriteValue(HiddenNode, "DefaultSalary", DefaultSalary);
+            WriteValue(HiddenNode, "ChangeProfessionCost", ChangeProfessionCost);
             WriteValue(HiddenNode, "MinimumAge", Minimum_Age);
             WriteValue(HiddenNode, "MaximumAge", Maximum_Age);
+            WriteValue(HiddenNode, "MaxContractDisputePeriods", MaxContractDisputePeriods);
 
             if (!Directory.Exists(SETTINGS_PATH))
                 Directory.CreateDirectory(SETTINGS_PATH);
@@ -335,6 +353,14 @@ namespace RosterManager
                     WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
                 if (WindowRoster.Position.yMax > Screen.currentResolution.height)
                     WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
+            }
+
+            if (window == "All" || window == "Contract Disputes")
+            {
+                if (WindowContractDispute.Position.xMax > Screen.currentResolution.width)
+                    WindowContractDispute.Position.x = Screen.currentResolution.width - WindowContractDispute.Position.width;
+                if (WindowContractDispute.Position.yMax > Screen.currentResolution.height)
+                    WindowContractDispute.Position.y = Screen.currentResolution.height - WindowContractDispute.Position.height;
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace RosterManager
 {
@@ -149,8 +151,14 @@ namespace RosterManager
             GUILayout.Label(WindowRoster.SelectedKerbal.Experience.ToString() + " / 99999");
             GUILayout.EndHorizontal();
 
-            if (RMSettings.EnableSalaries)
+            if (RMSettings.EnableSalaries && (WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Unowned))
             {
+                KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
+                if (kerbal.Key != null)
+                {
+                    if (kerbal.Value.salaryContractDispute)
+                        GUI.enabled = false;
+                }
                 GUILayout.Label("Salary");
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("", GUILayout.Width(10));
@@ -161,6 +169,7 @@ namespace RosterManager
                     ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
                 GUILayout.Label(WindowRoster.SelectedKerbal.Salary.ToString() + " / 100,000 " + RMSettings.SalaryPeriod);
                 GUILayout.EndHorizontal();
+                GUI.enabled = true;
             }
         }
 

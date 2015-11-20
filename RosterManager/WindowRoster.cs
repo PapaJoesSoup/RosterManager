@@ -20,7 +20,6 @@ namespace RosterManager
 
         //Profession vars
         internal static bool isPilot = false;
-
         internal static bool isEngineer = false;
         internal static bool isScientist = false;
 
@@ -271,6 +270,14 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
+                if (RMSettings.EnableAging)
+                {
+                    GUILayout.Label(new GUIContent("|Age", "Age of Kerbal"), hdrlabelStyle, GUILayout.Width(35));
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+                }
+
                 if (GUILayout.Button(new GUIContent("|Profession", buttonToolTip), hdrlabelStyle, GUILayout.Width(75)))
                     SortRosterList("Profession");
                 rect = GUILayoutUtility.GetLastRect();
@@ -293,7 +300,7 @@ namespace RosterManager
                     SortRosterList("Status");
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);                                          
 
                 GUILayout.EndHorizontal();
 
@@ -361,6 +368,15 @@ namespace RosterManager
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
+                        if (RMSettings.EnableAging)
+                        {
+                            KeyValuePair<string, KerbalLifeInfo> kerbalInfo = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == kerbal.name);
+                            if (kerbalInfo.Key != null)
+                            {
+                                GUILayout.Label(kerbalInfo.Value.age.ToString(), labelStyle, GUILayout.Width(35));
+                            }
+                        }
+                            
                         GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(75));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
@@ -799,7 +815,7 @@ namespace RosterManager
                 {
                     RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus descending, k.type descending, k.name select k).ToList();
                     RMAddon.AllCrewSort = "Status-D";
-                }
+                }            
         }
     }
 }
