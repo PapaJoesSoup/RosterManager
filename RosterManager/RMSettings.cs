@@ -49,6 +49,7 @@ namespace RosterManager
         internal static int MaxContractDisputePeriods = 3;
         internal static bool ChangeProfessionCharge = false;
         internal static double ChangeProfessionCost = 10000;
+        internal static double LifeInfoUpdatePeriod = 360;
 
         //SalaryPeriod vars
         internal static bool SalaryPeriodisMonthly = true;
@@ -223,8 +224,9 @@ namespace RosterManager
             }
             EnableAging = SettingsNode.HasValue("EnableAging") ? bool.Parse(SettingsNode.GetValue("EnableAging")) : EnableAging;
             ChangeProfessionCharge = SettingsNode.HasValue("ChangeProfessionCharge") ? bool.Parse(SettingsNode.GetValue("ChangeProfessionCharge")) : ChangeProfessionCharge;
-            
+
             // Hidden Settings
+            LifeInfoUpdatePeriod = HiddenNode.HasValue("LifeInfoUpdatePeriod") ? double.Parse(HiddenNode.GetValue("LifeInfoUpdatePeriod")) : LifeInfoUpdatePeriod;
             // Hidden Highlighting
             SourcePartColor = HiddenNode.HasValue("SourcePartColor") ? HiddenNode.GetValue("SourcePartColor") : SourcePartColor;
             TargetPartColor = HiddenNode.HasValue("TargetPartColor") ? HiddenNode.GetValue("TargetPartColor") : TargetPartColor;
@@ -288,6 +290,7 @@ namespace RosterManager
             WriteValue(SettingsNode, "ChangeProfessionCharge", ChangeProfessionCharge);
 
             // Hidden Settings
+            WriteValue(HiddenNode, "LifeInfoUpdatePeriod", LifeInfoUpdatePeriod);
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
             WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
             WriteValue(HiddenNode, "DefaultSalary", DefaultSalary);

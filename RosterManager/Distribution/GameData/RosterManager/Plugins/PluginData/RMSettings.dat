@@ -9,21 +9,22 @@ RM_Windows
 	}
 	SettingsPosition
 	{
-		x = 137
-		y = 102
+		x = 170
+		y = 335
 		width = 395
 		height = 335
 	}
 	RosterPosition
 	{
-		x = 992
-		y = 60
-		width = 600
+		x = 60
+		y = 53
+		width = 700
 		height = 330
 	}
 }
 RM_Settings
 {
+	RenameWithProfession = True
 	LockSettings = False
 	EnableHighlighting = True
 	ShowToolTips = True
@@ -38,10 +39,18 @@ RM_Settings
 	ErrorLogLength = 1000
 	SaveLogOnExit = False
 	EnableKerbalRename = True
-	RenameWithProfession = True
+	EnableSalaries = True
+	SalaryPeriod = Monthly
+	EnableAging = True
+	ChangeProfessionCharge = True
 }
 RM_Hidden
 {
 	SourcePartColor = red
 	TargetPartColor = green
+	DefaultSalary = 10000
+	ChangeProfessionCost = 10000
+	MinimumAge = 25
+	MaximumAge = 75
+	MaxContractDisputePeriods = 3
 }

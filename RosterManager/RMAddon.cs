@@ -42,6 +42,7 @@ namespace RosterManager
         {
             try
             {
+                GameEvents.onLevelWasLoaded.Add(refreshCrew);
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     DontDestroyOnLoad(this);
@@ -132,6 +133,7 @@ namespace RosterManager
             //Debug.Log("[RosterManager]:  RosterManagerAddon.OnDestroy");
             try
             {
+                GameEvents.onLevelWasLoaded.Remove(refreshCrew);
                 if (RMSettings.Loaded)
                 {
                     RMSettings.SaveSettings();
@@ -165,6 +167,20 @@ namespace RosterManager
             catch (Exception ex)
             {
                 Utilities.LogMessage("Error in:  RosterManagerAddon.OnDestroy.  " + ex.ToString(), "Error", true);
+            }
+        }
+
+        internal void refreshCrew(GameScenes scene)
+        {
+            RMAddon.FrozenKerbals.Clear();
+            AllCrew.Clear();
+
+            RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
+            AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+            if (InstalledMods.IsDFInstalled)
+            {
+                AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+                AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
             }
         }
 
@@ -560,9 +576,9 @@ namespace RosterManager
             base.OnUpdate();
 
             if (this.part != null && part.name == "RosterManager")
-                Events["DestoryPart"].active = true;
+                Events["Destroy Part"].active = true;
             else
-                Events["DestoryPart"].active = false;
+                Events["Destroy Part"].active = false;
         }
     }
 }

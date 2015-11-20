@@ -95,8 +95,7 @@ namespace RosterManager
         }
                
         public void Update()
-        {
-            //** WIP marker            
+        {                      
             try
             {
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT)
@@ -215,9 +214,8 @@ namespace RosterManager
             }
             //If found update their entry
             else if (kerbal.Value != null)
-            {
-                //** WIP marker
-                if (currentTime - kerbal.Value.lastUpdate > 360)  // Only update every 6 minutes. Should this be a constant or setting?
+            {                
+                if (currentTime - kerbal.Value.lastUpdate > RMSettings.LifeInfoUpdatePeriod)  // Only update every 6 minutes. Can be changed in hidden settings
                 {
                     if (RMSettings.EnableAging)
                     {
@@ -242,14 +240,13 @@ namespace RosterManager
 
         private void checkAge(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double currentTime)
         {
-            //** WIP marker
             //Calculate and update their age.
             //If they are DeepFreeze Frozen - They Don't Age, until they are thawed.
             if (DFInterface.IsDFInstalled)
             {
                 if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)
                 {
-                    //Frozen
+                    //Frozen - check if we are tracking when they were frozen, if not, set it to the time they were frozen
                     if (kerbal.Value.timeDFFrozen == 0d)
                     {
                         if (RMAddon.FrozenKerbals.ContainsKey(crew.name))
@@ -257,51 +254,50 @@ namespace RosterManager
                             kerbal.Value.timeDFFrozen = RMAddon.FrozenKerbals[crew.name].lastUpdate;
                         }
                     }
-                    return;
+                    return;  //We don't process age any further if they are frozen.
                 }
                 if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && (crew.type != ProtoCrewMember.KerbalType.Unowned || crew.type != ProtoCrewMember.KerbalType.Tourist))
                 {
-                    //They are really dead.
+                    //They are really dead. Should this ever occur? Just in case.
                     return;
                 }
-                //If we get here, they aren't frozen and they aren't really dead... so were they frozen? IE: we know them as status dead and time frozen > 0
+                //If we get here, they aren't frozen and they aren't really dead... so were they frozen? 
+                //IE: we know that if they are now crew, but their KerbalLifeInfo record has their status as dead and time frozen > 0
                 if (crew.type == ProtoCrewMember.KerbalType.Crew && kerbal.Value.status == ProtoCrewMember.RosterStatus.Dead && kerbal.Value.timeDFFrozen > 0d)
                 {
                     //We add the time they were frozen onto their time of last birthday - effectively extending their life.
-                    double timeFrozen = currentTime - kerbal.Value.timeDFFrozen;
+                    double timeFrozen = currentTime - kerbal.Value.timeDFFrozen;  //The amount of time they were frozen
                     kerbal.Value.timelastBirthday += timeFrozen;
+                    kerbal.Value.timeDFFrozen = 0d;
                 }
             }
 
             //Is it their Birthday?
             double birthdayTimeDiff = currentTime - kerbal.Value.timelastBirthday;
+            double years = 0d;
             if (GameSettings.KERBIN_TIME)
             {
-                double years = birthdayTimeDiff / 60 / 60 / 6 / 426;
-                if (years >= 1)
-                {
-                    //It's their Birthday!!!!
-                    ScreenMessages.PostScreenMessage("It's " + crew.name + " Birthday! They are now " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_CENTER);
-                    kerbal.Value.age += years;
-                    kerbal.Value.timelastBirthday = currentTime;
-                }
+                years = birthdayTimeDiff / 60 / 60 / 6 / 426;
+                
             }
             else
             {
-                double years = birthdayTimeDiff / 60 / 60 / 24 / 365;
-                if (years >= 1)
-                {
-                    //It's their Birthday!!!!
-                    ScreenMessages.PostScreenMessage("It's " + crew.name + " Birthday! They are now " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_CENTER);
-                    kerbal.Value.age += years;
-                    kerbal.Value.timelastBirthday = currentTime;
-                }
+                years = birthdayTimeDiff / 60 / 60 / 24 / 365;
+                
             }
-            //Check if they Die of Old Age
-            if (kerbal.Value.lifespan - 2 <= kerbal.Value.age)
+            if (years >= 1)
             {
-                int percentage = 20;
-                //** WIP marker
+                //It's their Birthday!!!!
+                if (kerbal.Value.type != ProtoCrewMember.KerbalType.Applicant)
+                    ScreenMessages.PostScreenMessage("It's " + crew.name + " Birthday! They are now " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_CENTER);
+                kerbal.Value.age += years;
+                kerbal.Value.timelastBirthday = currentTime;
+            }
+
+            //Check if they Die of Old Age
+            if (kerbal.Value.lifespan - 2 <= kerbal.Value.age)  //We start rolling the dice when their age is within 2 years of their lifespan age.
+            {
+                int percentage = 20;                
                 //Set random range based on:- if age is less than lifespan have 20% chance of death, if age is = or up to 2 years greater than lifespan have 40% chance of death.
                 // if age is > than 2 years past lifespan have 60% chance of death. If age is > than 4 years past lifespan have 80% chance of death.
                 if (kerbal.Value.age < kerbal.Value.lifespan)
@@ -314,8 +310,7 @@ namespace RosterManager
                     percentage = 80;
                 if (gen.Next(100) < percentage)
                 {
-                    //Their Time has Come.
-                    //** WIP marker
+                    //Their Time has Come. As long as they aren't currently DeepFreeze Frozen/comatose                    
                     if (crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead && (crew.type != ProtoCrewMember.KerbalType.Unowned || crew.type != ProtoCrewMember.KerbalType.Tourist))
                     {
                         TimeWarp.SetRate(0, false);
@@ -420,8 +415,7 @@ namespace RosterManager
         }
 
         private void checkSalary(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double currentTime)
-        {
-            //** WIP marker
+        {            
             double SalaryTimeSpan = SalaryTimeMonthRealCalendar;
             if (GameSettings.KERBIN_TIME)
             {
@@ -470,11 +464,9 @@ namespace RosterManager
         }
 
         private void processContractDispute(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double currentTime, bool start, bool extend)
-        {
-            //** WIP marker
+        {            
             // They will continue to work for X periods of salaryperiod, with a payrise. A backpay is accrued.
-            // Or they quit after X periods or if user does not accept the payrise.
-            //
+            // Or they quit after X periods or if user does not accept the payrise.            
             Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary unable to pay " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
             if (start)  //Start a new contract dispute
             {
@@ -492,8 +484,9 @@ namespace RosterManager
                 {
                     Funding.Instance.AddFunds(-(kerbal.Value.salary + kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
                     kerbal.Value.timelastsalary = currentTime;
-                    kerbal.Value.salaryContractDispute = false;
-                    if (crew.type != ProtoCrewMember.KerbalType.Crew)
+                    kerbal.Value.salaryContractDispute = false; 
+                    //If they are a tourist (dispute) and not dead (DeepFreeze frozen/comatose) set them back to crew                   
+                    if (crew.type == ProtoCrewMember.KerbalType.Tourist && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
                     {
                         kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
                         crew.type = ProtoCrewMember.KerbalType.Crew;
@@ -522,9 +515,9 @@ namespace RosterManager
             // otherwise, increase the periods we have been in dispute, user must accept payrise as well (if they don't the kerbal Quits) and calculate and store their backpay owed.
             kerbal.Value.salaryContractDisputePeriods++;
             if (kerbal.Value.salaryContractDisputePeriods > RMSettings.MaxContractDisputePeriods)
-            {
+            {                
                 //Kerbal Quits.
-                resignKerbal(crew, kerbal);                
+                resignKerbal(crew, kerbal);                                             
             }
             else
             {
@@ -546,8 +539,12 @@ namespace RosterManager
         {
             Utilities.LogMessage("RosterManagerLifeSpanAddon.resignKerbal " + crew.name + " contract in dispute. They will remain a tourist until they are paid.", "info", RMSettings.VerboseLogging);
             ScreenMessages.PostScreenMessage(crew.name + " contract in dispute. They will remain a tourist until they are paid.", 5.0f, ScreenMessageStyle.UPPER_CENTER);
-            kerbal.Value.type = ProtoCrewMember.KerbalType.Tourist;
-            crew.type = ProtoCrewMember.KerbalType.Tourist;            
+            //We don't change their status if they are unowned/dead (DeepFreeze Frozen)
+            if (crew.type != ProtoCrewMember.KerbalType.Unowned && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+            {
+                kerbal.Value.type = ProtoCrewMember.KerbalType.Tourist;
+                crew.type = ProtoCrewMember.KerbalType.Tourist;
+            }                       
         }
 
         public void removeKerbal(ProtoCrewMember crew)
