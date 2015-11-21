@@ -60,6 +60,8 @@ namespace RosterManager
                 ToolTip = WindowDebugger.ToolTip;
             if (WindowSettings.ToolTip != null && WindowSettings.ToolTip.Trim().Length > 0)
                 ToolTip = WindowSettings.ToolTip;
+            if (WindowContractDispute.ToolTip != null && WindowContractDispute.ToolTip.Trim().Length > 0)
+                ToolTip = WindowContractDispute.ToolTip;
 
             // Update stored tooltip.  We do this here so change can be picked up after the current onGUI.
             // Tooltip will not display if changes are made during the curreint OnGUI.  (Unity issue with onGUI callback functions)

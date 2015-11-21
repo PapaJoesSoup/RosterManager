@@ -41,8 +41,7 @@ namespace RosterManager
         internal void Awake()
         {
             try
-            {
-                GameEvents.onLevelWasLoaded.Add(refreshCrew);
+            {                
                 if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     DontDestroyOnLoad(this);
@@ -81,7 +80,7 @@ namespace RosterManager
         {
             Utilities.LogMessage("RosterManagerAddon.Start.", "Info", RMSettings.VerboseLogging);
             try
-            {
+            {                
                 if (WindowRoster.resetRosterSize)
                 {
                     WindowRoster.Position.height = 330; //reset height
@@ -112,6 +111,7 @@ namespace RosterManager
         {
             try
             {
+                refreshCrew(HighLogic.LoadedScene);
                 CheckForToolbarTypeToggle();
             }
             catch (Exception ex)
@@ -132,8 +132,7 @@ namespace RosterManager
         {
             //Debug.Log("[RosterManager]:  RosterManagerAddon.OnDestroy");
             try
-            {
-                GameEvents.onLevelWasLoaded.Remove(refreshCrew);
+            {                
                 if (RMSettings.Loaded)
                 {
                     RMSettings.SaveSettings();
@@ -171,12 +170,11 @@ namespace RosterManager
         }
 
         internal void refreshCrew(GameScenes scene)
-        {
-            RMAddon.FrozenKerbals.Clear();
-            AllCrew.Clear();
-
+        {            
             if (scene == GameScenes.EDITOR || scene == GameScenes.FLIGHT || scene == GameScenes.SPACECENTER || scene == GameScenes.TRACKSTATION)
             {
+                RMAddon.FrozenKerbals.Clear();
+                AllCrew.Clear();
                 RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                 AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
                 if (InstalledMods.IsDFInstalled)
@@ -363,14 +361,24 @@ namespace RosterManager
                 RMStyle.SetupGUI();
 
                 if (WindowDebugger.ShowWindow)
+                {
+                    step = "2 - Debugger";
                     WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, "Roster Manager -  Debug Console - Ver. " + RMSettings.CurVersion, GUILayout.MinHeight(20));
+
+                }
 
                 if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
                 {
                     if (WindowSettings.ShowWindow)
                     {
-                        step = "4 - Show Settings";
+                        step = "3 - Show Settings";
                         WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, "Roster Manager Settings", GUILayout.MinHeight(20));
+                    }
+
+                    if (WindowContractDispute.ShowWindow)
+                    {
+                        step = "4 - Contract Disputes";
+                        WindowContractDispute.Position = GUILayout.Window(318987, WindowContractDispute.Position, WindowContractDispute.Display, "Contract Disputes", GUILayout.MinHeight(20));
                     }
 
                     if (WindowRoster.ShowWindow)

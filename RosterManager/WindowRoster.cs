@@ -232,6 +232,21 @@ namespace RosterManager
                         }
                     }
 
+                    if (RMSettings.EnableSalaries)
+                    {
+                        if (GUILayout.Button("Contract Disputes", settingsStyle))
+                        {
+                            try
+                            {
+                                WindowContractDispute.ShowWindow = !WindowContractDispute.ShowWindow;
+                            }
+                            catch (Exception ex)
+                            {
+                                Utilities.LogMessage(string.Format(" opening Contract Disputes Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                            }
+                        }
+                    }
+
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 30 - ScrollViewerPosition.y);

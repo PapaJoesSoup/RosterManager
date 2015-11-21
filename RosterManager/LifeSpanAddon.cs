@@ -11,11 +11,13 @@ namespace RosterManager
         internal ProtoCrewMember crew;
         internal KeyValuePair<string, KerbalLifeInfo> kerbal;
         internal double payriseRequired;
-        public disputeKerbal(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double payriseRequired)
+        internal bool extended;
+        public disputeKerbal(ProtoCrewMember crew, KeyValuePair<string, KerbalLifeInfo> kerbal, double payriseRequired, bool extended)
         {
             this.crew = crew;
             this.kerbal = kerbal;
             this.payriseRequired = payriseRequired;
+            this.extended = extended;
         }
     }
 
@@ -75,25 +77,7 @@ namespace RosterManager
                 Utilities.LogMessage("Error in:  RosterManagerLifeSpanAddon.Start.  " + ex.ToString(), "Error", true);
             }
         }
-
-        internal void OnGUI()
-        {
-            if (ContractDisputeKerbals.Count() > 0)  //If we have outstanding contract disputes display window.
-            {
-
-                try
-                {
-                    WindowContractDispute.Position = GUILayout.Window(318546, WindowContractDispute.Position, WindowContractDispute.Display, "Contract Disputes", GUILayout.MinHeight(20));
-
-                    Utilities.ShowToolTips();
-                }
-                catch (Exception ex)
-                {
-                    Utilities.LogMessage("Error in:  RosterManagerLifeSpanAddon.OnGUI.  " + ex.ToString(), "Error", true);
-                }                
-            }
-        }
-               
+                              
         public void Update()
         {                      
             try
@@ -491,7 +475,7 @@ namespace RosterManager
                         kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
                         crew.type = ProtoCrewMember.KerbalType.Crew;
                     }
-                    disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, 0);
+                    disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, 0, true);
                     if (ContractDisputeKerbals.FirstOrDefault(a => a.crew == crew) != null)
                     {
                         ContractDisputeKerbals.Remove(dispkerbal);
@@ -527,10 +511,11 @@ namespace RosterManager
                 if (kerbal.Value.salary + payriseRequired > 100000)
                     payriseRequired = 0;              
                 //Populate ContractDisputeKerbals list with this kerbal. WindowcontractDispute Pop-up window will be shown for user to accept or decline payrise contract dispute.
-                disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, payriseRequired);
+                disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, payriseRequired, false);
                 if (ContractDisputeKerbals.FirstOrDefault(a => a.crew == crew) == null)  //We only add them if they aren't already on the list.
                 {
                     ContractDisputeKerbals.Add(dispkerbal);
+                    WindowContractDispute.ShowWindow = true;
                 }
             }                            
         }

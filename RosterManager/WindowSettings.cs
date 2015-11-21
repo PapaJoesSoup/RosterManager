@@ -207,6 +207,11 @@ namespace RosterManager
             GUILayout.Space(20);
             WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
+            label = "Contract Disputes Window Tool Tips";
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(20);
+            WindowContractDispute.ShowToolTips = GUILayout.Toggle(WindowContractDispute.ShowToolTips, label, GUILayout.Width(300));
+            GUILayout.EndHorizontal();
             GUI.enabled = true;
         }
 

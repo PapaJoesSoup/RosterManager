@@ -2,38 +2,45 @@ RM_Windows
 {
 	DebuggerPosition
 	{
-		x = 71
-		y = 248
+		x = 0
+		y = 0
 		width = 520
 		height = 354
 	}
 	SettingsPosition
 	{
-		x = 170
-		y = 335
+		x = 95
+		y = 539
 		width = 395
 		height = 335
 	}
 	RosterPosition
 	{
-		x = 60
-		y = 53
+		x = 742
+		y = 202
 		width = 700
 		height = 330
+	}
+	ContractDisputePosition
+	{
+		x = 54
+		y = 198
+		width = 700
+		height = 335
 	}
 }
 RM_Settings
 {
-	RenameWithProfession = True
 	LockSettings = False
 	EnableHighlighting = True
 	ShowToolTips = True
 	SettingsToolTips = True
 	RosterToolTips = True
 	DebuggerToolTips = True
+	ContractDisputeToolTips = True
 	ShowDebugger = False
 	EnableBlizzyToolbar = False
-	VerboseLogging = False
+	VerboseLogging = True
 	AutoDebug = False
 	DebugLogPath = \Plugins\PluginData\
 	ErrorLogLength = 1000
@@ -46,6 +53,7 @@ RM_Settings
 }
 RM_Hidden
 {
+	LifeInfoUpdatePeriod = 360
 	SourcePartColor = red
 	TargetPartColor = green
 	DefaultSalary = 10000

@@ -202,7 +202,7 @@ namespace RosterManager
             WindowSettings.ShowToolTips = SettingsNode.HasValue("SettingsToolTips") ? bool.Parse(SettingsNode.GetValue("SettingsToolTips")) : WindowSettings.ShowToolTips;
             WindowRoster.ShowToolTips = SettingsNode.HasValue("RosterToolTips") ? bool.Parse(SettingsNode.GetValue("RosterToolTips")) : WindowRoster.ShowToolTips;
             WindowDebugger.ShowToolTips = SettingsNode.HasValue("DebuggerToolTips") ? bool.Parse(SettingsNode.GetValue("DebuggerToolTips")) : WindowDebugger.ShowToolTips;
-            WindowContractDispute.ShowToolTips = SettingsNode.HasValue("ContractDisputeTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeTips")) : WindowContractDispute.ShowToolTips;
+            WindowContractDispute.ShowToolTips = SettingsNode.HasValue("ContractDisputeToolTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeToolTips")) : WindowContractDispute.ShowToolTips;
             
             // Config Settings
             EnableBlizzyToolbar = SettingsNode.HasValue("EnableBlizzyToolbar") ? bool.Parse(SettingsNode.GetValue("EnableBlizzyToolbar")) : EnableBlizzyToolbar;
@@ -279,7 +279,7 @@ namespace RosterManager
             WriteValue(SettingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
             WriteValue(SettingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
             WriteValue(SettingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
-            WriteValue(SettingsNode, "ContractDisputeTips", WindowContractDispute.ShowToolTips);
+            WriteValue(SettingsNode, "ContractDisputeToolTips", WindowContractDispute.ShowToolTips);
 
             // Config Settings
             WriteValue(SettingsNode, "ShowDebugger", WindowDebugger.ShowWindow);

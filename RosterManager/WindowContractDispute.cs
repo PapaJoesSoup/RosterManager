@@ -8,7 +8,7 @@ namespace RosterManager
         #region Settings Window (GUI)
         internal static float windowWidth = 700;
         internal static float windowHeight = 330;
-        internal static Rect Position = new Rect(0, 0, 0, 0);
+        internal static Rect Position = new Rect(0, 0, 700, 330);
         internal static bool ShowWindow = false;
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
@@ -18,13 +18,11 @@ namespace RosterManager
         private static List<disputeKerbal> processeddisputekerbals = new List<disputeKerbal>();
 
         internal static void Display(int windowId)
-        {
-            //Pause the game
-            TimeWarp.SetRate(0, true);
+        {            
             // Reset Tooltip active flag...            
             ToolTipActive = false;
 
-            Rect rect = new Rect(Position.width - 20, 4, 16, 16);
+            Rect rect = new Rect(680, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 ToolTip = "";
@@ -35,7 +33,7 @@ namespace RosterManager
 
             
             GUILayout.BeginVertical();
-            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
+            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(680));
             GUILayout.BeginVertical();
 
             DisplayDisputes();
@@ -45,7 +43,7 @@ namespace RosterManager
 
             GUILayout.BeginHorizontal();
             string buttonToolTip = string.Empty;
-            buttonToolTip = "Accept All Payrises.";
+            buttonToolTip = "Accept All Payrises. Kerbals will continue working.";
             if (GUILayout.Button("Accept"))
             {
                 // Accept all disputes.
@@ -55,9 +53,7 @@ namespace RosterManager
                     AcceptDispute(disputekerbal);
                 }
                 processeddisputekerbals.ForEach(id => LifeSpanAddon.Instance.ContractDisputeKerbals.Remove(id));
-                WindowContractDispute.ShowWindow = false;                
-                if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready)
-                    FlightDriver.SetPause(false);
+                WindowContractDispute.ShowWindow = false;                                
             }
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -74,8 +70,7 @@ namespace RosterManager
                 }
                 processeddisputekerbals.ForEach(id => LifeSpanAddon.Instance.ContractDisputeKerbals.Remove(id));
                 WindowContractDispute.ShowWindow = false;
-                if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ready)
-                    FlightDriver.SetPause(false);
+                
             }
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -160,25 +155,58 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
-                buttonToolTip = "Accept Payrise.";
-                if (GUILayout.Button(new GUIContent("Accept", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
+                if (disputekerbal.extended)
                 {
-                    //Accept payrise
-                    AcceptDispute(disputekerbal);
-                }                    
-                rect = GUILayoutUtility.GetLastRect();
-                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+                    if (Funding.CanAfford((float)disputekerbal.kerbal.Value.salary + (float)disputekerbal.kerbal.Value.owedSalary))
+                    {
+                        GUI.enabled = true;
+                        buttonToolTip = "Re-Instate kerbal and pay all owed funds.";
+                    }
+                    else
+                    {
+                        GUI.enabled = false;
+                        buttonToolTip = "Not enough funds to Re-Instate kerbal and pay all owed funds.";
+                    }
 
-                buttonToolTip = "Decline Payrise. Kerbal will resign.";
-                if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
-                {
-                    //Decline payrise
-                    DeclineDispute(disputekerbal);
+                    if (GUILayout.Button(new GUIContent("Re-Instate", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(100)))
+                    {
+                        //Accept payrise
+                        Funding.Instance.AddFunds(-(disputekerbal.kerbal.Value.salary + disputekerbal.kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
+                        disputekerbal.kerbal.Value.timelastsalary = Planetarium.GetUniversalTime();
+                        disputekerbal.kerbal.Value.salaryContractDispute = false;
+                        //If they are a tourist (dispute) and not dead (DeepFreeze frozen/comatose) set them back to crew                   
+                        if (disputekerbal.crew.type == ProtoCrewMember.KerbalType.Tourist && disputekerbal.crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+                        {
+                            disputekerbal.kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
+                            disputekerbal.crew.type = ProtoCrewMember.KerbalType.Crew;
+                        }
+                        processeddisputekerbals.Add(disputekerbal);                                               
+                    }
+                    GUI.enabled = true;
                 }
-                rect = GUILayoutUtility.GetLastRect();
-                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+                else
+                {
+                    buttonToolTip = "Accept Payrise.";
+                    if (GUILayout.Button(new GUIContent("Accept", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
+                    {
+                        //Accept payrise
+                        AcceptDispute(disputekerbal);
+                    }
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+                    buttonToolTip = "Decline Payrise. Kerbal will become a tourist until paid.";
+                    if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
+                    {
+                        //Decline payrise
+                        DeclineDispute(disputekerbal);
+                    }
+                    rect = GUILayoutUtility.GetLastRect();
+                    if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+                }
+                
                 GUILayout.EndHorizontal();
             }
 
@@ -188,7 +216,8 @@ namespace RosterManager
         private static void DeclineDispute(disputeKerbal disputekerbal)
         {
             LifeSpanAddon.Instance.resignKerbal(disputekerbal.crew, disputekerbal.kerbal);
-            processeddisputekerbals.Add(disputekerbal);
+            disputekerbal.extended = true;
+            disputekerbal.payriseRequired = 0;
         }
 
         private static void AcceptDispute(disputeKerbal disputekerbal)
@@ -204,7 +233,8 @@ namespace RosterManager
             {
                 disputekerbal.kerbal.Value.owedSalary += disputekerbal.kerbal.Value.salary;
             }
-            processeddisputekerbals.Add(disputekerbal);
+            disputekerbal.extended = true;
+            disputekerbal.payriseRequired = 0;
         }
 
         #endregion Settings Window (GUI)
