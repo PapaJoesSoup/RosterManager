@@ -74,10 +74,10 @@ namespace RosterManager
 
         // Tooltip Settings
         internal static bool prevShowToolTips = true;
-
         internal static bool prevSettingsToolTips = true;
         internal static bool prevRosterToolTips = true;
         internal static bool prevDebuggerToolTips = true;
+        internal static bool prevContractDisputeToolTips = true;
 
         // Configuration Settings
         internal static bool prevEnableBlizzyToolbar = false;
@@ -132,6 +132,7 @@ namespace RosterManager
             prevSettingsToolTips = WindowSettings.ShowToolTips;
             prevRosterToolTips = WindowRoster.ShowToolTips;
             prevDebuggerToolTips = WindowDebugger.ShowToolTips;
+            prevContractDisputeToolTips = WindowContractDispute.ShowToolTips;
             prevChangeProfessionCharge = ChangeProfessionCharge;            
 
             // sounds
@@ -157,6 +158,7 @@ namespace RosterManager
             WindowSettings.ShowToolTips = prevSettingsToolTips;
             WindowRoster.ShowToolTips = prevRosterToolTips;
             WindowDebugger.ShowToolTips = prevDebuggerToolTips;
+            WindowContractDispute.ShowToolTips = prevContractDisputeToolTips;
             ChangeProfessionCharge = prevChangeProfessionCharge;            
 
             //debugger Settings
@@ -184,6 +186,7 @@ namespace RosterManager
             WindowDebugger.Position = getRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
             WindowSettings.Position = getRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
             WindowRoster.Position = getRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
+            WindowContractDispute.Position = getRectangle(WindowsNode, "ContractDisputePosition", WindowContractDispute.Position);
 
             // now the settings
 
@@ -199,7 +202,8 @@ namespace RosterManager
             WindowSettings.ShowToolTips = SettingsNode.HasValue("SettingsToolTips") ? bool.Parse(SettingsNode.GetValue("SettingsToolTips")) : WindowSettings.ShowToolTips;
             WindowRoster.ShowToolTips = SettingsNode.HasValue("RosterToolTips") ? bool.Parse(SettingsNode.GetValue("RosterToolTips")) : WindowRoster.ShowToolTips;
             WindowDebugger.ShowToolTips = SettingsNode.HasValue("DebuggerToolTips") ? bool.Parse(SettingsNode.GetValue("DebuggerToolTips")) : WindowDebugger.ShowToolTips;
-
+            WindowContractDispute.ShowToolTips = SettingsNode.HasValue("ContractDisputeTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeTips")) : WindowContractDispute.ShowToolTips;
+            
             // Config Settings
             EnableBlizzyToolbar = SettingsNode.HasValue("EnableBlizzyToolbar") ? bool.Parse(SettingsNode.GetValue("EnableBlizzyToolbar")) : EnableBlizzyToolbar;
             WindowDebugger.ShowWindow = SettingsNode.HasValue("ShowDebugger") ? bool.Parse(SettingsNode.GetValue("ShowDebugger")) : WindowDebugger.ShowWindow;
@@ -261,6 +265,7 @@ namespace RosterManager
             WriteRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
             WriteRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
             WriteRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
+            WriteRectangle(WindowsNode, "ContractDisputePosition", WindowContractDispute.Position);
 
             //Write settings...
             // Realism Settings
@@ -274,6 +279,7 @@ namespace RosterManager
             WriteValue(SettingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
             WriteValue(SettingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
             WriteValue(SettingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
+            WriteValue(SettingsNode, "ContractDisputeTips", WindowContractDispute.ShowToolTips);
 
             // Config Settings
             WriteValue(SettingsNode, "ShowDebugger", WindowDebugger.ShowWindow);

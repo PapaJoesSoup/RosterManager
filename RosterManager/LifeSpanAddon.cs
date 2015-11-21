@@ -47,7 +47,7 @@ namespace RosterManager
         private const double SalaryTimeYearKerbalCalendar = 60 * 60 * 6 * 426;
         private const double SalaryTimeMonthKerbalCalendar = SalaryTimeYearKerbalCalendar / 12;
                 
-        internal List<disputeKerbal> ContractDisputeKerbals;  //List of Kerbals that un unresolved contract disputes
+        internal List<disputeKerbal> ContractDisputeKerbals = new List<disputeKerbal>();  //List of Kerbals that un unresolved contract disputes
                     
 
         protected LifeSpanAddon()
@@ -522,7 +522,7 @@ namespace RosterManager
             else
             {
                 //User must accept payrise of 10% * disputed periods. (IE; first period 10%, 2nd period 20%, etc)
-                double payriseRequired = kerbal.Value.salary * (kerbal.Value.salaryContractDisputePeriods * 10 / 100);
+                double payriseRequired = kerbal.Value.salary * (kerbal.Value.salaryContractDisputePeriods * 10d / 100d);
                 //Salaries cannot exceed 100000
                 if (kerbal.Value.salary + payriseRequired > 100000)
                     payriseRequired = 0;              

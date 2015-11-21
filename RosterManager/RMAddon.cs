@@ -175,13 +175,16 @@ namespace RosterManager
             RMAddon.FrozenKerbals.Clear();
             AllCrew.Clear();
 
-            RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-            AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-            if (InstalledMods.IsDFInstalled)
+            if (scene == GameScenes.EDITOR || scene == GameScenes.FLIGHT || scene == GameScenes.SPACECENTER || scene == GameScenes.TRACKSTATION)
             {
-                AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-                AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
-            }
+                RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
+                AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
+                if (InstalledMods.IsDFInstalled)
+                {
+                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
+                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
+                }
+            }            
         }
 
         // Stock vs Blizzy Toolbar switch handler

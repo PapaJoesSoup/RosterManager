@@ -6,7 +6,8 @@ namespace RosterManager
     internal static class WindowContractDispute
     {
         #region Settings Window (GUI)
-
+        internal static float windowWidth = 700;
+        internal static float windowHeight = 330;
         internal static Rect Position = new Rect(0, 0, 0, 0);
         internal static bool ShowWindow = false;
         internal static bool ToolTipActive = false;
@@ -20,11 +21,10 @@ namespace RosterManager
         {
             //Pause the game
             TimeWarp.SetRate(0, true);
-            // Reset Tooltip active flag...
-            Rect rect = new Rect();
+            // Reset Tooltip active flag...            
             ToolTipActive = false;
 
-            rect = new Rect(371, 4, 16, 16);
+            Rect rect = new Rect(Position.width - 20, 4, 16, 16);
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 ToolTip = "";
@@ -90,6 +90,7 @@ namespace RosterManager
               
         private static void DisplayDisputes()
         {
+            GUILayout.BeginHorizontal();
             Rect rect = new Rect();
             GUI.enabled = true;
             string buttonToolTip = string.Empty;
@@ -116,6 +117,14 @@ namespace RosterManager
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+            buttonToolTip = "Payrise Requested.";
+            GUILayout.Label(new GUIContent("PayRise Amt", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(80));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
+            GUILayout.EndHorizontal();
 
             processeddisputekerbals.Clear();
 
@@ -146,8 +155,13 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
+                buttonToolTip = "Payrise Requested.";
+                GUILayout.Label(disputekerbal.payriseRequired.ToString(), RMStyle.LabelStyle, GUILayout.Width(30));
+                if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
+
                 buttonToolTip = "Accept Payrise.";
-                if (GUILayout.Button(new GUIContent("Accept", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(50)))
+                if (GUILayout.Button(new GUIContent("Accept", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
                 {
                     //Accept payrise
                     AcceptDispute(disputekerbal);
@@ -157,7 +171,7 @@ namespace RosterManager
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
                 buttonToolTip = "Decline Payrise. Kerbal will resign.";
-                if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(50)))
+                if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
                 {
                     //Decline payrise
                     DeclineDispute(disputekerbal);
