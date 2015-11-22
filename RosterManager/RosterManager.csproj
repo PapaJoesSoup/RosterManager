@@ -69,9 +69,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="InstalledMods.cs" />
-    <Compile Include="KerbalLifeSpanInfo.cs" />
-    <Compile Include="LifeSpan.cs" />
-    <Compile Include="LifeSpanAddon.cs" />
+    <Compile Include="RMKerbals.cs" />
+    <Compile Include="RMLifeSpan.cs" />
+    <Compile Include="RMLifeSpanAddon.cs" />
     <Compile Include="ModMedical.cs" />
     <Compile Include="ModRecords.cs" />
     <Compile Include="ModSchedule.cs" />
@@ -84,7 +84,6 @@
     <Compile Include="WindowContractDispute.cs" />
     <Compile Include="WindowDebugger.cs" />
     <Compile Include="RMStyle.cs" />
-    <Compile Include="ModKerbal.cs" />
     <Compile Include="WindowRoster.cs" />
     <Compile Include="RMSettings.cs" />
     <Compile Include="WindowSettings.cs" />
@@ -94,6 +93,7 @@
     <Compile Include="Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="7za_dir.txt" />
     <Content Include="Distribution\ChangeLog.txt" />
     <Content Include="Distribution\GameData\RosterManager\Plugins\DFInterface.dll" />
     <Content Include="Distribution\GameData\RosterManager\Plugins\RosterManager.dll" />
@@ -102,6 +102,9 @@
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_24.png" />
     <Content Include="Distribution\GameData\RosterManager\Textures\Icon_On_38.png" />
     <Content Include="Distribution\Installation Notes.txt" />
+    <Content Include="ksp_dir.txt" />
+    <Content Include="mono_exe.txt" />
+    <Content Include="pdb2mdb_exe.txt" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -115,15 +118,22 @@
   <PropertyGroup>
     <PostBuildEvent>set /p KSP_DIR=&lt;"$(ProjectDir)ksp_dir.txt"
 
+set /p MONO_EXE_DIR=&lt;"$(ProjectDir)mono_exe.txt"
+
+set /p PDB2MDB_EXE_DIR=&lt;"$(ProjectDir)pdb2mdb_exe.txt"
+
+set /p ZA_DIR=&lt;"$(ProjectDir)7za_dir.txt"
+
+set
 xcopy "$(TargetPath)" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
 
 xcopy "$(TargetDir)$(ProjectName).pdb" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
 
 cd "$(TargetDir)"
-"C:\Program Files (x86)\mono\bin\mono.exe" "C:\Program Files (x86)\mono\lib\mono\4.5\pdb2mdb.exe" "$(TargetFileName)"
+"%25MONO_EXE_DIR%25" "%25PDB2MDB_EXE_DIR%25" "$(TargetFileName)"
 xcopy "$(TargetDir)$(ProjectName).dll.mdb" "$(SolutionDir)$(ProjectName)\Distribution\GameData\$(ProjectName)\Plugins\" /Y
 
-where /q "C:\7za\:7za.exe"
+where /q %25ZA_DIR%25:7za.exe
 if %25ERRORLEVEL%25 == 1 (
    echo Cannot find 7-zip to package build
 ) else (
@@ -131,8 +141,8 @@ if %25ERRORLEVEL%25 == 1 (
   ) 
 if exist "$(SolutionDir)$(ProjectName).zip" del "$(SolutionDir)$(ProjectName).zip"
    
-c:\7za\7za a -tzip -r  "$(SolutionDir)$(ProjectName).zip" "$(SolutionDir)$(ProjectName)\Distribution\GameData"
-c:\7za\7za d -r  -x!REPOSoftTech.png "$(SolutionDir)$(ProjectName).zip" "*.ddsified" "*.pdb" "*.mdb"
+%25ZA_DIR%257za.exe a -tzip -r  "$(SolutionDir)$(ProjectName).zip" "$(SolutionDir)$(ProjectName)\Distribution\GameData"
+%25ZA_DIR%257za.exe d -r  "$(SolutionDir)$(ProjectName).zip" "*.ddsified" "*.pdb" "*.mdb"
 xcopy /E /Y "$(SolutionDir)$(ProjectName)\Distribution\GameData" "%25KSP_DIR%25\GameData"
 </PostBuildEvent>
   </PropertyGroup>

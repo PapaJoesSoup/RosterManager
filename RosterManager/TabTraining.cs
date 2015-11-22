@@ -151,9 +151,9 @@ namespace RosterManager
             GUILayout.Label(WindowRoster.SelectedKerbal.Experience.ToString() + " / 99999");
             GUILayout.EndHorizontal();
 
-            if (RMSettings.EnableSalaries && (WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Unowned))
+            if (RMSettings.EnableSalaries && (WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Unowned))
             {
-                KeyValuePair<string, KerbalLifeInfo> kerbal = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
+                KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
                 if (kerbal.Key != null)
                 {
                     if (kerbal.Value.salaryContractDispute)
@@ -163,11 +163,11 @@ namespace RosterManager
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("", GUILayout.Width(10));
                 GUILayout.Label("0", GUILayout.Width(10));
-                WindowRoster.SelectedKerbal.Salary = (int)GUILayout.HorizontalSlider((float)WindowRoster.SelectedKerbal.Salary, 0, 100000, GUILayout.Width(300));
+                WindowRoster.SelectedKerbal.salary = (int)GUILayout.HorizontalSlider((float)WindowRoster.SelectedKerbal.salary, 0, 100000, GUILayout.Width(300));
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-                GUILayout.Label(WindowRoster.SelectedKerbal.Salary.ToString() + " / 100,000 " + RMSettings.SalaryPeriod);
+                GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString() + " / 100,000 " + RMSettings.SalaryPeriod);
                 GUILayout.EndHorizontal();
                 GUI.enabled = true;
             }

@@ -26,7 +26,7 @@ namespace RosterManager
                 GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.trait + ")");
                 if (RMSettings.EnableAging)
                 {
-                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.Age);
+                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age);
                 }                
             }
             else
@@ -34,7 +34,7 @@ namespace RosterManager
                 GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
                 if (RMSettings.EnableAging)
                 {
-                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.Age);
+                    GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age);
                 }
             }
             GUILayout.EndHorizontal();

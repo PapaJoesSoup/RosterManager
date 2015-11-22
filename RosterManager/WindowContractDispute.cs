@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace RosterManager
 {
     internal static class WindowContractDispute
     {
-        #region Settings Window (GUI)
+        // This class creates a GUI for ContractDispute data and processes user inputs for this data.        
+        #region ContractDisput Window (GUI)
         internal static float windowWidth = 700;
         internal static float windowHeight = 330;
         internal static Rect Position = new Rect(0, 0, 700, 330);
@@ -13,9 +15,7 @@ namespace RosterManager
         internal static bool ToolTipActive = false;
         internal static bool ShowToolTips = true;
         internal static string ToolTip = "";
-
-        private static Vector2 ScrollViewerPosition = Vector2.zero; 
-        private static List<disputeKerbal> processeddisputekerbals = new List<disputeKerbal>();
+        private static Vector2 ScrollViewerPosition = Vector2.zero;         
 
         internal static void Display(int windowId)
         {            
@@ -42,17 +42,17 @@ namespace RosterManager
             GUILayout.EndScrollView();
 
             GUILayout.BeginHorizontal();
+            List<RMKerbal> disputekerbals = new List<RMKerbal>(RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Values.Where(a => a.salaryContractDispute == true).ToList());
             string buttonToolTip = string.Empty;
             buttonToolTip = "Accept All Payrises. Kerbals will continue working.";
-            if (GUILayout.Button("Accept"))
+            if (GUILayout.Button(new GUIContent("Accept", buttonToolTip), RMStyle.ButtonStyle))
             {
-                // Accept all disputes.
-                processeddisputekerbals.Clear();
-                foreach (disputeKerbal disputekerbal in LifeSpanAddon.Instance.ContractDisputeKerbals)
+                // Accept all disputes.                
+                foreach (RMKerbal disputekerbal in disputekerbals)
                 {
-                    AcceptDispute(disputekerbal);
-                }
-                processeddisputekerbals.ForEach(id => LifeSpanAddon.Instance.ContractDisputeKerbals.Remove(id));
+                    if (!disputekerbal.salaryContractDisputeProcessed)
+                        AcceptDispute(disputekerbal);
+                }                
                 WindowContractDispute.ShowWindow = false;                                
             }
             rect = GUILayoutUtility.GetLastRect();
@@ -60,15 +60,14 @@ namespace RosterManager
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
             buttonToolTip = "Decline All Payrises, All listed kerbals will become tourists until you can pay them.";
-            if (GUILayout.Button("Decline"))
+            if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle))
             {
-                // Decline all disputes.    
-                processeddisputekerbals.Clear();
-                foreach (disputeKerbal disputekerbal in LifeSpanAddon.Instance.ContractDisputeKerbals)
+                // Decline all disputes.                    
+                foreach (RMKerbal disputekerbal in disputekerbals)
                 {
-                    DeclineDispute(disputekerbal);
-                }
-                processeddisputekerbals.ForEach(id => LifeSpanAddon.Instance.ContractDisputeKerbals.Remove(id));
+                    if (!disputekerbal.salaryContractDisputeProcessed)
+                        DeclineDispute(disputekerbal);
+                }                
                 WindowContractDispute.ShowWindow = false;
                 
             }
@@ -120,33 +119,38 @@ namespace RosterManager
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
             GUILayout.EndHorizontal();
-
-            processeddisputekerbals.Clear();
-
-            foreach (disputeKerbal disputekerbal in LifeSpanAddon.Instance.ContractDisputeKerbals)
+            
+            List<RMKerbal> disputekerbals = new List<RMKerbal>(RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Values.Where(a => a.salaryContractDispute == true).ToList());
+            if (disputekerbals.Count() == 0)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("There are no Contracts currently in Dispute.", RMStyle.LabelStyle, GUILayout.Width(280));
+                GUILayout.EndHorizontal();
+            }
+            foreach (RMKerbal disputekerbal in disputekerbals)
             {
                 buttonToolTip = string.Empty;
                 GUILayout.BeginHorizontal();
                 buttonToolTip = "Crew Member Name.";
-                GUILayout.Label(disputekerbal.crew.name, RMStyle.LabelStyle, GUILayout.Width(150));
+                GUILayout.Label(disputekerbal.Name, RMStyle.LabelStyle, GUILayout.Width(150));
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
                 buttonToolTip = "Crew Member's Current Salary.";
-                GUILayout.Label(disputekerbal.kerbal.Value.salary.ToString("###,##0"), RMStyle.LabelStyle, GUILayout.Width(80));
+                GUILayout.Label(disputekerbal.salary.ToString("###,##0"), RMStyle.LabelStyle, GUILayout.Width(80));
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
                 buttonToolTip = "Crew Member's Current Outstanding/Owing Salary.";
-                GUILayout.Label(disputekerbal.kerbal.Value.owedSalary.ToString("###,##0"), RMStyle.LabelStyle, GUILayout.Width(80));
+                GUILayout.Label(disputekerbal.owedSalary.ToString("###,##0"), RMStyle.LabelStyle, GUILayout.Width(80));
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
                 buttonToolTip = "How many Pay periods salary has been in dispute.";
-                GUILayout.Label(disputekerbal.kerbal.Value.salaryContractDisputePeriods.ToString(), RMStyle.LabelStyle, GUILayout.Width(30));
+                GUILayout.Label(disputekerbal.salaryContractDisputePeriods.ToString(), RMStyle.LabelStyle, GUILayout.Width(30));
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
@@ -155,9 +159,9 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
-                if (disputekerbal.extended)
+                if (disputekerbal.salaryContractDisputeProcessed)
                 {
-                    if (Funding.CanAfford((float)disputekerbal.kerbal.Value.salary + (float)disputekerbal.kerbal.Value.owedSalary))
+                    if (Funding.CanAfford((float)disputekerbal.salary + (float)disputekerbal.owedSalary))
                     {
                         GUI.enabled = true;
                         buttonToolTip = "Re-Instate kerbal and pay all owed funds.";
@@ -171,16 +175,16 @@ namespace RosterManager
                     if (GUILayout.Button(new GUIContent("Re-Instate", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(100)))
                     {
                         //Accept payrise
-                        Funding.Instance.AddFunds(-(disputekerbal.kerbal.Value.salary + disputekerbal.kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
-                        disputekerbal.kerbal.Value.timelastsalary = Planetarium.GetUniversalTime();
-                        disputekerbal.kerbal.Value.salaryContractDispute = false;
+                        Funding.Instance.AddFunds(-(disputekerbal.salary + disputekerbal.owedSalary), TransactionReasons.CrewRecruited);
+                        disputekerbal.timelastsalary = Planetarium.GetUniversalTime();
+                        disputekerbal.salaryContractDispute = false;
                         //If they are a tourist (dispute) and not dead (DeepFreeze frozen/comatose) set them back to crew                   
-                        if (disputekerbal.crew.type == ProtoCrewMember.KerbalType.Tourist && disputekerbal.crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+                        if (disputekerbal.type == ProtoCrewMember.KerbalType.Tourist && disputekerbal.status != ProtoCrewMember.RosterStatus.Dead)
                         {
-                            disputekerbal.kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
-                            disputekerbal.crew.type = ProtoCrewMember.KerbalType.Crew;
-                        }
-                        processeddisputekerbals.Add(disputekerbal);                                               
+                            disputekerbal.type = ProtoCrewMember.KerbalType.Crew;
+                            disputekerbal.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
+                            KerbalRoster.SetExperienceTrait(disputekerbal.Kerbal, disputekerbal.nonDisputeTrait);
+                        }                                           
                     }
                     GUI.enabled = true;
                 }
@@ -209,34 +213,33 @@ namespace RosterManager
                 
                 GUILayout.EndHorizontal();
             }
-
-            processeddisputekerbals.ForEach(id => LifeSpanAddon.Instance.ContractDisputeKerbals.Remove(id));
         }
 
-        private static void DeclineDispute(disputeKerbal disputekerbal)
+        private static void DeclineDispute(RMKerbal disputekerbal)
         {
-            LifeSpanAddon.Instance.resignKerbal(disputekerbal.crew, disputekerbal.kerbal);
-            disputekerbal.extended = true;
+            KeyValuePair<string, RMKerbal> kerbal = new KeyValuePair<string, RMKerbal>(disputekerbal.Name, disputekerbal);
+            RMLifeSpanAddon.Instance.resignKerbal(disputekerbal.Kerbal, kerbal);
+            disputekerbal.salaryContractDisputeProcessed = true;
             disputekerbal.payriseRequired = 0;
         }
 
-        private static void AcceptDispute(disputeKerbal disputekerbal)
+        private static void AcceptDispute(RMKerbal disputekerbal)
         {
-            disputekerbal.kerbal.Value.salary += disputekerbal.payriseRequired;
-            disputekerbal.kerbal.Value.salaryContractDispute = true;
+            disputekerbal.salary += disputekerbal.payriseRequired;
+            disputekerbal.salaryContractDispute = true;
             // Calculate and store their backpay.
             if (RMSettings.SalaryPeriodisYearly)
             {
-                disputekerbal.kerbal.Value.owedSalary += disputekerbal.kerbal.Value.salary * 12;
+                disputekerbal.owedSalary += disputekerbal.salary * 12;
             }
             else
             {
-                disputekerbal.kerbal.Value.owedSalary += disputekerbal.kerbal.Value.salary;
+                disputekerbal.owedSalary += disputekerbal.salary;
             }
-            disputekerbal.extended = true;
+            disputekerbal.salaryContractDisputeProcessed = true;
             disputekerbal.payriseRequired = 0;
         }
 
-        #endregion Settings Window (GUI)
+        #endregion ContractDisput Window (GUI)
     }
 }

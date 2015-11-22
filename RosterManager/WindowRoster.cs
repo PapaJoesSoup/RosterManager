@@ -62,9 +62,9 @@ namespace RosterManager
             }
         }
 
-        private static ModKerbal _selectedKerbal;
+        private static RMKerbal _selectedKerbal;
 
-        internal static ModKerbal SelectedKerbal
+        internal static RMKerbal SelectedKerbal
         {
             get { return _selectedKerbal; }
             set
@@ -234,7 +234,8 @@ namespace RosterManager
 
                     if (RMSettings.EnableSalaries)
                     {
-                        if (GUILayout.Button("Contract Disputes", settingsStyle))
+                        var disputesStyle = WindowContractDispute.ShowWindow ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+                        if (GUILayout.Button("Contract Disputes", disputesStyle))
                         {
                             try
                             {
@@ -369,7 +370,11 @@ namespace RosterManager
                         {
                             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                             {
-                                SelectedKerbal = new ModKerbal(kerbal, false);
+                                SelectedKerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
+                                if (SelectedKerbal == null) //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
+                                {
+                                    SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, true);
+                                }
                                 SetProfessionFlag();
                                 gender = SelectedKerbal.Gender;
                             }
@@ -385,14 +390,18 @@ namespace RosterManager
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
                         if (RMSettings.EnableAging)
                         {
-                            KeyValuePair<string, KerbalLifeInfo> kerbalInfo = LifeSpan.Instance.kerbalLifeRecord.KerbalLifeRecords.FirstOrDefault(a => a.Key == kerbal.name);
+                            KeyValuePair<string, RMKerbal> kerbalInfo = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name);
                             if (kerbalInfo.Key != null)
                             {
-                                GUILayout.Label(kerbalInfo.Value.age.ToString(), labelStyle, GUILayout.Width(35));
+                                GUILayout.Label(kerbalInfo.Value.age.ToString("##0"), labelStyle, GUILayout.Width(35));
                             }
                         }
-                            
-                        GUILayout.Label(kerbal.experienceTrait.Title, labelStyle, GUILayout.Width(75));
+                        string disptrait = string.Empty;
+                        if (SelectedKerbal != null)
+                            disptrait = SelectedKerbal.salaryContractDispute ? SelectedKerbal.nonDisputeTrait : kerbal.trait;
+                        else
+                            disptrait = kerbal.trait;
+                        GUILayout.Label(disptrait, labelStyle, GUILayout.Width(75));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
                         GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(240));
@@ -497,7 +506,7 @@ namespace RosterManager
                 bool kerbalFound = false;
                 while (!kerbalFound)
                 {
-                    SelectedKerbal = ModKerbal.CreateKerbal();
+                    SelectedKerbal = RMKerbal.CreateKerbal();
                     if (SelectedKerbal.Trait == KerbalProfession && SelectedKerbal.Gender == gender)
                         kerbalFound = true;
                 }
