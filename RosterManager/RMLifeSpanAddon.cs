@@ -158,46 +158,44 @@ namespace RosterManager
             //If not found and addifNotFound is true create a new entry
             if (kerbal.Value == null && addifNotFound)
             {
-                RMKerbal kerballifeinfo = new RMKerbal(Planetarium.GetUniversalTime(), crew, true, true);
-                kerballifeinfo.Trait = crew.trait;
-                kerballifeinfo.nonDisputeTrait = crew.trait;
-                kerballifeinfo.type = crew.type;
-                kerballifeinfo.status = crew.rosterStatus;
-                kerballifeinfo.vesselID = Guid.Empty;
-                kerballifeinfo.vesselName = string.Empty;
+                RMKerbal rmkerbal = new RMKerbal(Planetarium.GetUniversalTime(), crew, true, true);
+                rmkerbal.Trait = crew.trait;
+                rmkerbal.type = crew.type;
+                rmkerbal.status = crew.rosterStatus;
+                rmkerbal.vesselID = Guid.Empty;
+                rmkerbal.vesselName = string.Empty;
                 double dice_minage = rnd.Next(RMSettings.Minimum_Age - 3, RMSettings.Minimum_Age + 3); // Randomly set their age.
-                kerballifeinfo.age = dice_minage;
+                rmkerbal.age = dice_minage;
                 double dice_maxage = rnd.Next(RMSettings.Maximum_Age - 5, RMSettings.Maximum_Age + 5); // Randomly set their age.
-                kerballifeinfo.lifespan = dice_maxage;
-                RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(crew.name, kerballifeinfo);
-                kerballifeinfo.timelastBirthday = currentTime;
-                kerballifeinfo.timelastsalary = currentTime;
-                kerballifeinfo.salary = RMSettings.DefaultSalary;
+                rmkerbal.lifespan = dice_maxage;                
+                rmkerbal.timelastBirthday = currentTime;
+                rmkerbal.timelastsalary = currentTime;
+                rmkerbal.salary = RMSettings.DefaultSalary;
                 if (DFInterface.IsDFInstalled)
                 {
                     if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
                     {
                         if (RMAddon.FrozenKerbals.ContainsKey(crew.name))
                         {
-                            kerballifeinfo.timeDFFrozen = RMAddon.FrozenKerbals[crew.name].lastUpdate;
+                            rmkerbal.timeDFFrozen = RMAddon.FrozenKerbals[crew.name].lastUpdate;
                         }
                     }
                 }
-                kerballifeinfo.Name = crew.name;
-                kerballifeinfo.Stupidity = crew.stupidity;
-                kerballifeinfo.Courage = crew.courage;
-                kerballifeinfo.Badass = crew.isBadass;
-                kerballifeinfo.Gender = crew.gender;
-                kerballifeinfo.Skill = crew.experienceLevel;
-                kerballifeinfo.Experience = crew.experience;               
+                rmkerbal.Name = crew.name;
+                rmkerbal.Stupidity = crew.stupidity;
+                rmkerbal.Courage = crew.courage;
+                rmkerbal.Badass = crew.isBadass;
+                rmkerbal.Gender = crew.gender;
+                rmkerbal.Skill = crew.experienceLevel;
+                rmkerbal.Experience = crew.experience;
+                rmkerbal.Kerbal = crew;
+                RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(crew.name, rmkerbal);              
     }
             //If found update their entry
             else if (kerbal.Value != null)
             {                
                 if (currentTime - kerbal.Value.lastUpdate > RMSettings.LifeInfoUpdatePeriod)  // Only update every 6 minutes. Can be changed in hidden settings
                 {
-                    if (!kerbal.Value.salaryContractDispute)
-                        kerbal.Value.nonDisputeTrait = crew.trait;
                     if (RMSettings.EnableAging)
                     {
                         checkAge(crew, kerbal, currentTime);
@@ -475,8 +473,7 @@ namespace RosterManager
                     if (kerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
                     {
                         kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
-                        crew.type = ProtoCrewMember.KerbalType.Crew;
-                        KerbalRoster.SetExperienceTrait(crew, kerbal.Value.nonDisputeTrait);
+                        crew.type = ProtoCrewMember.KerbalType.Crew;                        
                     }
                     /*
                     disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, 0, true);
@@ -528,7 +525,6 @@ namespace RosterManager
             //We don't change their status if they are unowned/dead (DeepFreeze Frozen)
             if (crew.type != ProtoCrewMember.KerbalType.Unowned && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
             {
-                kerbal.Value.nonDisputeTrait = crew.trait;
                 kerbal.Value.type = ProtoCrewMember.KerbalType.Tourist;
                 crew.type = ProtoCrewMember.KerbalType.Tourist;
             }                       

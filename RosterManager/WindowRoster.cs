@@ -288,7 +288,8 @@ namespace RosterManager
 
                 if (RMSettings.EnableAging)
                 {
-                    GUILayout.Label(new GUIContent("|Age", "Age of Kerbal"), hdrlabelStyle, GUILayout.Width(35));
+                    if (GUILayout.Button(new GUIContent("|Age", "Age of Kerbal"), hdrlabelStyle, GUILayout.Width(35)))
+                        SortRosterList("Age");    
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
@@ -321,8 +322,10 @@ namespace RosterManager
                 GUILayout.EndHorizontal();
 
                 ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(680));
-                foreach (ProtoCrewMember kerbal in RMAddon.AllCrew)
+                //foreach (ProtoCrewMember kerbal in RMAddon.AllCrew
+                foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMAddon.AllCrew)
                 {
+                    ProtoCrewMember kerbal = rmkerbal.Value.Kerbal;
                     if (CanDisplayKerbal(kerbal))
                     {
                         GUIStyle labelStyle = null;
@@ -370,10 +373,12 @@ namespace RosterManager
                         {
                             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                             {
+                                //Find the RMKerbal entry for the selected kerbal.
                                 SelectedKerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
                                 if (SelectedKerbal == null) //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
                                 {
                                     SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, true);
+                                    RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(kerbal.name, SelectedKerbal);
                                 }
                                 SetProfessionFlag();
                                 gender = SelectedKerbal.Gender;
@@ -395,13 +400,8 @@ namespace RosterManager
                             {
                                 GUILayout.Label(kerbalInfo.Value.age.ToString("##0"), labelStyle, GUILayout.Width(35));
                             }
-                        }
-                        string disptrait = string.Empty;
-                        if (SelectedKerbal != null)
-                            disptrait = SelectedKerbal.salaryContractDispute ? SelectedKerbal.nonDisputeTrait : kerbal.trait;
-                        else
-                            disptrait = kerbal.trait;
-                        GUILayout.Label(disptrait, labelStyle, GUILayout.Width(75));
+                        }                        
+                        GUILayout.Label(kerbal.trait, labelStyle, GUILayout.Width(75));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
                         GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(240));
@@ -510,6 +510,8 @@ namespace RosterManager
                     if (SelectedKerbal.Trait == KerbalProfession && SelectedKerbal.Gender == gender)
                         kerbalFound = true;
                 }
+                if (!RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ContainsKey(SelectedKerbal.Name))
+                    RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(SelectedKerbal.Name, SelectedKerbal);
                 OnCreate = false;
             }
             if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80)))
@@ -653,8 +655,7 @@ namespace RosterManager
             {
                 if (kerbal.name.Contains(char.ConvertFromUtf32(1)))
                 {
-                    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
-                    KerbalRoster.SetExperienceTrait(kerbal);
+                    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");                    
                 }
             }
         }
@@ -777,69 +778,80 @@ namespace RosterManager
             if (sort == "Name")
                 if (RMAddon.AllCrewSort != "Name-A")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Name-A";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.name descending select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Name descending select k).ToList();
                     RMAddon.AllCrewSort = "Name-D";
                 }
             else if (sort == "Gender")
                 if (RMAddon.AllCrewSort != "Gender-A")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.gender descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Gender descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Gender-A";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.gender, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Gender, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Gender-D";
                 }
             else if (sort == "Profession")
                 if (RMAddon.AllCrewSort != "Profession-A")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceTrait.Title, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Trait, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Profession-A";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceTrait.Title descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Trait descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Profession-D";
                 }
             else if (sort == "Skill")
                 if (RMAddon.AllCrewSort != "Skill-D")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceLevel descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Kerbal.experienceLevel descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Skill-D";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experienceLevel, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Kerbal.experienceLevel, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Skill-A";
                 }
             else if (sort == "Experience")
                 if (RMAddon.AllCrewSort != "Experience-D")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experience descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Experience descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Experience-D";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.experience descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.Experience descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Experience-A";
                 }
             else if (sort == "Status")
                 if (RMAddon.AllCrewSort != "Status-A")
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus, k.type, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.status, k.Value.type, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Status-A";
                 }
                 else
                 {
-                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.rosterStatus descending, k.type descending, k.name select k).ToList();
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.status descending, k.Value.type descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Status-D";
-                }            
+                } 
+            else if (sort == "Age")
+                if (RMAddon.AllCrewSort != "Age-A")
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.age, k.Value.Name select k).ToList();
+                    RMAddon.AllCrewSort = "Age-A";
+                }
+                else
+                {
+                    RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.age descending, k.Value.Name select k).ToList();
+                    RMAddon.AllCrewSort = "Age-D";
+                }
         }
     }
 }

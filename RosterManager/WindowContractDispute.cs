@@ -183,7 +183,6 @@ namespace RosterManager
                         {
                             disputekerbal.type = ProtoCrewMember.KerbalType.Crew;
                             disputekerbal.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
-                            KerbalRoster.SetExperienceTrait(disputekerbal.Kerbal, disputekerbal.nonDisputeTrait);
                         }                                           
                     }
                     GUI.enabled = true;

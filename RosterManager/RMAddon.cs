@@ -27,7 +27,8 @@ namespace RosterManager
 
         internal static string toolTip;
 
-        internal static List<ProtoCrewMember> AllCrew;
+        internal static List<KeyValuePair<string, RMKerbal>> AllCrew = new List<KeyValuePair<string, RMKerbal>>();
+
         internal static string AllCrewSort = "";
 
         // DeepFreeze Frozen Crew interface
@@ -176,12 +177,8 @@ namespace RosterManager
                 RMAddon.FrozenKerbals.Clear();
                 AllCrew.Clear();
                 RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-                AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-                if (InstalledMods.IsDFInstalled)
-                {
-                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-                    AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
-                }
+                if (RMLifeSpan.Instance != null)
+                    AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();                
             }            
         }
 
@@ -290,12 +287,9 @@ namespace RosterManager
                         RMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
 
                     RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-                    AllCrew = HighLogic.CurrentGame.CrewRoster.Crew.ToList();
-                    if (InstalledMods.IsDFInstalled)
-                    {
-                        AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Unowned);
-                        AllCrew.AddRange(HighLogic.CurrentGame.CrewRoster.Tourist);
-                    }
+                    AllCrew.Clear();
+                    if (RMLifeSpan.Instance != null)
+                        AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();                    
                 }
             }
             catch (Exception ex)
