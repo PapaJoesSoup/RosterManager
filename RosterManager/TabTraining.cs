@@ -167,10 +167,10 @@ namespace RosterManager
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-                GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString() + " / 100,000 " + RMSettings.SalaryPeriod);
-                GUILayout.EndHorizontal();
-                GUI.enabled = true;
+                GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString("###,##0") + " / 100,000 " + RMSettings.SalaryPeriod);
+                GUILayout.EndHorizontal();                
             }
+            GUI.enabled = true;
         }
 
         private static void TabTeamDisplay(ref Rect rect, ref string label, ref string toolTip)

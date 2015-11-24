@@ -99,6 +99,7 @@ namespace RosterManager
         public float Courage = 0f;
         public bool Badass = false;
         public string Trait = "Pilot";
+        public string RealTrait = "Pilot";
         public ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
         public int Skill = 0;
         public float Experience = 0f;
@@ -114,7 +115,26 @@ namespace RosterManager
                 Stupidity = kerbal.stupidity;
                 Courage = kerbal.courage;
                 Badass = kerbal.isBadass;
-                Trait = kerbal.trait;
+                if (salaryContractDispute)
+                {
+                    RealTrait = kerbal.trait;
+                    Trait = "Tourist";                    
+                    KerbalRoster.SetExperienceTrait(kerbal, Trait);
+                }
+                else
+                {
+                    if (status == ProtoCrewMember.RosterStatus.Assigned)
+                    {
+                        Utilities.UnregisterExperienceTrait(this);
+                    }
+                    Trait = kerbal.trait;
+                    RealTrait = kerbal.trait;
+                    KerbalRoster.SetExperienceTrait(kerbal, Trait);
+                    if (status == ProtoCrewMember.RosterStatus.Assigned)
+                    {
+                        Utilities.RegisterExperienceTrait(this);
+                    }
+                }                
                 Gender = kerbal.gender;
                 Skill = kerbal.experienceLevel;
                 Experience = kerbal.experience;
@@ -153,8 +173,20 @@ namespace RosterManager
                 Kerbal.name = Name;
             // remove old save game hack for backwards compatability...
             Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
-            // New trait management is easy!
-            Kerbal.trait = Trait;
+            if (!salaryContractDispute)
+            {            
+                if (status == ProtoCrewMember.RosterStatus.Assigned)
+                {
+                    Utilities.UnregisterExperienceTrait(this);
+                }
+                RealTrait = Trait;
+                Kerbal.trait = Trait;                
+                KerbalRoster.SetExperienceTrait(Kerbal, Trait);
+                if (status == ProtoCrewMember.RosterStatus.Assigned)
+                {
+                    Utilities.RegisterExperienceTrait(this);
+                }
+            }            
             Kerbal.gender = Gender;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
@@ -210,6 +242,7 @@ namespace RosterManager
                 info.Courage = GetNodes.GetNodeValue(node, "Courage", 0f);
                 info.Badass = GetNodes.GetNodeValue(node, "Badass", false);
                 info.Trait = GetNodes.GetNodeValue(node, "Trait", "Pilot");
+                info.RealTrait = GetNodes.GetNodeValue(node, "RealTrait", "Pilot");
                 info.Gender = GetNodes.GetNodeValue(node, "Gender", ProtoCrewMember.Gender.Male);
                 info.Skill = GetNodes.GetNodeValue(node, "Skill", 0);
                 info.Experience = GetNodes.GetNodeValue(node, "Experience", 0f);
@@ -250,6 +283,7 @@ namespace RosterManager
             node.AddValue("Courage", Courage);
             node.AddValue("Badass", Badass);
             node.AddValue("Trait", Trait);
+            node.AddValue("RealTrait", RealTrait);
             node.AddValue("Gender", Gender);
             node.AddValue("Skill", Skill);
             node.AddValue("Experience", Experience);

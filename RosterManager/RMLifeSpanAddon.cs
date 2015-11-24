@@ -415,9 +415,9 @@ namespace RosterManager
                 if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
                 {
                     //Check if contractdispute is active and if it is process that
-                    if (kerbal.Value.salaryContractDispute)
+                    if (kerbal.Value.salaryContractDispute && kerbal.Value.salaryContractDisputeProcessed)
                     {
-                        processContractDispute(crew, kerbal, currentTime, false, true);
+                        processContractDispute(crew, kerbal, currentTime, false, false);
                     }
                     else  //No contract dispute so process normal salary.
                     {
@@ -430,7 +430,8 @@ namespace RosterManager
                         }
                         else  //Unable to pay, start a contract dispute.
                         {
-                            processContractDispute(crew, kerbal, currentTime, true, true);
+                            if (!kerbal.Value.salaryContractDispute && kerbal.Value.salaryContractDisputeProcessed)
+                                processContractDispute(crew, kerbal, currentTime, true, true);
                         }
                     }
                 }
@@ -456,6 +457,7 @@ namespace RosterManager
             {
                 ScreenMessages.PostScreenMessage("Insufficient funds to pay " + crew.name + " salary at this time.", 5.0f, ScreenMessageStyle.UPPER_CENTER);
                 kerbal.Value.salaryContractDispute = true;
+                kerbal.Value.RealTrait = kerbal.Value.Trait;
                 //Start processing dispute, increase the periods we have been in dispute, user must accept payrise as well (if they don't the kerbal Quits) and calculate and store their backpay owed.
                 extendContractDispute(crew, kerbal);
             }
@@ -468,19 +470,19 @@ namespace RosterManager
                 {
                     Funding.Instance.AddFunds(-(kerbal.Value.salary + kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
                     kerbal.Value.timelastsalary = currentTime;
-                    kerbal.Value.salaryContractDispute = false; 
+                    kerbal.Value.salaryContractDispute = false;
+                    kerbal.Value.salaryContractDisputeProcessed = false;
+                    kerbal.Value.salaryContractDisputePeriods = 0;
                     //If they are a tourist (dispute) and not dead (DeepFreeze frozen/comatose) set them back to crew                   
                     if (kerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
                     {
                         kerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
-                        crew.type = ProtoCrewMember.KerbalType.Crew;                        
+                        crew.type = ProtoCrewMember.KerbalType.Crew;
+                        kerbal.Value.Trait = kerbal.Value.RealTrait;
+                        crew.trait = kerbal.Value.RealTrait;
+                        KerbalRoster.SetExperienceTrait(crew, crew.trait);
+                        Utilities.RegisterExperienceTrait(kerbal.Value);                      
                     }
-                    /*
-                    disputeKerbal dispkerbal = new disputeKerbal(crew, kerbal, 0, true);
-                    if (ContractDisputeKerbals.FirstOrDefault(a => a.crew == crew) != null)
-                    {
-                        ContractDisputeKerbals.Remove(dispkerbal);
-                    }*/
                     Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary paid " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
                     Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary contract dispute ended " + crew.name, "info", RMSettings.VerboseLogging);
                     ScreenMessages.PostScreenMessage("Paid " + crew.name + " salary of " + (kerbal.Value.salary + kerbal.Value.owedSalary).ToString(), 5.0f, ScreenMessageStyle.UPPER_CENTER);
@@ -505,16 +507,18 @@ namespace RosterManager
             if (kerbal.Value.salaryContractDisputePeriods > RMSettings.MaxContractDisputePeriods)
             {                
                 //Kerbal Quits.
-                resignKerbal(crew, kerbal);                                             
+                resignKerbal(crew, kerbal);
+                kerbal.Value.salaryContractDisputeProcessed = true;
             }
             else
-            {                                  
+            {                
                 //User must accept payrise of 10% * disputed periods. (IE; first period 10%, 2nd period 20%, etc)
                 double payriseRequired = kerbal.Value.salary * (kerbal.Value.salaryContractDisputePeriods * 10d / 100d);                
                 //Salaries cannot exceed 100000
-                if (kerbal.Value.salary + payriseRequired > 100000)
+                if (kerbal.Value.salary + payriseRequired > 100000)  //**WIP Marker This probably should be a settings VAR, Hard-coded upper salary limit of 100000 funds.
                     payriseRequired = 0; 
-                WindowContractDispute.ShowWindow = true;                
+                //WindowContractDispute.ShowWindow = true;
+                kerbal.Value.salaryContractDisputeProcessed = false;           
             }                            
         }
 
@@ -524,9 +528,16 @@ namespace RosterManager
             ScreenMessages.PostScreenMessage(crew.name + " contract in dispute. They will remain a tourist until they are paid.", 5.0f, ScreenMessageStyle.UPPER_CENTER);
             //We don't change their status if they are unowned/dead (DeepFreeze Frozen)
             if (crew.type != ProtoCrewMember.KerbalType.Unowned && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
-            {
+            {                
+                Utilities.UnregisterExperienceTrait(kerbal.Value);
+                //kerbal.Value.RealTrait = kerbal.Value.Trait;
                 kerbal.Value.type = ProtoCrewMember.KerbalType.Tourist;
                 crew.type = ProtoCrewMember.KerbalType.Tourist;
+                kerbal.Value.Trait = "Tourist";
+                crew.trait = "Tourist";
+                KerbalRoster.SetExperienceTrait(crew, crew.trait);
+                kerbal.Value.salaryContractDisputeProcessed = true;
+                kerbal.Value.salaryContractDispute = true;
             }                       
         }
 

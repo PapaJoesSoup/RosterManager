@@ -43,9 +43,9 @@ namespace RosterManager
         {
             try
             {                
-                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                if (HighLogic.LoadedScene == GameScenes.FLIGHT || HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION)
                 {
-                    DontDestroyOnLoad(this);
+                    //DontDestroyOnLoad(this);
                     RMSettings.ApplySettings();
                     WindowRoster.ResetKerbalProfessions();
                     Utilities.LogMessage("RosterManagerAddon.Awake Active...", "info", RMSettings.VerboseLogging);
@@ -57,8 +57,12 @@ namespace RosterManager
                         if (!ActivateBlizzyToolBar())
                         {
                             // We failed to activate the toolbar, so revert to stock
-                            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-                            GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                            if (ApplicationLauncher.Ready)
+                            {
+                                OnGUIAppLauncherReady();
+                            }
+                            else
+                                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);                            
                             Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
                         }
                     }
@@ -66,8 +70,12 @@ namespace RosterManager
                     {
                         // Use stock Toolbar
                         Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
-                        GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-                        GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                        if (ApplicationLauncher.Ready)
+                        {
+                            OnGUIAppLauncherReady();
+                        }
+                        else
+                            GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);                        
                     }
                 }
             }
@@ -174,7 +182,7 @@ namespace RosterManager
         {            
             if (scene == GameScenes.EDITOR || scene == GameScenes.FLIGHT || scene == GameScenes.SPACECENTER || scene == GameScenes.TRACKSTATION)
             {
-                RMAddon.FrozenKerbals.Clear();
+                //RMAddon.FrozenKerbals.Clear();
                 AllCrew.Clear();
                 RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                 if (RMLifeSpan.Instance != null)
@@ -192,19 +200,16 @@ namespace RosterManager
                 if (!ActivateBlizzyToolBar())
                 {
                     // We failed to activate the toolbar, so revert to stock
-                    GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-                    GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
-
+                    GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);                    
                     Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
                     RMSettings.EnableBlizzyToolbar = RMSettings.prevEnableBlizzyToolbar;
                 }
                 else
                 {
                     OnGUIAppLauncherDestroyed();
-                    GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);
-                    GameEvents.onGUIApplicationLauncherDestroyed.Remove(OnGUIAppLauncherDestroyed);
+                    GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIAppLauncherReady);                    
                     RMSettings.prevEnableBlizzyToolbar = RMSettings.EnableBlizzyToolbar;
-                    if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                    if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                     {
                         RMRoster_Blizzy.Visible = true;
                     }
@@ -214,12 +219,11 @@ namespace RosterManager
             {
                 // Use stock Toolbar
                 Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     RMRoster_Blizzy.Visible = false;
                 }
-                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);
-                GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGUIAppLauncherDestroyed);
+                GameEvents.onGUIApplicationLauncherReady.Add(OnGUIAppLauncherReady);                
                 OnGUIAppLauncherReady();
                 RMSettings.prevEnableBlizzyToolbar = RMSettings.EnableBlizzyToolbar;
             }
@@ -232,7 +236,8 @@ namespace RosterManager
             try
             {
                 // Setup Roster Button
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER && RMRoster_Stock == null && !RMSettings.EnableBlizzyToolbar)
+                if ((HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+                    && RMRoster_Stock == null && !RMSettings.EnableBlizzyToolbar)
                 {
                     string Iconfile = "Icon_Off_38";
                     RMRoster_Stock = ApplicationLauncher.Instance.AddModApplication(
@@ -242,7 +247,9 @@ namespace RosterManager
                         DummyVoid,
                         DummyVoid,
                         DummyVoid,
-                        ApplicationLauncher.AppScenes.SPACECENTER,
+                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.FLIGHT |
+                                          ApplicationLauncher.AppScenes.MAPVIEW | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB |
+                                          ApplicationLauncher.AppScenes.TRACKSTATION,
                         (Texture)GameDatabase.Instance.GetTexture(TextureFolder + Iconfile, false));
 
                     if (WindowRoster.ShowWindow)
@@ -278,7 +285,7 @@ namespace RosterManager
             //Debug.Log("[RosterManager]:  RosterManagerAddon.OnSMRosterToggleOn");
             try
             {
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
                     if (RMSettings.EnableBlizzyToolbar)
@@ -287,9 +294,9 @@ namespace RosterManager
                         RMRoster_Stock.SetTexture((Texture)GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
 
                     RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
-                    AllCrew.Clear();
-                    if (RMLifeSpan.Instance != null)
-                        AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();                    
+                    //AllCrew.Clear();
+                    //if (RMLifeSpan.Instance != null)
+                    //    AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();                    
                 }
             }
             catch (Exception ex)
@@ -310,7 +317,7 @@ namespace RosterManager
                 {
                     if (ToolbarManager.ToolbarAvailable)
                     {
-                        if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                        if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                         {
                             RMRoster_Blizzy = ToolbarManager.Instance.add("RosterManager", "Roster");
                             RMRoster_Blizzy.TexturePath = WindowSettings.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
@@ -361,7 +368,7 @@ namespace RosterManager
 
                 }
 
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                 {
                     if (WindowSettings.ShowWindow)
                     {

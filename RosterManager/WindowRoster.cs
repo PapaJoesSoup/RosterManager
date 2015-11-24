@@ -43,11 +43,11 @@ namespace RosterManager
 
         //Kerbal List Filter vars
         internal static bool isAll = true;
-
         internal static bool isAssign = false;
         internal static bool isAvail = false;
         internal static bool isDead = false;
         internal static bool isFrozen = false;
+        internal static bool isDispute = false;
 
         internal static bool OnCreate = false;
 
@@ -183,7 +183,7 @@ namespace RosterManager
                 OnCreate = false;
                 SelectedKerbal = null;
                 ToolTip = "";
-                if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
+                if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
                     RMAddon.OnRMRosterToggle();
                 else
                     ShowWindow = false;
@@ -326,10 +326,11 @@ namespace RosterManager
                 foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMAddon.AllCrew)
                 {
                     ProtoCrewMember kerbal = rmkerbal.Value.Kerbal;
-                    if (CanDisplayKerbal(kerbal))
+                    if (CanDisplayKerbal(rmkerbal.Value))
                     {
                         GUIStyle labelStyle = null;
-                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+                        if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing
+                            || rmkerbal.Value.salaryContractDispute)
                             labelStyle = RMStyle.LabelStyleRed;
                         else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                             labelStyle = RMStyle.LabelStyleYellow;
@@ -347,7 +348,10 @@ namespace RosterManager
                                 {
                                     if (crewMember == kerbal)
                                     {
-                                        rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                        if (rmkerbal.Value.salaryContractDispute)
+                                            rosterDetails = "Dispute - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                        else
+                                            rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
                                     }
                                 }
@@ -358,6 +362,11 @@ namespace RosterManager
                             // This kerbal could be frozen.  Lets find out...
                             rosterDetails = GetFrozenDetials(kerbal);
                             labelStyle = RMStyle.LabelStyleCyan;
+                        }
+                        else if (rmkerbal.Value.salaryContractDispute)
+                        {
+                            // This kerbal is in contract dispute
+                            rosterDetails = "Contract Dispute";
                         }
                         else
                         {
@@ -401,7 +410,7 @@ namespace RosterManager
                                 GUILayout.Label(kerbalInfo.Value.age.ToString("##0"), labelStyle, GUILayout.Width(35));
                             }
                         }                        
-                        GUILayout.Label(kerbal.trait, labelStyle, GUILayout.Width(75));
+                        GUILayout.Label(rmkerbal.Value.salaryContractDispute ? rmkerbal.Value.RealTrait : kerbal.trait, labelStyle, GUILayout.Width(75));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
                         GUILayout.Label(rosterDetails, labelStyle, GUILayout.Width(240));
@@ -586,64 +595,75 @@ namespace RosterManager
             GUILayout.Label("Kerbal Filter:", GUILayout.Width(90));
             isAll = GUILayout.Toggle(isAll, "All", GUILayout.Width(50));
             if (isAll)
-                isAssign = isAvail = isDead = isFrozen = false;
+                isAssign = isAvail = isDead = isFrozen = isDispute = false;
             else
             {
-                if (!isAssign && !isAvail && !isDead && !isFrozen)
+                if (!isAssign && !isAvail && !isDead && !isFrozen && !isDispute)
                     isAll = true;
             }
             isAssign = GUILayout.Toggle(isAssign, "Assigned", GUILayout.Width(80));
             if (isAssign)
-                isAll = isAvail = isDead = isFrozen = false;
+                isAll = isAvail = isDead = isFrozen = isDispute = false;
             else
             {
-                if (!isAll && !isAvail && !isDead && !isFrozen)
+                if (!isAll && !isAvail && !isDead && !isFrozen && !isDispute)
                     isAssign = true;
             }
             isAvail = GUILayout.Toggle(isAvail, "Available", GUILayout.Width(80));
             if (isAvail)
-                isAll = isAssign = isDead = isFrozen = false;
+                isAll = isAssign = isDead = isFrozen = isDispute = false;
             else
             {
-                if (!isAll && !isAssign && !isDead && !isFrozen)
+                if (!isAll && !isAssign && !isDead && !isFrozen && !isDispute)
                     isAvail = true;
             }
             isDead = GUILayout.Toggle(isDead, "Dead/Missing", GUILayout.Width(100));
             if (isDead)
-                isAll = isAssign = isAvail = isFrozen = false;
+                isAll = isAssign = isAvail = isFrozen = isDispute = false;
             else
             {
-                if (!isAll && !isAssign && !isAvail && !isFrozen)
+                if (!isAll && !isAssign && !isAvail && !isFrozen && !isDispute)
                     isDead = true;
             }
+            isDispute = GUILayout.Toggle(isDispute, "Dispute", GUILayout.Width(80));
+            if (isDispute)
+                isAll = isAssign = isAvail = isFrozen = isDead = false;
+            else
+            {
+                if (!isAll && !isAssign && !isAvail && !isFrozen && !isDead)
+                    isDispute = true;
+            }
+            
             if (DFInterface.IsDFInstalled)
             {
-                isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(100));
+                isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(80));
                 if (isFrozen)
-                    isAll = isAssign = isAvail = isDead = false;
+                    isAll = isAssign = isAvail = isDead = isDispute = false;
                 else
                 {
-                    if (!isAll && !isAssign && !isAvail && !isDead)
+                    if (!isAll && !isAssign && !isAvail && !isDead && !isDispute)
                         isFrozen = true;
                 }
             }
             GUILayout.EndHorizontal();
         }
 
-        private static bool CanDisplayKerbal(ProtoCrewMember kerbal)
+        private static bool CanDisplayKerbal(RMKerbal kerbal)
         {
             if (isAll)
                 return true;
             else if (isAssign &&
-                (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
-                || (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew)))
+                (kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned
+                || (kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew)))
                 return true;
-            else if (isAvail && kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
+            else if (isAvail && kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Available)
                 return true;
-            else if (isDead && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Crew)
-                || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
+            else if (isDead && (kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Crew)
+                || kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing)
                 return true;
-            else if (isFrozen && (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew))
+            else if (isFrozen && (kerbal.Kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type != ProtoCrewMember.KerbalType.Crew))
+                return true;
+            else if (isDispute && (kerbal.salaryContractDispute))
                 return true;
             else
                 return false;
@@ -709,6 +729,8 @@ namespace RosterManager
         internal static void DisplaySelectProfession()
         {
             GUILayout.BeginHorizontal();
+            if (SelectedKerbal.salaryContractDispute)
+                GUI.enabled = false;
             GUILayout.Label("Profession:", GUILayout.Width(80));
             isPilot = GUILayout.Toggle(isPilot, "Pilot", GUILayout.Width(70));
             if (isPilot)
@@ -734,6 +756,7 @@ namespace RosterManager
                 if (!isPilot && !isEngineer)
                     isScientist = true;
             }
+            GUI.enabled = true;
             GUILayout.EndHorizontal();
         }
 
@@ -757,7 +780,7 @@ namespace RosterManager
             {
                 if (RMSettings.EnableKerbalRename)
                 {
-                    WindowRoster.SelectedKerbal.Trait = WindowRoster.KerbalProfession;
+                    WindowRoster.SelectedKerbal.Trait = WindowRoster.KerbalProfession;                    
                 }
                 RMAddon.saveMessage = WindowRoster.SelectedKerbal.SubmitChanges();
                 if (string.IsNullOrEmpty(RMAddon.saveMessage))

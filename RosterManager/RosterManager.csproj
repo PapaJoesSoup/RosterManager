@@ -58,9 +58,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="DFInterface, Version=0.3.5712.8487, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="DFInterface, Version=0.4.5792.35419, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\DeepFreeze\Source\bin\Debug\DFInterface.dll</HintPath>
+      <HintPath>Distribution\GameData\RosterManager\Plugins\DFInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">

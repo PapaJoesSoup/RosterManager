@@ -105,5 +105,61 @@ namespace RosterManager
 
         private static void EmptyWindow(int windowId)
         { }
+
+        internal static void UnregisterExperienceTrait(RMKerbal rmkerbal)
+        {
+            Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.vesselID);
+            Part vslpart = null;
+            if (vsl != null)
+            {
+                if (vsl.loaded)
+                {
+                    foreach (Part part in vsl.parts)
+                    {
+                        bool found = false;
+                        foreach (ProtoCrewMember partcrew in part.protoModuleCrew)
+                        {
+                            if (partcrew == rmkerbal.Kerbal)
+                            {
+                                rmkerbal.Kerbal.UnregisterExperienceTraits(part);
+                                found = true;
+                                vslpart = part;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                }
+            }            
+        }
+
+        internal static void RegisterExperienceTrait(RMKerbal rmkerbal)
+        {
+            Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.vesselID);
+            Part vslpart = null;
+            if (vsl != null)
+            {
+                if (vsl.loaded)
+                {
+                    foreach (Part part in vsl.parts)
+                    {
+                        bool found = false;
+                        foreach (ProtoCrewMember partcrew in part.protoModuleCrew)
+                        {
+                            if (partcrew == rmkerbal.Kerbal)
+                            {
+                                rmkerbal.Kerbal.RegisterExperienceTraits(part);
+                                found = true;
+                                vslpart = part;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                }                
+            }
+        }
     }
 }
