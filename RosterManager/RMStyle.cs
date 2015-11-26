@@ -19,6 +19,7 @@ namespace RosterManager
         internal static GUIStyle LabelStyleBold;
         internal static GUIStyle LabelStyleBoldCenter;
         internal static GUIStyle LabelStyleRed;
+        internal static GUIStyle LabelStyleMagenta;
         internal static GUIStyle LabelStyleYellow;
         internal static GUIStyle LabelStyleGreen;
         internal static GUIStyle LabelStyleCyan;
@@ -117,6 +118,9 @@ namespace RosterManager
 
             LabelStyleRed = new GUIStyle(LabelStyle);
             LabelStyleRed.normal.textColor = Color.red;
+
+            LabelStyleMagenta = new GUIStyle(LabelStyle);
+            LabelStyleMagenta.normal.textColor = Color.magenta;
 
             LabelStyleYellow = new GUIStyle(LabelStyle);
             LabelStyleYellow.normal.textColor = Color.yellow;

@@ -28,7 +28,8 @@ namespace RosterManager
             }
         }
 
-        internal RMKerbals rmkerbals { get; private set; }
+        internal RMKerbals rmKerbals { get; private set; }
+        internal RMGameSettings rmGameSettings { get; set; }
         private readonly List<Component> children = new List<Component>();
 
         public override void OnAwake()
@@ -36,7 +37,8 @@ namespace RosterManager
             Utilities.LogMessage("RosterManagerLifeSpan.Awake Active...", "info", RMSettings.VerboseLogging);
             base.OnAwake();
             _Instance = this;
-            rmkerbals = new RMKerbals();
+            rmKerbals = new RMKerbals();
+            rmGameSettings = new RMGameSettings();
 
             if (HighLogic.LoadedScene == GameScenes.SPACECENTER)
             {
@@ -67,13 +69,21 @@ namespace RosterManager
         public override void OnLoad(ConfigNode gameNode)
         {
             base.OnLoad(gameNode);
-            rmkerbals.Load(gameNode);
+            rmGameSettings.Load(gameNode);
+            rmKerbals.Load(gameNode);
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+            {
+                //Salaries and Profession change charing are disabled in non-career mode games.
+                rmGameSettings.EnableSalaries = false;
+                rmGameSettings.ChangeProfessionCharge = false;                
+            }
         }
 
         public override void OnSave(ConfigNode gameNode)
         {
             base.OnSave(gameNode);
-            rmkerbals.Save(gameNode);
+            rmGameSettings.Save(gameNode);
+            rmKerbals.Save(gameNode);
         }
 
         protected void OnDestroy()

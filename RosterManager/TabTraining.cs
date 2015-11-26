@@ -151,9 +151,9 @@ namespace RosterManager
             GUILayout.Label(WindowRoster.SelectedKerbal.Experience.ToString() + " / 99999");
             GUILayout.EndHorizontal();
 
-            if (RMSettings.EnableSalaries && (WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Unowned))
+            if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries && (WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.type == ProtoCrewMember.KerbalType.Unowned))
             {
-                KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
+                KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
                 if (kerbal.Key != null)
                 {
                     if (kerbal.Value.salaryContractDispute)
@@ -167,7 +167,7 @@ namespace RosterManager
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
-                GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString("###,##0") + " / 100,000 " + RMSettings.SalaryPeriod);
+                GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString("###,##0") + " / 100,000 " + RMLifeSpan.Instance.rmGameSettings.SalaryPeriod);
                 GUILayout.EndHorizontal();                
             }
             GUI.enabled = true;

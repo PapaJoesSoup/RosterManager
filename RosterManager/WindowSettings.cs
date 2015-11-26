@@ -117,34 +117,97 @@ namespace RosterManager
 
             label = "Enable Kerbal Aging";
             toolTip = "Your Kerbals will age and eventually die from old age.";
-            RMSettings.EnableAging = GUILayout.Toggle(RMSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
+            RMLifeSpan.Instance.rmGameSettings.EnableAging = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
 
+            if (!RMLifeSpan.Instance.rmGameSettings.EnableAging)
+                GUI.enabled = false;
+            GUILayout.BeginHorizontal();
+            toolTip = "Average age of new Applicant Kerbals.";
+            GUILayout.Label(new GUIContent("Kerbal Minimum Age: ", toolTip), GUILayout.Width(140));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            string strMinimum_Age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age.ToString();
+            int Minimum_age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age;
+            strMinimum_Age = GUILayout.TextField(strMinimum_Age, GUILayout.Width(40));
+            GUILayout.Label("(Years)", GUILayout.Width(50));            
+            if (int.TryParse(strMinimum_Age, out Minimum_age))
+                RMLifeSpan.Instance.rmGameSettings.Minimum_Age = Minimum_age;
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            toolTip = "Average Lifespan of Kerbals (how long they live).";
+            GUILayout.Label(new GUIContent("Kerbal Lifespan: ", toolTip), GUILayout.Width(140));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            string strMaximum_Age = RMLifeSpan.Instance.rmGameSettings.Maximum_Age.ToString();
+            int Maximum_age = RMLifeSpan.Instance.rmGameSettings.Maximum_Age;
+            strMaximum_Age = GUILayout.TextField(strMaximum_Age, GUILayout.Width(40));
+            GUILayout.Label("(Years)", GUILayout.Width(50));
+            if (int.TryParse(strMaximum_Age, out Maximum_age))
+                RMLifeSpan.Instance.rmGameSettings.Maximum_Age = Maximum_age;
+            GUILayout.EndHorizontal();
+
+            GUI.enabled = true;
             if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
                 GUI.enabled = false;
             label = "Enable Salaries (career game only)";
             toolTip = "Kerbals must be paid Salaries.";
-            RMSettings.EnableSalaries = GUILayout.Toggle(RMSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
+            RMLifeSpan.Instance.rmGameSettings.EnableSalaries = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
 
-            if (!RMSettings.EnableSalaries)
+            if (!RMLifeSpan.Instance.rmGameSettings.EnableSalaries)
                 GUI.enabled = false;
             DisplaySelectSalaryPeriod();
 
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
-                GUI.enabled = false;
-
-            label = "Charge funds for Profession Change";
-            toolTip = "Charge funds for changing a Kerbal's profession.";
-            RMSettings.ChangeProfessionCharge = GUILayout.Toggle(RMSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(300));
+            GUILayout.BeginHorizontal();
+            toolTip = "Default salary for Kerbals.";
+            GUILayout.Label(new GUIContent("Default Kerbal Salary: ", toolTip), GUILayout.Width(140));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-                        
+            string strDef_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary.ToString();
+            double Default_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
+            strDef_salary = GUILayout.TextField(strDef_salary, GUILayout.Width(70));
+            GUILayout.Label("(Funds)", GUILayout.Width(50));
+            GUILayout.EndHorizontal();
+            if (double.TryParse(strDef_salary, out Default_salary))
+                RMLifeSpan.Instance.rmGameSettings.DefaultSalary = Default_salary;
+
+            GUI.enabled = true;
+            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+                GUI.enabled = false;
+
+            label = "Charge funds for Profession Change (career game only)";
+            toolTip = "Charge funds for changing a Kerbal's profession.";
+            RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(300));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+
+            if (!RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge)
+                GUI.enabled = false;
+
+            GUILayout.BeginHorizontal();
+            toolTip = "Cost of changing a Kerbals Profession.";
+            GUILayout.Label(new GUIContent("Change Profession Cost: ", toolTip), GUILayout.Width(140));
+            rect = GUILayoutUtility.GetLastRect();
+            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
+                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
+            string strChg_prof = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost.ToString();
+            double Chg_prof = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost;
+            strChg_prof = GUILayout.TextField(strChg_prof, GUILayout.Width(70));
+            GUILayout.Label("(Funds)", GUILayout.Width(50));
+            GUILayout.EndHorizontal();
+            if (double.TryParse(strChg_prof, out Chg_prof))
+                RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost = Chg_prof;
+
             GUI.enabled = true;
         }
 
@@ -152,28 +215,28 @@ namespace RosterManager
         {
             GUILayout.BeginHorizontal();
             GUILayout.Label("SalaryPeriod:", GUILayout.Width(80));
-            RMSettings.SalaryPeriodisMonthly = GUILayout.Toggle(RMSettings.SalaryPeriodisMonthly, "Monthly", GUILayout.Width(70));
-            if (RMSettings.SalaryPeriodisMonthly)
+            RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly, "Monthly", GUILayout.Width(70));
+            if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly)
             {
-                RMSettings.SalaryPeriodisYearly = false;
+                RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = false;
             }
             else
             {
-                if (!RMSettings.SalaryPeriodisYearly)
+                if (!RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
                 {
-                    RMSettings.SalaryPeriodisMonthly = true;
-                    RMSettings.SalaryPeriod = "Monthly";
+                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = true;
+                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriod = "Monthly";
                 }
             }
-            RMSettings.SalaryPeriodisYearly = GUILayout.Toggle(RMSettings.SalaryPeriodisYearly, "Yearly", GUILayout.Width(80));
-            if (RMSettings.SalaryPeriodisYearly)
-                RMSettings.SalaryPeriodisMonthly = false;
+            RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly, "Yearly", GUILayout.Width(80));
+            if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
+                RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = false;
             else
             {
-                if (!RMSettings.SalaryPeriodisMonthly)
+                if (!RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly)
                 {
-                    RMSettings.SalaryPeriodisYearly = true;
-                    RMSettings.SalaryPeriod = "Yearly";
+                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = true;
+                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriod = "Yearly";
                 }
             }
             GUILayout.EndHorizontal();

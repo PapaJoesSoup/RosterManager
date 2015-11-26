@@ -232,7 +232,7 @@ namespace RosterManager
                         }
                     }
 
-                    if (RMSettings.EnableSalaries)
+                    if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries)
                     {
                         var disputesStyle = WindowContractDispute.ShowWindow ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
                         if (GUILayout.Button("Contract Disputes", disputesStyle))
@@ -286,7 +286,7 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
-                if (RMSettings.EnableAging)
+                if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     if (GUILayout.Button(new GUIContent("|Age", "Age of Kerbal"), hdrlabelStyle, GUILayout.Width(35)))
                         SortRosterList("Age");    
@@ -330,8 +330,10 @@ namespace RosterManager
                     {
                         GUIStyle labelStyle = null;
                         if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead || kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Missing
-                            || rmkerbal.Value.salaryContractDispute)
+                            || (rmkerbal.Value.salaryContractDispute && rmkerbal.Value.Trait == "Tourist"))
                             labelStyle = RMStyle.LabelStyleRed;
+                        else if (rmkerbal.Value.salaryContractDispute && rmkerbal.Value.Trait != "Tourist")
+                            labelStyle = RMStyle.LabelStyleMagenta;
                         else if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
                             labelStyle = RMStyle.LabelStyleYellow;
                         else
@@ -349,7 +351,10 @@ namespace RosterManager
                                     if (crewMember == kerbal)
                                     {
                                         if (rmkerbal.Value.salaryContractDispute)
-                                            rosterDetails = "Dispute - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                            if (rmkerbal.Value.Trait == "Tourist")
+                                                rosterDetails = "Strike - " + thisVessel.GetName().Replace("(unloaded)", "");
+                                            else
+                                                rosterDetails = "Dispute - " + thisVessel.GetName().Replace("(unloaded)", "");
                                         else
                                             rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
                                         break;
@@ -366,7 +371,10 @@ namespace RosterManager
                         else if (rmkerbal.Value.salaryContractDispute)
                         {
                             // This kerbal is in contract dispute
-                            rosterDetails = "Contract Dispute";
+                            if (rmkerbal.Value.Trait == "Tourist")
+                                rosterDetails = "Contract Cancelled - Strike";
+                            else
+                                rosterDetails = "Contract Dispute";
                         }
                         else
                         {
@@ -383,11 +391,11 @@ namespace RosterManager
                             if (SelectedKerbal == null || SelectedKerbal.Kerbal != kerbal)
                             {
                                 //Find the RMKerbal entry for the selected kerbal.
-                                SelectedKerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
+                                SelectedKerbal = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
                                 if (SelectedKerbal == null) //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
                                 {
                                     SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, true);
-                                    RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(kerbal.name, SelectedKerbal);
+                                    RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Add(kerbal.name, SelectedKerbal);
                                 }
                                 SetProfessionFlag();
                                 gender = SelectedKerbal.Gender;
@@ -402,9 +410,9 @@ namespace RosterManager
                         if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                             ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - ScrollViewerPosition.y);
                         GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
-                        if (RMSettings.EnableAging)
+                        if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                         {
-                            KeyValuePair<string, RMKerbal> kerbalInfo = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name);
+                            KeyValuePair<string, RMKerbal> kerbalInfo = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name);
                             if (kerbalInfo.Key != null)
                             {
                                 GUILayout.Label(kerbalInfo.Value.age.ToString("##0"), labelStyle, GUILayout.Width(35));
@@ -519,8 +527,8 @@ namespace RosterManager
                     if (SelectedKerbal.Trait == KerbalProfession && SelectedKerbal.Gender == gender)
                         kerbalFound = true;
                 }
-                if (!RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ContainsKey(SelectedKerbal.Name))
-                    RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(SelectedKerbal.Name, SelectedKerbal);
+                if (!RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.ContainsKey(SelectedKerbal.Name))
+                    RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Add(SelectedKerbal.Name, SelectedKerbal);
                 OnCreate = false;
             }
             if (GUILayout.Button("Cancel", GUILayout.MaxWidth(80)))

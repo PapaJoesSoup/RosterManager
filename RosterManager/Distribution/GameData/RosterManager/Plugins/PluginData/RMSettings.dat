@@ -26,11 +26,11 @@ RM_Windows
 		x = 54
 		y = 198
 		width = 700
-		height = 335
+		height = 336
 	}
 }
 RM_Settings
-{
+{	
 	LockSettings = False
 	EnableHighlighting = True
 	ShowToolTips = True
@@ -46,19 +46,10 @@ RM_Settings
 	ErrorLogLength = 1000
 	SaveLogOnExit = False
 	EnableKerbalRename = True
-	EnableSalaries = True
-	SalaryPeriod = Monthly
-	EnableAging = True
-	ChangeProfessionCharge = True
 }
 RM_Hidden
-{
+{	
 	LifeInfoUpdatePeriod = 360
 	SourcePartColor = red
 	TargetPartColor = green
-	DefaultSalary = 10000
-	ChangeProfessionCost = 10000
-	MinimumAge = 25
-	MaximumAge = 75
-	MaxContractDisputePeriods = 3
 }

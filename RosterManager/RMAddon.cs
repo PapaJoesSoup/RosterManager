@@ -186,7 +186,7 @@ namespace RosterManager
                 AllCrew.Clear();
                 RMAddon.FrozenKerbals = WindowRoster.GetFrozenKerbals();
                 if (RMLifeSpan.Instance != null)
-                    AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();                
+                    AllCrew = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.ToList();                
             }            
         }
 

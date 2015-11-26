@@ -24,7 +24,7 @@ namespace RosterManager
                 GUILayout.Label("Name:", GUILayout.Width(80));
                 WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(230));
                 GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.trait + ")");
-                if (RMSettings.EnableAging)
+                if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age.ToString("##0"));
                 }                
@@ -32,7 +32,7 @@ namespace RosterManager
             else
             {
                 GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(300));
-                if (RMSettings.EnableAging)
+                if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age.ToString("##0"));
                 }

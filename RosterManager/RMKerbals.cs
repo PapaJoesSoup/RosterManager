@@ -125,14 +125,14 @@ namespace RosterManager
                 {
                     if (status == ProtoCrewMember.RosterStatus.Assigned)
                     {
-                        Utilities.UnregisterExperienceTrait(this);
+                        UnregisterExperienceTrait(this);
                     }
                     Trait = kerbal.trait;
                     RealTrait = kerbal.trait;
                     KerbalRoster.SetExperienceTrait(kerbal, Trait);
                     if (status == ProtoCrewMember.RosterStatus.Assigned)
                     {
-                        Utilities.RegisterExperienceTrait(this);
+                        RegisterExperienceTrait(this);
                     }
                 }                
                 Gender = kerbal.gender;
@@ -177,14 +177,14 @@ namespace RosterManager
             {            
                 if (status == ProtoCrewMember.RosterStatus.Assigned)
                 {
-                    Utilities.UnregisterExperienceTrait(this);
+                    UnregisterExperienceTrait(this);
                 }
                 RealTrait = Trait;
                 Kerbal.trait = Trait;                
                 KerbalRoster.SetExperienceTrait(Kerbal, Trait);
                 if (status == ProtoCrewMember.RosterStatus.Assigned)
                 {
-                    Utilities.RegisterExperienceTrait(this);
+                    RegisterExperienceTrait(this);
                 }
             }            
             Kerbal.gender = Gender;
@@ -289,6 +289,62 @@ namespace RosterManager
             node.AddValue("Experience", Experience);
 
             return node;
+        }
+
+        internal static void UnregisterExperienceTrait(RMKerbal rmkerbal)
+        {
+            Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.vesselID);
+            Part vslpart = null;
+            if (vsl != null)
+            {
+                if (vsl.loaded)
+                {
+                    foreach (Part part in vsl.parts)
+                    {
+                        bool found = false;
+                        foreach (ProtoCrewMember partcrew in part.protoModuleCrew)
+                        {
+                            if (partcrew == rmkerbal.Kerbal)
+                            {
+                                rmkerbal.Kerbal.UnregisterExperienceTraits(part);
+                                found = true;
+                                vslpart = part;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                }
+            }
+        }
+
+        internal static void RegisterExperienceTrait(RMKerbal rmkerbal)
+        {
+            Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.vesselID);
+            Part vslpart = null;
+            if (vsl != null)
+            {
+                if (vsl.loaded)
+                {
+                    foreach (Part part in vsl.parts)
+                    {
+                        bool found = false;
+                        foreach (ProtoCrewMember partcrew in part.protoModuleCrew)
+                        {
+                            if (partcrew == rmkerbal.Kerbal)
+                            {
+                                rmkerbal.Kerbal.RegisterExperienceTraits(part);
+                                found = true;
+                                vslpart = part;
+                                break;
+                            }
+                        }
+                        if (found)
+                            break;
+                    }
+                }
+            }
         }
     }
 

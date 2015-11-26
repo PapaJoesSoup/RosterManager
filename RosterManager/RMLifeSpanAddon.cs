@@ -78,7 +78,7 @@ namespace RosterManager
                     {
                         foreach (ProtoCrewMember crew in FlightGlobals.ActiveVessel.GetVesselCrew().ToList())
                         {
-                            KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == crew.name);
+                            KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == crew.name);
                             if (kerbal.Key != null)
                             {
                                 kerbal.Value.vesselID = FlightGlobals.ActiveVessel.id;
@@ -135,7 +135,7 @@ namespace RosterManager
             List<ProtoCrewMember> crewkerbals = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
             foreach (ProtoCrewMember crew in crewkerbals)
             {
-                if ((crew.type == ProtoCrewMember.KerbalType.Tourist && RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ContainsKey(crew.name))
+                if ((crew.type == ProtoCrewMember.KerbalType.Tourist && RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.ContainsKey(crew.name))
                     || crew.type != ProtoCrewMember.KerbalType.Tourist)
                 {
                     updateKerbal(crew, true);
@@ -154,7 +154,7 @@ namespace RosterManager
         {
             double currentTime = Planetarium.GetUniversalTime();
             //First find them in the internal Dictionary.
-            KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == crew.name);
+            KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == crew.name);
             //If not found and addifNotFound is true create a new entry
             if (kerbal.Value == null && addifNotFound)
             {
@@ -164,13 +164,13 @@ namespace RosterManager
                 rmkerbal.status = crew.rosterStatus;
                 rmkerbal.vesselID = Guid.Empty;
                 rmkerbal.vesselName = string.Empty;
-                double dice_minage = rnd.Next(RMSettings.Minimum_Age - 3, RMSettings.Minimum_Age + 3); // Randomly set their age.
+                double dice_minage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Minimum_Age - 3, RMLifeSpan.Instance.rmGameSettings.Minimum_Age + 3); // Randomly set their age.
                 rmkerbal.age = dice_minage;
-                double dice_maxage = rnd.Next(RMSettings.Maximum_Age - 5, RMSettings.Maximum_Age + 5); // Randomly set their age.
+                double dice_maxage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Maximum_Age - 5, RMLifeSpan.Instance.rmGameSettings.Maximum_Age + 5); // Randomly set their age.
                 rmkerbal.lifespan = dice_maxage;                
                 rmkerbal.timelastBirthday = currentTime;
                 rmkerbal.timelastsalary = currentTime;
-                rmkerbal.salary = RMSettings.DefaultSalary;
+                rmkerbal.salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
                 if (DFInterface.IsDFInstalled)
                 {
                     if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
@@ -189,18 +189,18 @@ namespace RosterManager
                 rmkerbal.Skill = crew.experienceLevel;
                 rmkerbal.Experience = crew.experience;
                 rmkerbal.Kerbal = crew;
-                RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Add(crew.name, rmkerbal);              
+                RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Add(crew.name, rmkerbal);              
     }
             //If found update their entry
             else if (kerbal.Value != null)
             {                
                 if (currentTime - kerbal.Value.lastUpdate > RMSettings.LifeInfoUpdatePeriod)  // Only update every 6 minutes. Can be changed in hidden settings
                 {
-                    if (RMSettings.EnableAging)
+                    if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                     {
                         checkAge(crew, kerbal, currentTime);
                     }                        
-                    if (RMSettings.EnableSalaries)
+                    if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries)
                     {
                         checkSalary(crew, kerbal, currentTime);
                     }
@@ -398,14 +398,14 @@ namespace RosterManager
             double SalaryTimeSpan = SalaryTimeMonthRealCalendar;
             if (GameSettings.KERBIN_TIME)
             {
-                if (RMSettings.SalaryPeriodisYearly)
+                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
                     SalaryTimeSpan = SalaryTimeYearKerbalCalendar;
                 else
                     SalaryTimeSpan = SalaryTimeMonthKerbalCalendar;
             }
             else
             {
-                if (RMSettings.SalaryPeriodisYearly)
+                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
                     SalaryTimeSpan = SalaryTimeYearRealCalendar;
             }
             
@@ -417,7 +417,7 @@ namespace RosterManager
                     //Check if contractdispute is active and if it is process that
                     if (kerbal.Value.salaryContractDispute && kerbal.Value.salaryContractDisputeProcessed)
                     {
-                        processContractDispute(crew, kerbal, currentTime, false, false);
+                        processContractDispute(crew, kerbal, currentTime, false, true);
                     }
                     else  //No contract dispute so process normal salary.
                     {
@@ -471,8 +471,10 @@ namespace RosterManager
                     Funding.Instance.AddFunds(-(kerbal.Value.salary + kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
                     kerbal.Value.timelastsalary = currentTime;
                     kerbal.Value.salaryContractDispute = false;
-                    kerbal.Value.salaryContractDisputeProcessed = false;
+                    kerbal.Value.salaryContractDisputeProcessed = true;
                     kerbal.Value.salaryContractDisputePeriods = 0;
+                    kerbal.Value.payriseRequired = 0d;
+                    kerbal.Value.owedSalary = 0d;
                     //If they are a tourist (dispute) and not dead (DeepFreeze frozen/comatose) set them back to crew                   
                     if (kerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
                     {
@@ -481,7 +483,7 @@ namespace RosterManager
                         kerbal.Value.Trait = kerbal.Value.RealTrait;
                         crew.trait = kerbal.Value.RealTrait;
                         KerbalRoster.SetExperienceTrait(crew, crew.trait);
-                        Utilities.RegisterExperienceTrait(kerbal.Value);                      
+                        RMKerbal.RegisterExperienceTrait(kerbal.Value);                      
                     }
                     Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary paid " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
                     Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary contract dispute ended " + crew.name, "info", RMSettings.VerboseLogging);
@@ -504,7 +506,7 @@ namespace RosterManager
             //How many salaryperiods have we been in dispute? If > RMSettings.MaxContractDisputePeriods periods kerbal Quits (becomes a tourist).
             // otherwise, increase the periods we have been in dispute, user must accept payrise as well (if they don't the kerbal Quits) and calculate and store their backpay owed.
             kerbal.Value.salaryContractDisputePeriods++;
-            if (kerbal.Value.salaryContractDisputePeriods > RMSettings.MaxContractDisputePeriods)
+            if (kerbal.Value.salaryContractDisputePeriods > RMLifeSpan.Instance.rmGameSettings.MaxContractDisputePeriods)
             {                
                 //Kerbal Quits.
                 resignKerbal(crew, kerbal);
@@ -516,8 +518,8 @@ namespace RosterManager
                 double payriseRequired = kerbal.Value.salary * (kerbal.Value.salaryContractDisputePeriods * 10d / 100d);                
                 //Salaries cannot exceed 100000
                 if (kerbal.Value.salary + payriseRequired > 100000)  //**WIP Marker This probably should be a settings VAR, Hard-coded upper salary limit of 100000 funds.
-                    payriseRequired = 0; 
-                //WindowContractDispute.ShowWindow = true;
+                    payriseRequired = 0;
+                kerbal.Value.payriseRequired = payriseRequired;
                 kerbal.Value.salaryContractDisputeProcessed = false;           
             }                            
         }
@@ -529,13 +531,14 @@ namespace RosterManager
             //We don't change their status if they are unowned/dead (DeepFreeze Frozen)
             if (crew.type != ProtoCrewMember.KerbalType.Unowned && crew.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
             {                
-                Utilities.UnregisterExperienceTrait(kerbal.Value);
+                RMKerbal.UnregisterExperienceTrait(kerbal.Value);
                 //kerbal.Value.RealTrait = kerbal.Value.Trait;
                 kerbal.Value.type = ProtoCrewMember.KerbalType.Tourist;
                 crew.type = ProtoCrewMember.KerbalType.Tourist;
                 kerbal.Value.Trait = "Tourist";
                 crew.trait = "Tourist";
                 KerbalRoster.SetExperienceTrait(crew, crew.trait);
+                kerbal.Value.payriseRequired = 0d;                
                 kerbal.Value.salaryContractDisputeProcessed = true;
                 kerbal.Value.salaryContractDispute = true;
             }                       
@@ -544,10 +547,10 @@ namespace RosterManager
         public void removeKerbal(ProtoCrewMember crew)
         {
             //First find them in the internal Dictionary.
-            if (RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ContainsKey(crew.name))
+            if (RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.ContainsKey(crew.name))
             {
                 //Then remove them.
-                RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.Remove(crew.name);
+                RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Remove(crew.name);
             }
         }
     }
