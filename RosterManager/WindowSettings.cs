@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace RosterManager
 {
@@ -24,13 +25,14 @@ namespace RosterManager
             if (GUI.Button(rect, new GUIContent("", "Close Window")))
             {
                 ToolTip = "";
+                RMSettings.RestoreTempSettings();
                 WindowSettings.ShowWindow = false;
             }
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
 
             // Store settings in case we cancel later...
-            RMSettings.StoreTempSettings();
+            //RMSettings.StoreTempSettings();
 
             GUILayout.BeginVertical();
             ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
@@ -50,6 +52,45 @@ namespace RosterManager
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Save"))
             {
+                //If EnableAging has been turned ON when it was previously OFF, we reset age processing, otherwise they could all die instantly.
+                if (RMLifeSpan.Instance.rmGameSettings.EnableAging && RMSettings.prevEnableAging == false)
+                {
+                    double currentTime = Planetarium.GetUniversalTime();
+                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
+                    {
+                        rmkerbal.Value.timelastBirthday = currentTime;
+                        rmkerbal.Value.timeNextBirthday = RMKerbal.BirthdayNextDue(currentTime);
+                    }
+                }
+                //If EnableSalaries has been turned OFF when it was previously ON, reset any kerbals from tourist back to active.
+                if (!RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == true)
+                {
+                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
+                    {
+                        if (rmkerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && rmkerbal.Value.Kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+                        {
+                            rmkerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
+                            rmkerbal.Value.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
+                            rmkerbal.Value.Trait = rmkerbal.Value.RealTrait;
+                            rmkerbal.Value.Kerbal.trait = rmkerbal.Value.RealTrait;
+                            KerbalRoster.SetExperienceTrait(rmkerbal.Value.Kerbal, rmkerbal.Value.Trait);
+                            RMKerbal.RegisterExperienceTrait(rmkerbal.Value);                            
+                        }
+                        rmkerbal.Value.salaryContractDispute = false;
+                        rmkerbal.Value.salaryContractDisputePeriods = 0;
+                        rmkerbal.Value.salaryContractDisputeProcessed = true;
+                    }
+                }
+                //If EnableSalaries has been turned ON when it was previously OFF, reset all kerbals salary time to now.
+                if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == false)
+                {
+                    double currentTime = Planetarium.GetUniversalTime();
+                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
+                    {
+                        rmkerbal.Value.timelastsalary = currentTime;
+                        rmkerbal.Value.timeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
+                    }
+                }
                 RMSettings.SaveSettings();
                 WindowSettings.ShowWindow = false;
             }
@@ -167,7 +208,7 @@ namespace RosterManager
             DisplaySelectSalaryPeriod();
 
             GUILayout.BeginHorizontal();
-            toolTip = "Default salary for Kerbals.";
+            toolTip = "Default salary for each Kerbal per each salary period.";
             GUILayout.Label(new GUIContent("Default Kerbal Salary: ", toolTip), GUILayout.Width(140));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
@@ -175,7 +216,7 @@ namespace RosterManager
             string strDef_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary.ToString();
             double Default_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
             strDef_salary = GUILayout.TextField(strDef_salary, GUILayout.Width(70));
-            GUILayout.Label("(Funds)", GUILayout.Width(50));
+            GUILayout.Label("(Funds/per salary period)", GUILayout.Width(120));
             GUILayout.EndHorizontal();
             if (double.TryParse(strDef_salary, out Default_salary))
                 RMLifeSpan.Instance.rmGameSettings.DefaultSalary = Default_salary;
@@ -273,7 +314,7 @@ namespace RosterManager
             label = "Contract Disputes Window Tool Tips";
             GUILayout.BeginHorizontal();
             GUILayout.Space(20);
-            WindowContractDispute.ShowToolTips = GUILayout.Toggle(WindowContractDispute.ShowToolTips, label, GUILayout.Width(300));
+            WindowContracts.ShowToolTips = GUILayout.Toggle(WindowContracts.ShowToolTips, label, GUILayout.Width(300));
             GUILayout.EndHorizontal();
             GUI.enabled = true;
         }

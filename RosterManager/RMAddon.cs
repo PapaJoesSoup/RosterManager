@@ -376,10 +376,10 @@ namespace RosterManager
                         WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, "Roster Manager Settings", GUILayout.MinHeight(20));
                     }
 
-                    if (WindowContractDispute.ShowWindow)
+                    if (WindowContracts.ShowWindow)
                     {
-                        step = "4 - Contract Disputes";
-                        WindowContractDispute.Position = GUILayout.Window(318987, WindowContractDispute.Position, WindowContractDispute.Display, "Contract Disputes", GUILayout.MinHeight(20));
+                        step = "4 - Roster Contracts";
+                        WindowContracts.Position = GUILayout.Window(318987, WindowContracts.Position, WindowContracts.Display, "Roster Contracts", GUILayout.MinHeight(20));
                     }
 
                     if (WindowRoster.ShowWindow)

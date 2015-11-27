@@ -81,6 +81,7 @@ namespace RosterManager
         public double age = 25d;  //Their current age
         public double lifespan = 75d;  //Their lifespan in years
         public double timelastBirthday = 0d;  //Game time of their last birthday
+        public double timeNextBirthday = 0d; //Game time of their next birthday
         public double timeDFFrozen = 0d;  //Game time they were DeepFreeze Frozen
         public double salary = 10000d;  //Their Salary
         public bool salaryContractDispute = false; //If their salary is in dispute (ie.Unpaid)
@@ -89,6 +90,7 @@ namespace RosterManager
         public double owedSalary = 0d; //Backpay they are owed
         public int salaryContractDisputePeriods = 0; //Number of salary periods contract has been in dispute
         public double timelastsalary = 0d; //Game Time they were last paid
+        public double timeSalaryDue = 0d; // Game Time salary is next due
         public string notes = string.Empty; //Their notes
 
         public ProtoCrewMember Kerbal { get; set; }
@@ -104,12 +106,50 @@ namespace RosterManager
         public int Skill = 0;
         public float Experience = 0f;
 
+        private System.Random rnd = new System.Random();  // Random seed for setting Kerbals ages
+        
+
         public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
         {
             lastUpdate = currentTime;
             Kerbal = kerbal;
             IsNew = isnew;
             Name = kerbal.name;
+            if (isnew)
+            {
+                Trait = kerbal.trait;
+                type = kerbal.type;
+                status = kerbal.rosterStatus;
+                vesselID = Guid.Empty;
+                vesselName = string.Empty;
+                double dice_minage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Minimum_Age - 3, RMLifeSpan.Instance.rmGameSettings.Minimum_Age + 3); // Randomly set their age.
+                age = dice_minage;
+                double dice_maxage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Maximum_Age - 5, RMLifeSpan.Instance.rmGameSettings.Maximum_Age + 5); // Randomly set their age.
+                lifespan = dice_maxage;
+                timelastBirthday = currentTime;
+                timeNextBirthday = BirthdayNextDue(currentTime);
+                timelastsalary = currentTime;
+                timeSalaryDue = SalaryNextDue(currentTime);
+                salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
+                if (DFInterface.IsDFInstalled)
+                {
+                    if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
+                    {
+                        if (RMAddon.FrozenKerbals.ContainsKey(kerbal.name))
+                        {
+                            timeDFFrozen = RMAddon.FrozenKerbals[kerbal.name].lastUpdate;
+                        }
+                    }
+                }
+                Name = kerbal.name;
+                Stupidity = kerbal.stupidity;
+                Courage = kerbal.courage;
+                Badass = kerbal.isBadass;
+                Gender = kerbal.gender;
+                Skill = kerbal.experienceLevel;
+                Experience = kerbal.experience;
+                Kerbal = kerbal;
+            }
             if (modKerbal)
             {
                 Stupidity = kerbal.stupidity;
@@ -230,8 +270,10 @@ namespace RosterManager
                 info.age = GetNodes.GetNodeValue(node, "age", 25.0d);
                 info.lifespan = GetNodes.GetNodeValue(node, "lifespan", 75.0d);
                 info.timelastBirthday = GetNodes.GetNodeValue(node, "timelastBirthday", lastUpdate);
+                info.timeNextBirthday = GetNodes.GetNodeValue(node, "timeNextBirthday", BirthdayNextDue(info.timelastBirthday));
                 info.timeDFFrozen = GetNodes.GetNodeValue(node, "timeDFFrozen", 0d);
                 info.salary = GetNodes.GetNodeValue(node, "salary", 0d);
+                info.timeSalaryDue = GetNodes.GetNodeValue(node, "timeSalaryDue", lastUpdate);
                 info.timelastsalary = GetNodes.GetNodeValue(node, "timelastsalary", lastUpdate);
                 info.salaryContractDispute = GetNodes.GetNodeValue(node, "salaryContractDispute", false);
                 info.owedSalary = GetNodes.GetNodeValue(node, "owedSalary", 0d);
@@ -270,8 +312,10 @@ namespace RosterManager
             node.AddValue("age", age);
             node.AddValue("lifespan", lifespan);
             node.AddValue("timelastBirthday", timelastBirthday);
+            node.AddValue("timeNextBirthday", timeNextBirthday);
             node.AddValue("timeDFFrozen", timeDFFrozen);
             node.AddValue("salary", salary);
+            node.AddValue("timeSalaryDue", timeSalaryDue);
             node.AddValue("timelastsalary", timelastsalary);
             node.AddValue("notes", notes);
             node.AddValue("salaryContractDispute", salaryContractDispute);
@@ -345,6 +389,42 @@ namespace RosterManager
                     }
                 }
             }
+        }
+        
+        public static double SalaryNextDue(double Time)
+        {
+            int SalaryTimeMonthRealCalendar = KSPUtil.EarthYear / 12;
+            int SalaryTimeMonthKerbalCalendar = KSPUtil.KerbinYear / 12;
+            double returnTime = 0d;
+            double SalaryTimeSpan = SalaryTimeMonthRealCalendar;
+            if (GameSettings.KERBIN_TIME)
+            {
+                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
+                    SalaryTimeSpan = KSPUtil.KerbinYear;
+                else
+                    SalaryTimeSpan = SalaryTimeMonthKerbalCalendar;
+            }
+            else
+            {
+                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
+                    SalaryTimeSpan = KSPUtil.EarthYear;
+            }
+            returnTime = Time + SalaryTimeSpan;
+            return returnTime;
+        }
+
+        public static double BirthdayNextDue(double Time)
+        {
+            double returnTime = 0d;
+            double BirthdayTimeSpan = KSPUtil.KerbinYear;
+            if (!GameSettings.KERBIN_TIME)
+            {
+                BirthdayTimeSpan = KSPUtil.EarthYear;
+
+            }
+
+            returnTime = Time + BirthdayTimeSpan;
+            return returnTime;
         }
     }
 

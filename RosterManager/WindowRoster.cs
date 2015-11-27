@@ -234,16 +234,16 @@ namespace RosterManager
 
                     if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries)
                     {
-                        var disputesStyle = WindowContractDispute.ShowWindow ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-                        if (GUILayout.Button("Contract Disputes", disputesStyle))
+                        var disputesStyle = WindowContracts.ShowWindow ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+                        if (GUILayout.Button("Salary Contracts", disputesStyle))
                         {
                             try
                             {
-                                WindowContractDispute.ShowWindow = !WindowContractDispute.ShowWindow;
+                                WindowContracts.ShowWindow = !WindowContracts.ShowWindow;
                             }
                             catch (Exception ex)
                             {
-                                Utilities.LogMessage(string.Format(" opening Contract Disputes Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+                                Utilities.LogMessage(string.Format(" opening Salary Contracts Window.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
                             }
                         }
                     }
@@ -394,7 +394,7 @@ namespace RosterManager
                                 SelectedKerbal = RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
                                 if (SelectedKerbal == null) //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
                                 {
-                                    SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, true);
+                                    SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, false);
                                     RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Add(kerbal.name, SelectedKerbal);
                                 }
                                 SetProfessionFlag();

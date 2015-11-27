@@ -33,9 +33,9 @@ namespace RosterManager
             Maximum_Age = 75;
             MaxContractDisputePeriods = 3;
             ChangeProfessionCharge = false;
-            ChangeProfessionCost = 10000;
+            ChangeProfessionCost = 5000;
             EnableSalaries = false;
-            DefaultSalary = 10000;
+            DefaultSalary = 5000;
             SalaryPeriodisMonthly = true;
             SalaryPeriodisYearly = false;
             SalaryPeriod = "Monthly";

@@ -29,16 +29,10 @@ namespace RosterManager
             {
                 return _Instance;
             }
-        }
-                     
-        private System.Random rnd = new System.Random();  // Random seed for setting Kerbals ages
-        private System.Random gen = new System.Random();  // Random seed for deciding when a kerbal dies of old age. Do we need two seeds?
-
-        private const double SalaryTimeYearRealCalendar = 60 * 60 * 24 * 365;
-        private const double SalaryTimeMonthRealCalendar = SalaryTimeYearRealCalendar / 12;
-        private const double SalaryTimeYearKerbalCalendar = 60 * 60 * 6 * 426;
-        private const double SalaryTimeMonthKerbalCalendar = SalaryTimeYearKerbalCalendar / 12;
+        }                    
         
+        private System.Random gen = new System.Random();  // Random seed for deciding when a kerbal dies of old age. Do we need two seeds?
+                
         protected RMLifeSpanAddon()
         {
             Utilities.LogMessage("RosterManagerLifeSpanAddon.Constructor Active...", "info", RMSettings.VerboseLogging);
@@ -158,37 +152,7 @@ namespace RosterManager
             //If not found and addifNotFound is true create a new entry
             if (kerbal.Value == null && addifNotFound)
             {
-                RMKerbal rmkerbal = new RMKerbal(Planetarium.GetUniversalTime(), crew, true, true);
-                rmkerbal.Trait = crew.trait;
-                rmkerbal.type = crew.type;
-                rmkerbal.status = crew.rosterStatus;
-                rmkerbal.vesselID = Guid.Empty;
-                rmkerbal.vesselName = string.Empty;
-                double dice_minage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Minimum_Age - 3, RMLifeSpan.Instance.rmGameSettings.Minimum_Age + 3); // Randomly set their age.
-                rmkerbal.age = dice_minage;
-                double dice_maxage = rnd.Next(RMLifeSpan.Instance.rmGameSettings.Maximum_Age - 5, RMLifeSpan.Instance.rmGameSettings.Maximum_Age + 5); // Randomly set their age.
-                rmkerbal.lifespan = dice_maxage;                
-                rmkerbal.timelastBirthday = currentTime;
-                rmkerbal.timelastsalary = currentTime;
-                rmkerbal.salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
-                if (DFInterface.IsDFInstalled)
-                {
-                    if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
-                    {
-                        if (RMAddon.FrozenKerbals.ContainsKey(crew.name))
-                        {
-                            rmkerbal.timeDFFrozen = RMAddon.FrozenKerbals[crew.name].lastUpdate;
-                        }
-                    }
-                }
-                rmkerbal.Name = crew.name;
-                rmkerbal.Stupidity = crew.stupidity;
-                rmkerbal.Courage = crew.courage;
-                rmkerbal.Badass = crew.isBadass;
-                rmkerbal.Gender = crew.gender;
-                rmkerbal.Skill = crew.experienceLevel;
-                rmkerbal.Experience = crew.experience;
-                rmkerbal.Kerbal = crew;
+                RMKerbal rmkerbal = new RMKerbal(Planetarium.GetUniversalTime(), crew, true, false);                
                 RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Add(crew.name, rmkerbal);              
     }
             //If found update their entry
@@ -252,25 +216,15 @@ namespace RosterManager
             }
 
             //Is it their Birthday?
-            double birthdayTimeDiff = currentTime - kerbal.Value.timelastBirthday;
-            double years = 0d;
-            if (GameSettings.KERBIN_TIME)
-            {
-                years = birthdayTimeDiff / 60 / 60 / 6 / 426;
-                
-            }
-            else
-            {
-                years = birthdayTimeDiff / 60 / 60 / 24 / 365;
-                
-            }
-            if (years >= 1)
+            
+            if (currentTime >= kerbal.Value.timeNextBirthday)
             {
                 //It's their Birthday!!!!
-                if (kerbal.Value.type != ProtoCrewMember.KerbalType.Applicant)
-                    ScreenMessages.PostScreenMessage("It's " + crew.name + " Birthday! They are now " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_CENTER);
-                kerbal.Value.age += Math.Truncate(years);
+                kerbal.Value.age += 1;
                 kerbal.Value.timelastBirthday = currentTime;
+                kerbal.Value.timeNextBirthday = RMKerbal.BirthdayNextDue(currentTime);
+                if (kerbal.Value.type != ProtoCrewMember.KerbalType.Applicant)
+                    ScreenMessages.PostScreenMessage("It's " + crew.name + " Birthday! They are now " + kerbal.Value.age, 5.0f, ScreenMessageStyle.UPPER_CENTER);                                
             }
 
             //Check if they Die of Old Age
@@ -395,28 +349,21 @@ namespace RosterManager
 
         private void checkSalary(ProtoCrewMember crew, KeyValuePair<string, RMKerbal> kerbal, double currentTime)
         {            
-            double SalaryTimeSpan = SalaryTimeMonthRealCalendar;
-            if (GameSettings.KERBIN_TIME)
+            if (currentTime >= kerbal.Value.timeSalaryDue) // Salary Due??
             {
-                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
-                    SalaryTimeSpan = SalaryTimeYearKerbalCalendar;
-                else
-                    SalaryTimeSpan = SalaryTimeMonthKerbalCalendar;
-            }
-            else
-            {
-                if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
-                    SalaryTimeSpan = SalaryTimeYearRealCalendar;
-            }
-            
-            if (currentTime - kerbal.Value.timelastsalary >= SalaryTimeSpan) // Salary Due??
-            {
+                //Set time next salary due
+                kerbal.Value.timeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
                 //Pay Salary
                 if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER)
                 {
                     //Check if contractdispute is active and if it is process that
                     if (kerbal.Value.salaryContractDispute && kerbal.Value.salaryContractDisputeProcessed)
                     {
+                        //If they are a Tourist they are on strike. We don't process dispute. 
+                        if (kerbal.Value.type == ProtoCrewMember.KerbalType.Tourist)
+                        {                            
+                            return;
+                        }
                         processContractDispute(crew, kerbal, currentTime, false, true);
                     }
                     else  //No contract dispute so process normal salary.
@@ -424,7 +371,7 @@ namespace RosterManager
                         if (Funding.CanAfford((float)kerbal.Value.salary))
                         {
                             Funding.Instance.AddFunds(-kerbal.Value.salary, TransactionReasons.CrewRecruited);
-                            kerbal.Value.timelastsalary = currentTime;
+                            kerbal.Value.timelastsalary = currentTime;                            
                             Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary paid " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
                             ScreenMessages.PostScreenMessage("Paid " + crew.name + " salary of " + kerbal.Value.salary.ToString(), 5.0f, ScreenMessageStyle.UPPER_CENTER);
                         }
@@ -435,24 +382,14 @@ namespace RosterManager
                         }
                     }
                 }
-            }
-            // This else was to auto-resolve contract disputes, but am leaving it manual for this version.
-            // Perhaps in the next version it can be activated again, but with a auto-resolve conflicts setting.
-            //else    
-            //{
-            //Check if contractdispute is active and if it is process that
-            //    if (kerbal.Value.salaryContractDispute)
-            //    {
-            //        processContractDispute(crew, kerbal, currentTime, false, false);
-            //    }
-            //}            
+            }                  
         }
 
         private void processContractDispute(ProtoCrewMember crew, KeyValuePair<string, RMKerbal> kerbal, double currentTime, bool start, bool extend)
-        {            
-            // They will continue to work for X periods of salaryperiod, with a payrise. A backpay is accrued.
-            // Or they quit after X periods or if user does not accept the payrise.            
-            Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary unable to pay " + crew.name + " salary.", "info", RMSettings.VerboseLogging);
+        {
+            // They will continue to work for RMLifeSpan.Instance.rmGameSettings.MaxContractDisputePeriods of salaryperiod, with a payrise that must be accepted each time. All backpay is accrued.
+            // Or they quit/strike after RMLifeSpan.Instance.rmGameSettings.MaxContractDisputePeriods or if user does not accept the payrise.            
+            Utilities.LogMessage("RosterManagerLifeSpanAddon.CheckSalary unable to pay " + crew.name + " salary.", "info", RMSettings.VerboseLogging);            
             if (start)  //Start a new contract dispute
             {
                 ScreenMessages.PostScreenMessage("Insufficient funds to pay " + crew.name + " salary at this time.", 5.0f, ScreenMessageStyle.UPPER_CENTER);
@@ -465,7 +402,7 @@ namespace RosterManager
             {
                 //Check if we have funds now?
                 //If we have pay them.
-                //Else process contract dispute.
+                //Else extend the contract dispute.
                 if (Funding.CanAfford((float)kerbal.Value.salary + (float)kerbal.Value.owedSalary))
                 {
                     Funding.Instance.AddFunds(-(kerbal.Value.salary + kerbal.Value.owedSalary), TransactionReasons.CrewRecruited);
@@ -491,7 +428,7 @@ namespace RosterManager
                     ScreenMessages.PostScreenMessage(crew.name + " contract dispute ended.", 5.0f, ScreenMessageStyle.UPPER_CENTER);
                 }
                 else  //Can't end dispute
-                {
+                {                    
                     if (extend)
                     {
                         kerbal.Value.timelastsalary = currentTime;
@@ -552,6 +489,6 @@ namespace RosterManager
                 //Then remove them.
                 RMLifeSpan.Instance.rmKerbals.ALLRMKerbals.Remove(crew.name);
             }
-        }
+        }        
     }
 }

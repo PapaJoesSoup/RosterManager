@@ -82,7 +82,7 @@
     <Compile Include="TabRecords.cs" />
     <Compile Include="TabScheduling.cs" />
     <Compile Include="TabTraining.cs" />
-    <Compile Include="WindowContractDispute.cs" />
+    <Compile Include="WindowContracts.cs" />
     <Compile Include="WindowDebugger.cs" />
     <Compile Include="RMStyle.cs" />
     <Compile Include="WindowRoster.cs" />

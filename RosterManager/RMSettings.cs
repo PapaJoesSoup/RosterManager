@@ -42,7 +42,7 @@ namespace RosterManager
         internal static bool AutoDebug = false;
         internal static bool SaveLogOnExit = false;
                 
-        internal static double LifeInfoUpdatePeriod = 360;
+        internal static double LifeInfoUpdatePeriod = 60;
                
         // Non user managed Internal options
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
@@ -124,7 +124,7 @@ namespace RosterManager
             prevSettingsToolTips = WindowSettings.ShowToolTips;
             prevRosterToolTips = WindowRoster.ShowToolTips;
             prevDebuggerToolTips = WindowDebugger.ShowToolTips;
-            prevContractDisputeToolTips = WindowContractDispute.ShowToolTips;
+            prevContractDisputeToolTips = WindowContracts.ShowToolTips;
             prevChangeProfessionCharge = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge;
             prevDefaultSalary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
             prevChangeProfessionCost = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost;
@@ -155,7 +155,7 @@ namespace RosterManager
             WindowSettings.ShowToolTips = prevSettingsToolTips;
             WindowRoster.ShowToolTips = prevRosterToolTips;
             WindowDebugger.ShowToolTips = prevDebuggerToolTips;
-            WindowContractDispute.ShowToolTips = prevContractDisputeToolTips;
+            WindowContracts.ShowToolTips = prevContractDisputeToolTips;
             RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge = prevChangeProfessionCharge;
             RMLifeSpan.Instance.rmGameSettings.DefaultSalary = prevDefaultSalary;
             RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost = prevChangeProfessionCost;
@@ -199,7 +199,7 @@ namespace RosterManager
             WindowDebugger.Position = getRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
             WindowSettings.Position = getRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
             WindowRoster.Position = getRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
-            WindowContractDispute.Position = getRectangle(WindowsNode, "ContractDisputePosition", WindowContractDispute.Position);
+            WindowContracts.Position = getRectangle(WindowsNode, "ContractDisputePosition", WindowContracts.Position);
 
             // now the settings
 
@@ -215,7 +215,7 @@ namespace RosterManager
             WindowSettings.ShowToolTips = SettingsNode.HasValue("SettingsToolTips") ? bool.Parse(SettingsNode.GetValue("SettingsToolTips")) : WindowSettings.ShowToolTips;
             WindowRoster.ShowToolTips = SettingsNode.HasValue("RosterToolTips") ? bool.Parse(SettingsNode.GetValue("RosterToolTips")) : WindowRoster.ShowToolTips;
             WindowDebugger.ShowToolTips = SettingsNode.HasValue("DebuggerToolTips") ? bool.Parse(SettingsNode.GetValue("DebuggerToolTips")) : WindowDebugger.ShowToolTips;
-            WindowContractDispute.ShowToolTips = SettingsNode.HasValue("ContractDisputeToolTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeToolTips")) : WindowContractDispute.ShowToolTips;
+            WindowContracts.ShowToolTips = SettingsNode.HasValue("ContractDisputeToolTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeToolTips")) : WindowContracts.ShowToolTips;
             
             // Config Settings
             EnableBlizzyToolbar = SettingsNode.HasValue("EnableBlizzyToolbar") ? bool.Parse(SettingsNode.GetValue("EnableBlizzyToolbar")) : EnableBlizzyToolbar;
@@ -255,7 +255,7 @@ namespace RosterManager
             WriteRectangle(WindowsNode, "DebuggerPosition", WindowDebugger.Position);
             WriteRectangle(WindowsNode, "SettingsPosition", WindowSettings.Position);
             WriteRectangle(WindowsNode, "RosterPosition", WindowRoster.Position);
-            WriteRectangle(WindowsNode, "ContractDisputePosition", WindowContractDispute.Position);
+            WriteRectangle(WindowsNode, "ContractDisputePosition", WindowContracts.Position);
 
             //Write settings...
             // Realism Settings
@@ -269,7 +269,7 @@ namespace RosterManager
             WriteValue(SettingsNode, "SettingsToolTips", WindowSettings.ShowToolTips);
             WriteValue(SettingsNode, "RosterToolTips", WindowRoster.ShowToolTips);
             WriteValue(SettingsNode, "DebuggerToolTips", WindowDebugger.ShowToolTips);
-            WriteValue(SettingsNode, "ContractDisputeToolTips", WindowContractDispute.ShowToolTips);
+            WriteValue(SettingsNode, "ContractDisputeToolTips", WindowContracts.ShowToolTips);
 
             // Config Settings
             WriteValue(SettingsNode, "ShowDebugger", WindowDebugger.ShowWindow);
@@ -345,12 +345,12 @@ namespace RosterManager
                     WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
             }
 
-            if (window == "All" || window == "Contract Disputes")
+            if (window == "All" || window == "WindowContracts")
             {
-                if (WindowContractDispute.Position.xMax > Screen.currentResolution.width)
-                    WindowContractDispute.Position.x = Screen.currentResolution.width - WindowContractDispute.Position.width;
-                if (WindowContractDispute.Position.yMax > Screen.currentResolution.height)
-                    WindowContractDispute.Position.y = Screen.currentResolution.height - WindowContractDispute.Position.height;
+                if (WindowContracts.Position.xMax > Screen.currentResolution.width)
+                    WindowContracts.Position.x = Screen.currentResolution.width - WindowContracts.Position.width;
+                if (WindowContracts.Position.yMax > Screen.currentResolution.height)
+                    WindowContracts.Position.y = Screen.currentResolution.height - WindowContracts.Position.height;
             }
         }
 

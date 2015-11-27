@@ -27,6 +27,7 @@ namespace RosterManager
                 if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age.ToString("##0"));
+                    GUILayout.Label("Next Bday: " + KSPUtil.PrintDate((int)WindowRoster.SelectedKerbal.timeNextBirthday, false, false));
                 }                
             }
             else
@@ -35,6 +36,7 @@ namespace RosterManager
                 if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age.ToString("##0"));
+                    GUILayout.Label("Next Bday: " + KSPUtil.PrintDate((int)WindowRoster.SelectedKerbal.timeNextBirthday, false, false));
                 }
             }
             GUILayout.EndHorizontal();
