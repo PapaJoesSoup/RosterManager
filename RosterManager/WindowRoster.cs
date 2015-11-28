@@ -20,6 +20,7 @@ namespace RosterManager
 
         //Profession vars
         internal static bool isPilot = false;
+
         internal static bool isEngineer = false;
         internal static bool isScientist = false;
 
@@ -43,6 +44,7 @@ namespace RosterManager
 
         //Kerbal List Filter vars
         internal static bool isAll = true;
+
         internal static bool isAssign = false;
         internal static bool isAvail = false;
         internal static bool isDead = false;
@@ -289,7 +291,7 @@ namespace RosterManager
                 if (RMLifeSpan.Instance.rmGameSettings.EnableAging)
                 {
                     if (GUILayout.Button(new GUIContent("|Age", "Age of Kerbal"), hdrlabelStyle, GUILayout.Width(35)))
-                        SortRosterList("Age");    
+                        SortRosterList("Age");
                     rect = GUILayoutUtility.GetLastRect();
                     if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                         ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
@@ -317,7 +319,7 @@ namespace RosterManager
                     SortRosterList("Status");
                 rect = GUILayoutUtility.GetLastRect();
                 if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);                                          
+                    ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - ScrollViewerPosition.y);
 
                 GUILayout.EndHorizontal();
 
@@ -417,7 +419,7 @@ namespace RosterManager
                             {
                                 GUILayout.Label(kerbalInfo.Value.age.ToString("##0"), labelStyle, GUILayout.Width(35));
                             }
-                        }                        
+                        }
                         GUILayout.Label(rmkerbal.Value.salaryContractDispute ? rmkerbal.Value.RealTrait : kerbal.trait, labelStyle, GUILayout.Width(75));
                         GUILayout.Label(kerbal.experienceLevel.ToString(), labelStyle, GUILayout.Width(35));
                         GUILayout.Label(kerbal.experience.ToString(), labelStyle, GUILayout.Width(75));
@@ -641,7 +643,7 @@ namespace RosterManager
                 if (!isAll && !isAssign && !isAvail && !isFrozen && !isDead)
                     isDispute = true;
             }
-            
+
             if (DFInterface.IsDFInstalled)
             {
                 isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(80));
@@ -683,7 +685,7 @@ namespace RosterManager
             {
                 if (kerbal.name.Contains(char.ConvertFromUtf32(1)))
                 {
-                    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");                    
+                    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
                 }
             }
         }
@@ -788,7 +790,7 @@ namespace RosterManager
             {
                 if (RMSettings.EnableKerbalRename)
                 {
-                    WindowRoster.SelectedKerbal.Trait = WindowRoster.KerbalProfession;                    
+                    WindowRoster.SelectedKerbal.Trait = WindowRoster.KerbalProfession;
                 }
                 RMAddon.saveMessage = WindowRoster.SelectedKerbal.SubmitChanges();
                 if (string.IsNullOrEmpty(RMAddon.saveMessage))
@@ -871,7 +873,7 @@ namespace RosterManager
                 {
                     RMAddon.AllCrew = (from k in RMAddon.AllCrew orderby k.Value.status descending, k.Value.type descending, k.Value.Name select k).ToList();
                     RMAddon.AllCrewSort = "Status-D";
-                } 
+                }
             else if (sort == "Age")
                 if (RMAddon.AllCrewSort != "Age-A")
                 {

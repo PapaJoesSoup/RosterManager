@@ -55,6 +55,7 @@ namespace RosterManager
                 //If EnableAging has been turned ON when it was previously OFF, we reset age processing, otherwise they could all die instantly.
                 if (RMLifeSpan.Instance.rmGameSettings.EnableAging && RMSettings.prevEnableAging == false)
                 {
+                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, aging has been enabled. Reset all birthdays.", "info", RMSettings.VerboseLogging);
                     double currentTime = Planetarium.GetUniversalTime();
                     foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
                     {
@@ -65,6 +66,7 @@ namespace RosterManager
                 //If EnableSalaries has been turned OFF when it was previously ON, reset any kerbals from tourist back to active.
                 if (!RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == true)
                 {
+                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned off. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
                     foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
                     {
                         if (rmkerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && rmkerbal.Value.Kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
@@ -74,7 +76,7 @@ namespace RosterManager
                             rmkerbal.Value.Trait = rmkerbal.Value.RealTrait;
                             rmkerbal.Value.Kerbal.trait = rmkerbal.Value.RealTrait;
                             KerbalRoster.SetExperienceTrait(rmkerbal.Value.Kerbal, rmkerbal.Value.Trait);
-                            RMKerbal.RegisterExperienceTrait(rmkerbal.Value);                            
+                            RMKerbal.RegisterExperienceTrait(rmkerbal.Value);
                         }
                         rmkerbal.Value.salaryContractDispute = false;
                         rmkerbal.Value.salaryContractDisputePeriods = 0;
@@ -84,6 +86,7 @@ namespace RosterManager
                 //If EnableSalaries has been turned ON when it was previously OFF, reset all kerbals salary time to now.
                 if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == false)
                 {
+                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned on. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
                     double currentTime = Planetarium.GetUniversalTime();
                     foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
                     {
@@ -174,7 +177,7 @@ namespace RosterManager
             string strMinimum_Age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age.ToString();
             int Minimum_age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age;
             strMinimum_Age = GUILayout.TextField(strMinimum_Age, GUILayout.Width(40));
-            GUILayout.Label("(Years)", GUILayout.Width(50));            
+            GUILayout.Label("(Years)", GUILayout.Width(50));
             if (int.TryParse(strMinimum_Age, out Minimum_age))
                 RMLifeSpan.Instance.rmGameSettings.Minimum_Age = Minimum_age;
             GUILayout.EndHorizontal();
@@ -227,7 +230,7 @@ namespace RosterManager
 
             label = "Charge funds for Profession Change (career game only)";
             toolTip = "Charge funds for changing a Kerbal's profession.";
-            RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(300));
+            RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(320));
             rect = GUILayoutUtility.GetLastRect();
             if (Event.current.type == EventType.Repaint && ShowToolTips == true)
                 ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);

@@ -9,7 +9,7 @@ Version 0.2.0.0 xx Nov 2015
        All un-paid salary will accrue each time they are not paid.
        The user can accept the payrise and the kerbal will continue to work for you. However, this will only occur for 3 pay periods. At the end of the third occurrence of them not
 	   being paid the kerbal will go on strike (Become a tourist). Until such time as they are paid all owed money.
-	 - A Contract dispute Window is available to see all kerbals that currently are in contract dispute and allow you to accept payrise, decline (they go on strike). Or if you have
+	 - A Contracts Window is available to see all kerbals that currently are in contract dispute and allow you to accept payrise, decline (they go on strike). Or if you have
 	   funds available you can re-pay them all owed monies and they will go back to work for you.
 	 - Each month or year (salary period) funds are checked and if there are enough contract disputes are automatically resolved.     
  - Added KerbalLifeSpanInfo including Age and lifespan processing setting for each kerbal. 

@@ -9,22 +9,22 @@ RM_Windows
 	}
 	SettingsPosition
 	{
-		x = 95
-		y = 539
+		x = 0
+		y = 0
 		width = 395
 		height = 335
 	}
 	RosterPosition
 	{
-		x = 742
-		y = 202
+		x = 0
+		y = 0
 		width = 700
 		height = 330
 	}
 	ContractDisputePosition
 	{
-		x = 54
-		y = 198
+		x = 0
+		y = 0
 		width = 700
 		height = 336
 	}
@@ -40,7 +40,7 @@ RM_Settings
 	ContractDisputeToolTips = True
 	ShowDebugger = False
 	EnableBlizzyToolbar = False
-	VerboseLogging = True
+	VerboseLogging = False
 	AutoDebug = False
 	DebugLogPath = \Plugins\PluginData\
 	ErrorLogLength = 1000
@@ -49,7 +49,7 @@ RM_Settings
 }
 RM_Hidden
 {	
-	LifeInfoUpdatePeriod = 360
+	LifeInfoUpdatePeriod = 60
 	SourcePartColor = red
 	TargetPartColor = green
 }

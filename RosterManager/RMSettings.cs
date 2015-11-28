@@ -41,9 +41,9 @@ namespace RosterManager
         internal static bool EnableKerbalRename = false;
         internal static bool AutoDebug = false;
         internal static bool SaveLogOnExit = false;
-                
+
         internal static double LifeInfoUpdatePeriod = 60;
-               
+
         // Non user managed Internal options
         internal static Color defaultColor = new Color(0.478f, 0.698f, 0.478f, 0.698f);
 
@@ -62,6 +62,7 @@ namespace RosterManager
 
         // Tooltip Settings
         internal static bool prevShowToolTips = true;
+
         internal static bool prevSettingsToolTips = true;
         internal static bool prevRosterToolTips = true;
         internal static bool prevDebuggerToolTips = true;
@@ -69,6 +70,7 @@ namespace RosterManager
 
         // Configuration Settings
         internal static bool prevEnableBlizzyToolbar = false;
+
         internal static bool prevShowDebugger = false;
         internal static bool prevVerboseLogging = false;
         internal static string prevErrorLogLength = "1000";
@@ -130,7 +132,7 @@ namespace RosterManager
             prevChangeProfessionCost = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost;
             prevMinimum_Age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age;
             prevMaximum_Age = RMLifeSpan.Instance.rmGameSettings.Maximum_Age;
-            prevMaxContractDisputePeriods = RMLifeSpan.Instance.rmGameSettings.MaxContractDisputePeriods;          
+            prevMaxContractDisputePeriods = RMLifeSpan.Instance.rmGameSettings.MaxContractDisputePeriods;
 
             // sounds
 
@@ -216,7 +218,7 @@ namespace RosterManager
             WindowRoster.ShowToolTips = SettingsNode.HasValue("RosterToolTips") ? bool.Parse(SettingsNode.GetValue("RosterToolTips")) : WindowRoster.ShowToolTips;
             WindowDebugger.ShowToolTips = SettingsNode.HasValue("DebuggerToolTips") ? bool.Parse(SettingsNode.GetValue("DebuggerToolTips")) : WindowDebugger.ShowToolTips;
             WindowContracts.ShowToolTips = SettingsNode.HasValue("ContractDisputeToolTips") ? bool.Parse(SettingsNode.GetValue("ContractDisputeToolTips")) : WindowContracts.ShowToolTips;
-            
+
             // Config Settings
             EnableBlizzyToolbar = SettingsNode.HasValue("EnableBlizzyToolbar") ? bool.Parse(SettingsNode.GetValue("EnableBlizzyToolbar")) : EnableBlizzyToolbar;
             WindowDebugger.ShowWindow = SettingsNode.HasValue("ShowDebugger") ? bool.Parse(SettingsNode.GetValue("ShowDebugger")) : WindowDebugger.ShowWindow;
@@ -225,14 +227,14 @@ namespace RosterManager
             DebugLogPath = SettingsNode.HasValue("DebugLogPath") ? SettingsNode.GetValue("DebugLogPath") : DebugLogPath;
             ErrorLogLength = SettingsNode.HasValue("ErrorLogLength") ? SettingsNode.GetValue("ErrorLogLength") : ErrorLogLength;
             SaveLogOnExit = SettingsNode.HasValue("SaveLogOnExit") ? bool.Parse(SettingsNode.GetValue("SaveLogOnExit")) : SaveLogOnExit;
-            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;            
+            EnableKerbalRename = SettingsNode.HasValue("EnableKerbalRename") ? bool.Parse(SettingsNode.GetValue("EnableKerbalRename")) : EnableKerbalRename;
 
             // Hidden Settings
             LifeInfoUpdatePeriod = HiddenNode.HasValue("LifeInfoUpdatePeriod") ? double.Parse(HiddenNode.GetValue("LifeInfoUpdatePeriod")) : LifeInfoUpdatePeriod;
             // Hidden Highlighting
             SourcePartColor = HiddenNode.HasValue("SourcePartColor") ? HiddenNode.GetValue("SourcePartColor") : SourcePartColor;
             TargetPartColor = HiddenNode.HasValue("TargetPartColor") ? HiddenNode.GetValue("TargetPartColor") : TargetPartColor;
-                        
+
             //Hidden sound
 
             // Okay, set the Settings loaded flag
@@ -279,12 +281,12 @@ namespace RosterManager
             WriteValue(SettingsNode, "DebugLogPath", DebugLogPath);
             WriteValue(SettingsNode, "ErrorLogLength", ErrorLogLength);
             WriteValue(SettingsNode, "SaveLogOnExit", SaveLogOnExit);
-            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);            
+            WriteValue(SettingsNode, "EnableKerbalRename", EnableKerbalRename);
 
             // Hidden Settings
             WriteValue(HiddenNode, "LifeInfoUpdatePeriod", LifeInfoUpdatePeriod);
             WriteValue(HiddenNode, "SourcePartColor", SourcePartColor);
-            WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);            
+            WriteValue(HiddenNode, "TargetPartColor", TargetPartColor);
 
             if (!Directory.Exists(SETTINGS_PATH))
                 Directory.CreateDirectory(SETTINGS_PATH);

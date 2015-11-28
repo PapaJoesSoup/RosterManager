@@ -20,7 +20,6 @@ namespace RosterManager
             GUILayout.BeginHorizontal();
             if (RMSettings.EnableKerbalRename)
             {
-                
                 GUILayout.Label("Name:", GUILayout.Width(80));
                 WindowRoster.SelectedKerbal.Name = GUILayout.TextField(WindowRoster.SelectedKerbal.Name, GUILayout.Width(230));
                 GUILayout.Label(" - (" + WindowRoster.SelectedKerbal.Kerbal.trait + ")");
@@ -28,7 +27,7 @@ namespace RosterManager
                 {
                     GUILayout.Label("Age: " + WindowRoster.SelectedKerbal.age.ToString("##0"));
                     GUILayout.Label("Next Bday: " + KSPUtil.PrintDate((int)WindowRoster.SelectedKerbal.timeNextBirthday, false, false));
-                }                
+                }
             }
             else
             {

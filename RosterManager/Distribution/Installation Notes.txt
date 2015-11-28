@@ -27,7 +27,9 @@ Installation steps:
 ------------
 What's New:
 ------------
-
+Age processing added.
+Salary processing added.
+See changelog for further details.
 
 ----------
 License:  CC BY-NC-SA 4.0

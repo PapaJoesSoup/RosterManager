@@ -1,26 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace RosterManager
+﻿namespace RosterManager
 {
     internal class RMGameSettings
     {
         // This class stores the RosterManager Gamesettings config node, which are settings stored for each saved game.
-        // which includes Settings for Aging of kerbals, charging for chaing a kerbals profession, and Salaries settings.        
+        // which includes Settings for Aging of kerbals, charging for chaing a kerbals profession, and Salaries settings.
 
         public const string configNodeName = "RMGameSettings";
-        //Aging vars        
+
+        //Aging vars
         internal bool EnableAging { get; set; }
+
         internal int Minimum_Age { get; set; }
         internal int Maximum_Age { get; set; }
         internal int MaxContractDisputePeriods { get; set; }
+
         //Profession change vars
         internal bool ChangeProfessionCharge { get; set; }
+
         internal double ChangeProfessionCost { get; set; }
+
         //SalaryPeriod vars
         internal bool EnableSalaries { get; set; }
+
         internal double DefaultSalary { get; set; }
         internal bool SalaryPeriodisMonthly { get; set; }
         internal bool SalaryPeriodisYearly { get; set; }
@@ -39,7 +40,7 @@ namespace RosterManager
             SalaryPeriodisMonthly = true;
             SalaryPeriodisYearly = false;
             SalaryPeriod = "Monthly";
-    }
+        }
 
         internal void Load(ConfigNode node)
         {
@@ -53,7 +54,7 @@ namespace RosterManager
                 ChangeProfessionCharge = GetNodes.GetNodeValue(RMGamesettingsNode, "ChangeProfessionCharge", ChangeProfessionCharge);
                 ChangeProfessionCost = GetNodes.GetNodeValue(RMGamesettingsNode, "ChangeProfessionCost", ChangeProfessionCost);
                 EnableSalaries = GetNodes.GetNodeValue(RMGamesettingsNode, "EnableSalaries", EnableSalaries);
-                DefaultSalary = GetNodes.GetNodeValue(RMGamesettingsNode, "DefaultSalary", DefaultSalary);                
+                DefaultSalary = GetNodes.GetNodeValue(RMGamesettingsNode, "DefaultSalary", DefaultSalary);
                 SalaryPeriod = GetNodes.GetNodeValue(RMGamesettingsNode, "SalaryPeriod", SalaryPeriod);
                 if (SalaryPeriod == "Yearly")
                 {
@@ -67,7 +68,7 @@ namespace RosterManager
                     SalaryPeriodisYearly = false;
                 }
             }
-        }            
+        }
 
         internal void Save(ConfigNode node)
         {
@@ -88,8 +89,8 @@ namespace RosterManager
             settingsNode.AddValue("ChangeProfessionCharge", ChangeProfessionCharge);
             settingsNode.AddValue("ChangeProfessionCost", ChangeProfessionCost);
             settingsNode.AddValue("EnableSalaries", EnableSalaries);
-            settingsNode.AddValue("DefaultSalary", DefaultSalary);            
+            settingsNode.AddValue("DefaultSalary", DefaultSalary);
             settingsNode.AddValue("SalaryPeriod", SalaryPeriod);
-        }        
+        }
     }
 }

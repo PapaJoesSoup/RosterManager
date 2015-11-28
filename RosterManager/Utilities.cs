@@ -104,6 +104,6 @@ namespace RosterManager
         }
 
         private static void EmptyWindow(int windowId)
-        { }        
+        { }
     }
 }

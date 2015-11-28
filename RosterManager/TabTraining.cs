@@ -168,7 +168,7 @@ namespace RosterManager
                 if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips == true)
                     ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
                 GUILayout.Label(WindowRoster.SelectedKerbal.salary.ToString("###,##0") + " / 100,000 " + RMLifeSpan.Instance.rmGameSettings.SalaryPeriod);
-                GUILayout.EndHorizontal();                
+                GUILayout.EndHorizontal();
             }
             GUI.enabled = true;
         }

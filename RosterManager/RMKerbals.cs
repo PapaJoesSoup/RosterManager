@@ -14,7 +14,7 @@ namespace RosterManager
 
         public const string configNodeName = "RMKerbals";
 
-        internal Dictionary<string, RMKerbal> ALLRMKerbals { get; set; }        
+        internal Dictionary<string, RMKerbal> ALLRMKerbals { get; set; }
 
         internal RMKerbals()
         {
@@ -107,7 +107,6 @@ namespace RosterManager
         public float Experience = 0f;
 
         private System.Random rnd = new System.Random();  // Random seed for setting Kerbals ages
-        
 
         public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
         {
@@ -158,7 +157,7 @@ namespace RosterManager
                 if (salaryContractDispute)
                 {
                     RealTrait = kerbal.trait;
-                    Trait = "Tourist";                    
+                    Trait = "Tourist";
                     KerbalRoster.SetExperienceTrait(kerbal, Trait);
                 }
                 else
@@ -174,7 +173,7 @@ namespace RosterManager
                     {
                         RegisterExperienceTrait(this);
                     }
-                }                
+                }
                 Gender = kerbal.gender;
                 Skill = kerbal.experienceLevel;
                 Experience = kerbal.experience;
@@ -214,19 +213,19 @@ namespace RosterManager
             // remove old save game hack for backwards compatability...
             Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
             if (!salaryContractDispute)
-            {            
+            {
                 if (status == ProtoCrewMember.RosterStatus.Assigned)
                 {
                     UnregisterExperienceTrait(this);
                 }
                 RealTrait = Trait;
-                Kerbal.trait = Trait;                
+                Kerbal.trait = Trait;
                 KerbalRoster.SetExperienceTrait(Kerbal, Trait);
                 if (status == ProtoCrewMember.RosterStatus.Assigned)
                 {
                     RegisterExperienceTrait(this);
                 }
-            }            
+            }
             Kerbal.gender = Gender;
             Kerbal.stupidity = Stupidity;
             Kerbal.courage = Courage;
@@ -390,7 +389,7 @@ namespace RosterManager
                 }
             }
         }
-        
+
         public static double SalaryNextDue(double Time)
         {
             int SalaryTimeMonthRealCalendar = KSPUtil.EarthYear / 12;
@@ -420,7 +419,6 @@ namespace RosterManager
             if (!GameSettings.KERBIN_TIME)
             {
                 BirthdayTimeSpan = KSPUtil.EarthYear;
-
             }
 
             returnTime = Time + BirthdayTimeSpan;

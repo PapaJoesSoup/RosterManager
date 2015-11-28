@@ -9,7 +9,7 @@ namespace RosterManager
         // This ScenarioModule class stores the Roster Manager RMKerbals instance of all known kerbals.
         // The class is used to:-
         // Persist the RMKerbals data in the save game file.
-        // Load the RMLifeSpanAddon class which processes Age and Salary processing.        
+        // Load the RMLifeSpanAddon class which processes Age and Salary processing.
         private static RMLifeSpan _Instance;
 
         public static bool isActive
@@ -75,7 +75,7 @@ namespace RosterManager
             {
                 //Salaries and Profession change charing are disabled in non-career mode games.
                 rmGameSettings.EnableSalaries = false;
-                rmGameSettings.ChangeProfessionCharge = false;                
+                rmGameSettings.ChangeProfessionCharge = false;
             }
         }
 
