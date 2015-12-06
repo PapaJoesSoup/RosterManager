@@ -1,4 +1,4 @@
-﻿namespace RosterManager
+﻿namespace RosterManager.Modules
 {
   public class ModMedical
   {

@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DF;
+using RosterManager.Api;
+using RosterManager.Windows.Tabs;
 using UnityEngine;
 
-namespace RosterManager
+namespace RosterManager.Windows
 {
   internal static class WindowRoster
   {

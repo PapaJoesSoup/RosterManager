@@ -1,7 +1,8 @@
 ﻿using System.Globalization;
+using RosterManager.Api;
 using UnityEngine;
 
-namespace RosterManager
+namespace RosterManager.Windows
 {
   internal static class WindowSettings
   {

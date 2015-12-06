@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace RosterManager
+namespace RosterManager.Api
 {
     internal static class InstalledMods
     {

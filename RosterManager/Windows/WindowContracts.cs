@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using RosterManager.Api;
 using UnityEngine;
 
-namespace RosterManager
+namespace RosterManager.Windows
 {
   internal static class WindowContracts
   {

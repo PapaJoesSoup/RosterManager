@@ -1,13 +1,13 @@
-﻿namespace RosterManager
+﻿namespace RosterManager.Modules
 {
-  internal class ModSchedule
+  public class ModRecords
   {
     internal ProtoCrewMember Kerbal;
 
-    public ModSchedule()
+    public ModRecords()
     { }
 
-    public ModSchedule(ProtoCrewMember kerbal)
+    public ModRecords(ProtoCrewMember kerbal)
     {
       Kerbal = kerbal;
     }

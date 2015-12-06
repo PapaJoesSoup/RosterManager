@@ -2,6 +2,8 @@ using DF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RosterManager.Api;
+using RosterManager.Windows;
 using UnityEngine;
 
 namespace RosterManager

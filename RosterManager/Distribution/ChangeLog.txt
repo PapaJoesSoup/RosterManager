@@ -1,4 +1,4 @@
-Version 0.2.0.0 05 Dec 2015 
+Version 0.2.0.0 06 Dec 2015 
  - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
  - Up to date with DeepFreeze Mod integration.
  - Fixed Filter tab at top of GUI, and added Frozen filter (if DeepFreeze is installed)

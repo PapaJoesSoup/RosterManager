@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace RosterManager
+namespace RosterManager.Windows
 {
   internal class WindowDebugger
   {

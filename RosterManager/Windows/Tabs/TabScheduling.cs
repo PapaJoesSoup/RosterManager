@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosterManager
+namespace RosterManager.Windows.Tabs
 {
   internal class TabScheduling
   {
