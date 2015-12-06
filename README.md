@@ -4,7 +4,7 @@ Kerbal Space Program Addon.  Manages all kerbals in a given save game.  Adds gam
 License:  CC-BY-NC-SA 4.0
 
 ============
-Version 0.2.0.0 xx Nov 2015 
+Version 0.2.0.0 06 Dec 2015 
  - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
  - Up to date with DeepFreeze Mod integration.
  - Fixed Filter tab at top of GUI, and added Frozen filter (if DeepFreeze is installed)
@@ -17,7 +17,8 @@ Version 0.2.0.0 xx Nov 2015
 	   being paid the kerbal will go on strike (Become a tourist). Until such time as they are paid all owed money.
 	 - A Contract dispute Window is available to see all kerbals that currently are in contract dispute and allow you to accept payrise, decline (they go on strike). Or if you have
 	   funds available you can re-pay them all owed monies and they will go back to work for you.
-	 - Each month or year (salary period) funds are checked and if there are enough contract disputes are automatically resolved.     
+	 - Each month or year (salary period) funds are checked and if there are enough contract disputes are automatically resolved. 
+ - Significant refactoring of the code in prep for next development phase.
  - Added KerbalLifeSpanInfo including Age and lifespan processing setting for each kerbal. 
    - If this setting is on all kerbals in the game will age over time and eventually die from old age.
    - If the Repawn kerbal option is on in the main game settings then they will respawn when the die (but as a new freshman again).
