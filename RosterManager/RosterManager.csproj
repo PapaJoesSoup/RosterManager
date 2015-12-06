@@ -139,7 +139,7 @@ if %25ERRORLEVEL%25 == 1 (
   ) 
 if exist "$(SolutionDir)$(ProjectName).zip" del "$(SolutionDir)$(ProjectName).zip"
    
-%25ZA_DIR%257za.exe a -tzip -r  "$(SolutionDir)$(ProjectName).zip" "$(SolutionDir)$(ProjectName)\Distribution\GameData"
+%25ZA_DIR%257za.exe a -tzip -r  "$(SolutionDir)$(ProjectName).@(VersionNumber)_%25DATE:~4,2%25%25DATE:~7,2%25%25DATE:~10,4%25.zip" "$(SolutionDir)$(ProjectName)\Distribution\*.*"
 %25ZA_DIR%257za.exe d -r  "$(SolutionDir)$(ProjectName).@(VersionNumber)_%25DATE:~4,2%25%25DATE:~7,2%25%25DATE:~10,4%25.zip" "*.ddsified" "*.pdb" "*.mdb"
 xcopy /E /Y "$(SolutionDir)$(ProjectName)\Distribution\GameData" "%25KSP_DIR%25\GameData"
 </PostBuildEvent>
