@@ -6,9 +6,9 @@ namespace RosterManager
 {
     internal static class InstalledMods
     {
-        private static Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        private static readonly Assembly[] Assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-        internal static bool IsSMInstalled
+        internal static bool IsSmInstalled
         {
             get
             {
@@ -16,7 +16,7 @@ namespace RosterManager
             }
         }
 
-        internal static bool IsCLSInstalled
+        internal static bool IsClsInstalled
         {
             get
             {
@@ -24,7 +24,7 @@ namespace RosterManager
             }
         }
 
-        internal static bool IsDFInstalled
+        internal static bool IsDfInstalled
         {
             get
             {
@@ -34,9 +34,9 @@ namespace RosterManager
 
         internal static bool IsModInstalled(string assemblyName)
         {
-            Assembly assembly = (from a in assemblies
-                                 where a.FullName.StartsWith(assemblyName)
-                                 select a).SingleOrDefault();
+            var assembly = (from a in Assemblies
+                            where a.FullName.StartsWith(assemblyName)
+                            select a).SingleOrDefault();
             return assembly != null;
         }
     }

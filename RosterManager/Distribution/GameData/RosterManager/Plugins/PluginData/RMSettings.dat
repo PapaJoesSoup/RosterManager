@@ -19,7 +19,7 @@ RM_Windows
 		x = 0
 		y = 0
 		width = 700
-		height = 330
+		height = 335
 	}
 	ContractDisputePosition
 	{

@@ -2,28 +2,25 @@
 
 namespace RosterManager
 {
-    internal class TabMedical
+  internal class TabMedical
+  {
+    internal static bool ShowToolTips = true;
+    internal static string ToolTip = "";
+    internal static bool ToolTipActive = true;
+    private static Vector2 _scrollDetailsPosition = Vector2.zero;
+
+    internal static void Display()
     {
-        internal static bool ShowToolTips = true;
-        internal static string ToolTip = "";
-        internal static bool ToolTipActive = true;
-        private static Vector2 ScrollDetailsPosition = Vector2.zero;
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
+      GUILayout.Label("Kerbal Medical:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
-        internal static void Display()
-        {
-            ScrollDetailsPosition = GUILayout.BeginScrollView(ScrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-            GUILayout.Label("Kerbal Medical:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+      if (!string.IsNullOrEmpty(RMAddon.SaveMessage))
+      {
+        GUILayout.Label(RMAddon.SaveMessage, RMStyle.ErrorLabelRedStyle);
+      }
+      GUILayout.EndScrollView();
 
-            if (!string.IsNullOrEmpty(RMAddon.saveMessage))
-            {
-                GUILayout.Label(RMAddon.saveMessage, RMStyle.ErrorLabelRedStyle);
-            }
-            GUILayout.EndScrollView();
-
-            WindowRoster.DisplayEditActionButtons(ref rect, ref label, ref toolTip);
-        }
+      WindowRoster.DisplayActionButtonsEdit();
     }
+  }
 }

@@ -1,23 +1,23 @@
 ﻿namespace RosterManager
 {
-    public class ModRecords
+  public class ModRecords
+  {
+    internal ProtoCrewMember Kerbal;
+
+    public ModRecords()
+    { }
+
+    public ModRecords(ProtoCrewMember kerbal)
     {
-        internal ProtoCrewMember Kerbal;
-
-        public ModRecords()
-        { }
-
-        public ModRecords(ProtoCrewMember kerbal)
-        {
-            Kerbal = kerbal;
-        }
-
-        internal void Load()
-        {
-        }
-
-        internal void Save()
-        {
-        }
+      Kerbal = kerbal;
     }
+
+    internal void Load()
+    {
+    }
+
+    internal void Save()
+    {
+    }
+  }
 }

@@ -187,3 +187,6 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+RosterManager/Distribution/GameData/RosterManager/Plugins/RosterManager.dll.mdb
+RosterManager.zip
+RosterManager.sln.DotSettings

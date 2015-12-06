@@ -1,4 +1,4 @@
-Version 0.2.0.0 xx Nov 2015 
+Version 0.2.0.0 05 Dec 2015 
  - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
  - Up to date with DeepFreeze Mod integration.
  - Fixed Filter tab at top of GUI, and added Frozen filter (if DeepFreeze is installed)
@@ -17,7 +17,8 @@ Version 0.2.0.0 xx Nov 2015
    - If the Repawn kerbal option is on in the main game settings then they will respawn when the die (but as a new freshman again).
    - If you also have DeepFreeze Mod intalled then freezing a kerbal will stop the aging process whilst they are frozen.
    - Each Kerbals age is shown in the Attributes Tab for each kerbal and the main roster list. But the age cannot be changed. 
- 
+ - Refactored code, cleaned up code style, standardized variables and usage.
+
 Version 0.1.0.1 23 Jun 2015 - 1.0.3 and DeepFreeze compatability
  - Updated DFInterface.dll to latest version
  - updated KSP assembly references to KSP ver 1.0.3

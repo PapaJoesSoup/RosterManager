@@ -53,10 +53,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="DFInterface, Version=0.4.5792.35419, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -64,7 +64,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\UnityEngine.dll</HintPath>
+      <HintPath>..\..\KSPAssemblies\Managed\1.0.5\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

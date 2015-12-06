@@ -1,371 +1,362 @@
-﻿using System.Collections.Generic;
+﻿using System.Globalization;
 using UnityEngine;
 
 namespace RosterManager
 {
-    internal static class WindowSettings
+  internal static class WindowSettings
+  {
+    #region Settings Window (GUI)
+
+    internal static Rect Position = new Rect(0, 0, 0, 0);
+    internal static bool ShowWindow;
+    internal static bool ToolTipActive;
+    internal static bool ShowToolTips = true;
+    internal static string ToolTip = "";
+
+    private static Vector2 _scrollViewerPosition = Vector2.zero;
+
+    internal static void Display(int windowId)
     {
-        #region Settings Window (GUI)
+      // Reset Tooltip active flag...
+      ToolTipActive = false;
 
-        internal static Rect Position = new Rect(0, 0, 0, 0);
-        internal static bool ShowWindow = false;
-        internal static bool ToolTipActive = false;
-        internal static bool ShowToolTips = true;
-        internal static string ToolTip = "";
+      var rect = new Rect(371, 4, 16, 16);
+      if (GUI.Button(rect, new GUIContent("", "Close Window")))
+      {
+        ToolTip = "";
+        RMSettings.RestoreTempSettings();
+        ShowWindow = false;
+      }
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
 
-        private static Vector2 ScrollViewerPosition = Vector2.zero;
+      // Store settings in case we cancel later...
+      //RMSettings.StoreTempSettings();
 
-        internal static void Display(int windowId)
+      GUILayout.BeginVertical();
+      _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
+      GUILayout.BeginVertical();
+
+      DisplayOptions();
+
+      DisplayHighlighting();
+
+      DisplayToolTips();
+
+      DisplayConfiguration();
+
+      GUILayout.EndVertical();
+      GUILayout.EndScrollView();
+
+      GUILayout.BeginHorizontal();
+      if (GUILayout.Button("Save"))
+      {
+        //If EnableAging has been turned ON when it was previously OFF, we reset age processing, otherwise they could all die instantly.
+        if (RMLifeSpan.Instance.RMGameSettings.EnableAging && RMSettings.PrevEnableAging == false)
         {
-            // Reset Tooltip active flag...
-            Rect rect = new Rect();
-            ToolTipActive = false;
-
-            rect = new Rect(371, 4, 16, 16);
-            if (GUI.Button(rect, new GUIContent("", "Close Window")))
-            {
-                ToolTip = "";
-                RMSettings.RestoreTempSettings();
-                WindowSettings.ShowWindow = false;
-            }
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
-
-            // Store settings in case we cancel later...
-            //RMSettings.StoreTempSettings();
-
-            GUILayout.BeginVertical();
-            ScrollViewerPosition = GUILayout.BeginScrollView(ScrollViewerPosition, GUILayout.Height(280), GUILayout.Width(375));
-            GUILayout.BeginVertical();
-
-            DisplayOptions();
-
-            DisplayHighlighting();
-
-            DisplayToolTips();
-
-            DisplayConfiguration();
-
-            GUILayout.EndVertical();
-            GUILayout.EndScrollView();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Save"))
-            {
-                //If EnableAging has been turned ON when it was previously OFF, we reset age processing, otherwise they could all die instantly.
-                if (RMLifeSpan.Instance.rmGameSettings.EnableAging && RMSettings.prevEnableAging == false)
-                {
-                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, aging has been enabled. Reset all birthdays.", "info", RMSettings.VerboseLogging);
-                    double currentTime = Planetarium.GetUniversalTime();
-                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
-                    {
-                        rmkerbal.Value.timelastBirthday = currentTime;
-                        rmkerbal.Value.timeNextBirthday = RMKerbal.BirthdayNextDue(currentTime);
-                    }
-                }
-                //If EnableSalaries has been turned OFF when it was previously ON, reset any kerbals from tourist back to active.
-                if (!RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == true)
-                {
-                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned off. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
-                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
-                    {
-                        if (rmkerbal.Value.type == ProtoCrewMember.KerbalType.Tourist && rmkerbal.Value.Kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
-                        {
-                            rmkerbal.Value.type = ProtoCrewMember.KerbalType.Crew;
-                            rmkerbal.Value.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
-                            rmkerbal.Value.Trait = rmkerbal.Value.RealTrait;
-                            rmkerbal.Value.Kerbal.trait = rmkerbal.Value.RealTrait;
-                            KerbalRoster.SetExperienceTrait(rmkerbal.Value.Kerbal, rmkerbal.Value.Trait);
-                            RMKerbal.RegisterExperienceTrait(rmkerbal.Value);
-                        }
-                        rmkerbal.Value.salaryContractDispute = false;
-                        rmkerbal.Value.salaryContractDisputePeriods = 0;
-                        rmkerbal.Value.salaryContractDisputeProcessed = true;
-                    }
-                }
-                //If EnableSalaries has been turned ON when it was previously OFF, reset all kerbals salary time to now.
-                if (RMLifeSpan.Instance.rmGameSettings.EnableSalaries && RMSettings.prevEnableSalaries == false)
-                {
-                    Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned on. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
-                    double currentTime = Planetarium.GetUniversalTime();
-                    foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.rmKerbals.ALLRMKerbals)
-                    {
-                        rmkerbal.Value.timelastsalary = currentTime;
-                        rmkerbal.Value.timeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
-                    }
-                }
-                RMSettings.SaveSettings();
-                WindowSettings.ShowWindow = false;
-            }
-            if (GUILayout.Button("Cancel"))
-            {
-                // We've canclled, so restore original settings.
-                RMSettings.RestoreTempSettings();
-                WindowSettings.ShowWindow = false;
-            }
-            GUILayout.EndHorizontal();
-            GUILayout.EndVertical();
-
-            GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-            RMSettings.RepositionWindows("WindowSettings");
+          Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, aging has been enabled. Reset all birthdays.", "info", RMSettings.VerboseLogging);
+          var currentTime = Planetarium.GetUniversalTime();
+          foreach (var rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+          {
+            rmkerbal.Value.TimelastBirthday = currentTime;
+            rmkerbal.Value.TimeNextBirthday = RMKerbal.BirthdayNextDue(currentTime);
+          }
         }
-
-        private static void DisplayConfiguration()
+        //If EnableSalaries has been turned OFF when it was previously ON, reset any kerbals from tourist back to active.
+        if (!RMLifeSpan.Instance.RMGameSettings.EnableSalaries && RMSettings.PrevEnableSalaries)
         {
-            Rect rect = new Rect();
-            string label = "";
-            string toolTip = "";
-
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-            GUILayout.Label("Configuraton");
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            if (!ToolbarManager.ToolbarAvailable)
+          Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned off. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
+          foreach (var rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+          {
+            if (rmkerbal.Value.Type == ProtoCrewMember.KerbalType.Tourist && rmkerbal.Value.Kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
             {
-                if (RMSettings.EnableBlizzyToolbar)
-                    RMSettings.EnableBlizzyToolbar = false;
-                GUI.enabled = false;
+              rmkerbal.Value.Type = ProtoCrewMember.KerbalType.Crew;
+              rmkerbal.Value.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
+              rmkerbal.Value.Trait = rmkerbal.Value.RealTrait;
+              rmkerbal.Value.Kerbal.trait = rmkerbal.Value.RealTrait;
+              KerbalRoster.SetExperienceTrait(rmkerbal.Value.Kerbal, rmkerbal.Value.Trait);
+              RMKerbal.RegisterExperienceTrait(rmkerbal.Value);
             }
-            else
-                GUI.enabled = true;
-
-            label = "Enable Blizzy Toolbar (Replaces Stock Toolbar)";
-            RMSettings.EnableBlizzyToolbar = GUILayout.Toggle(RMSettings.EnableBlizzyToolbar, label, GUILayout.Width(300));
-
-            GUI.enabled = true;
-            label = "Enable Debug Window";
-            WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, label, GUILayout.Width(300));
-
-            label = "Enable Verbose Logging";
-            RMSettings.VerboseLogging = GUILayout.Toggle(RMSettings.VerboseLogging, label, GUILayout.Width(300));
-
-            label = "Enable RM Debug Window On Error";
-            RMSettings.AutoDebug = GUILayout.Toggle(RMSettings.AutoDebug, label, GUILayout.Width(300));
-
-            label = "Save Error log on Exit";
-            RMSettings.SaveLogOnExit = GUILayout.Toggle(RMSettings.SaveLogOnExit, label, GUILayout.Width(300));
-
-            // create Limit Error Log Length slider;
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Error Log Length: ", GUILayout.Width(140));
-            RMSettings.ErrorLogLength = GUILayout.TextField(RMSettings.ErrorLogLength, GUILayout.Width(40));
-            GUILayout.Label("(lines)", GUILayout.Width(50));
-            GUILayout.EndHorizontal();
-
-            label = "Enable Kerbal Renaming";
-            toolTip = "Allows renaming a Kerbal.";
-            RMSettings.EnableKerbalRename = GUILayout.Toggle(RMSettings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            label = "Enable Kerbal Aging";
-            toolTip = "Your Kerbals will age and eventually die from old age.";
-            RMLifeSpan.Instance.rmGameSettings.EnableAging = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            if (!RMLifeSpan.Instance.rmGameSettings.EnableAging)
-                GUI.enabled = false;
-            GUILayout.BeginHorizontal();
-            toolTip = "Average age of new Applicant Kerbals.";
-            GUILayout.Label(new GUIContent("Kerbal Minimum Age: ", toolTip), GUILayout.Width(140));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-            string strMinimum_Age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age.ToString();
-            int Minimum_age = RMLifeSpan.Instance.rmGameSettings.Minimum_Age;
-            strMinimum_Age = GUILayout.TextField(strMinimum_Age, GUILayout.Width(40));
-            GUILayout.Label("(Years)", GUILayout.Width(50));
-            if (int.TryParse(strMinimum_Age, out Minimum_age))
-                RMLifeSpan.Instance.rmGameSettings.Minimum_Age = Minimum_age;
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            toolTip = "Average Lifespan of Kerbals (how long they live).";
-            GUILayout.Label(new GUIContent("Kerbal Lifespan: ", toolTip), GUILayout.Width(140));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-            string strMaximum_Age = RMLifeSpan.Instance.rmGameSettings.Maximum_Age.ToString();
-            int Maximum_age = RMLifeSpan.Instance.rmGameSettings.Maximum_Age;
-            strMaximum_Age = GUILayout.TextField(strMaximum_Age, GUILayout.Width(40));
-            GUILayout.Label("(Years)", GUILayout.Width(50));
-            if (int.TryParse(strMaximum_Age, out Maximum_age))
-                RMLifeSpan.Instance.rmGameSettings.Maximum_Age = Maximum_age;
-            GUILayout.EndHorizontal();
-
-            GUI.enabled = true;
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
-                GUI.enabled = false;
-            label = "Enable Salaries (career game only)";
-            toolTip = "Kerbals must be paid Salaries.";
-            RMLifeSpan.Instance.rmGameSettings.EnableSalaries = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            if (!RMLifeSpan.Instance.rmGameSettings.EnableSalaries)
-                GUI.enabled = false;
-            DisplaySelectSalaryPeriod();
-
-            GUILayout.BeginHorizontal();
-            toolTip = "Default salary for each Kerbal per each salary period.";
-            GUILayout.Label(new GUIContent("Default Kerbal Salary: ", toolTip), GUILayout.Width(140));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-            string strDef_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary.ToString();
-            double Default_salary = RMLifeSpan.Instance.rmGameSettings.DefaultSalary;
-            strDef_salary = GUILayout.TextField(strDef_salary, GUILayout.Width(70));
-            GUILayout.Label("(Funds/per salary period)", GUILayout.Width(120));
-            GUILayout.EndHorizontal();
-            if (double.TryParse(strDef_salary, out Default_salary))
-                RMLifeSpan.Instance.rmGameSettings.DefaultSalary = Default_salary;
-
-            GUI.enabled = true;
-            if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
-                GUI.enabled = false;
-
-            label = "Charge funds for Profession Change (career game only)";
-            toolTip = "Charge funds for changing a Kerbal's profession.";
-            RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(320));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            if (!RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCharge)
-                GUI.enabled = false;
-
-            GUILayout.BeginHorizontal();
-            toolTip = "Cost of changing a Kerbals Profession.";
-            GUILayout.Label(new GUIContent("Change Profession Cost: ", toolTip), GUILayout.Width(140));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-            string strChg_prof = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost.ToString();
-            double Chg_prof = RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost;
-            strChg_prof = GUILayout.TextField(strChg_prof, GUILayout.Width(70));
-            GUILayout.Label("(Funds)", GUILayout.Width(50));
-            GUILayout.EndHorizontal();
-            if (double.TryParse(strChg_prof, out Chg_prof))
-                RMLifeSpan.Instance.rmGameSettings.ChangeProfessionCost = Chg_prof;
-
-            GUI.enabled = true;
+            rmkerbal.Value.SalaryContractDispute = false;
+            rmkerbal.Value.SalaryContractDisputePeriods = 0;
+            rmkerbal.Value.SalaryContractDisputeProcessed = true;
+          }
         }
-
-        internal static void DisplaySelectSalaryPeriod()
+        //If EnableSalaries has been turned ON when it was previously OFF, reset all kerbals salary time to now.
+        if (RMLifeSpan.Instance.RMGameSettings.EnableSalaries && RMSettings.PrevEnableSalaries == false)
         {
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("SalaryPeriod:", GUILayout.Width(80));
-            RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly, "Monthly", GUILayout.Width(70));
-            if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly)
-            {
-                RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = false;
-            }
-            else
-            {
-                if (!RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
-                {
-                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = true;
-                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriod = "Monthly";
-                }
-            }
-            RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = GUILayout.Toggle(RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly, "Yearly", GUILayout.Width(80));
-            if (RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly)
-                RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly = false;
-            else
-            {
-                if (!RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisMonthly)
-                {
-                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriodisYearly = true;
-                    RMLifeSpan.Instance.rmGameSettings.SalaryPeriod = "Yearly";
-                }
-            }
-            GUILayout.EndHorizontal();
+          Utilities.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned on. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
+          var currentTime = Planetarium.GetUniversalTime();
+          foreach (var rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+          {
+            rmkerbal.Value.Timelastsalary = currentTime;
+            rmkerbal.Value.TimeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
+          }
         }
+        RMSettings.SaveSettings();
+        ShowWindow = false;
+      }
+      if (GUILayout.Button("Cancel"))
+      {
+        // We've canclled, so restore original settings.
+        RMSettings.RestoreTempSettings();
+        ShowWindow = false;
+      }
+      GUILayout.EndHorizontal();
+      GUILayout.EndVertical();
 
-        private static void DisplayToolTips()
-        {
-            // Enable Tool Tips
-            string label = "";
-            GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-            GUILayout.Label("ToolTips");
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            label = "Enable Tool Tips";
-            RMSettings.ShowToolTips = GUILayout.Toggle(RMSettings.ShowToolTips, label, GUILayout.Width(300));
-
-            GUI.enabled = RMSettings.ShowToolTips;
-            label = "Settings Window Tool Tips";
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            WindowSettings.ShowToolTips = GUILayout.Toggle(WindowSettings.ShowToolTips, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-            label = "Roster Window Tool Tips";
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-            label = "Debugger Window Tool Tips";
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-            label = "Contract Disputes Window Tool Tips";
-            GUILayout.BeginHorizontal();
-            GUILayout.Space(20);
-            WindowContracts.ShowToolTips = GUILayout.Toggle(WindowContracts.ShowToolTips, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-            GUI.enabled = true;
-        }
-
-        private static void DisplayHighlighting()
-        {
-            string label = "";
-            GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-            GUILayout.Label("Highlighting");
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            // EnableHighlighting Mode
-            GUILayout.BeginHorizontal();
-            label = "Enable Highlighting";
-            RMSettings.EnableHighlighting = GUILayout.Toggle(RMSettings.EnableHighlighting, label, GUILayout.Width(300));
-            GUILayout.EndHorizontal();
-        }
-
-        private static void DisplayOptions()
-        {
-            Rect rect = new Rect();
-            GUI.enabled = true;
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-            if (!RMSettings.LockSettings)
-                GUILayout.Label("Settings / Options");
-            else
-                GUILayout.Label("Settings / Options  (Locked.  Unlock in Config file)");
-            GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
-
-            bool isEnabled = (!RMSettings.LockSettings);
-            // Realism Mode
-            GUI.enabled = isEnabled;
-            GUIContent guiLabel = new GUIContent("Enable Realism Mode", "Turns on/off Realism Mode.\r\nWhen ON, causes changes in the interface and limits\r\nyour freedom to things that would not be 'Realistic'.\r\nWhen Off, Allows Fills, Dumps, Repeating Science, instantaneous Xfers, Crew Xfers anywwhere, etc.");
-            RMSettings.RealismMode = GUILayout.Toggle(RMSettings.RealismMode, guiLabel, GUILayout.Width(300));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-
-            // LockSettings Mode
-            GUI.enabled = isEnabled;
-            guiLabel = new GUIContent("Lock Settings  (If set ON, disable in config file)", "Locks the settings in this section so they cannot be altered in game.\r\nTo turn off Locking you MUST edit the Config.xml file.");
-            RMSettings.LockSettings = GUILayout.Toggle(RMSettings.LockSettings, guiLabel, GUILayout.Width(300));
-            rect = GUILayoutUtility.GetLastRect();
-            if (Event.current.type == EventType.Repaint && ShowToolTips == true)
-                ToolTip = Utilities.SetActiveTooltip(rect, WindowSettings.Position, GUI.tooltip, ref ToolTipActive, 80, 0 - ScrollViewerPosition.y);
-        }
-
-        #endregion Settings Window (GUI)
+      GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+      RMSettings.RepositionWindows("WindowSettings");
     }
+
+    private static void DisplayConfiguration()
+    {
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+      GUILayout.Label("Configuraton");
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+      if (!ToolbarManager.ToolbarAvailable)
+      {
+        if (RMSettings.EnableBlizzyToolbar)
+          RMSettings.EnableBlizzyToolbar = false;
+        GUI.enabled = false;
+      }
+      else
+        GUI.enabled = true;
+
+      var label = "Enable Blizzy Toolbar (Replaces Stock Toolbar)";
+      RMSettings.EnableBlizzyToolbar = GUILayout.Toggle(RMSettings.EnableBlizzyToolbar, label, GUILayout.Width(300));
+
+      GUI.enabled = true;
+      label = "Enable Debug Window";
+      WindowDebugger.ShowWindow = GUILayout.Toggle(WindowDebugger.ShowWindow, label, GUILayout.Width(300));
+
+      label = "Enable Verbose Logging";
+      RMSettings.VerboseLogging = GUILayout.Toggle(RMSettings.VerboseLogging, label, GUILayout.Width(300));
+
+      label = "Enable RM Debug Window On Error";
+      RMSettings.AutoDebug = GUILayout.Toggle(RMSettings.AutoDebug, label, GUILayout.Width(300));
+
+      label = "Save Error log on Exit";
+      RMSettings.SaveLogOnExit = GUILayout.Toggle(RMSettings.SaveLogOnExit, label, GUILayout.Width(300));
+
+      // create Limit Error Log Length slider;
+      GUILayout.BeginHorizontal();
+      GUILayout.Label("Error Log Length: ", GUILayout.Width(140));
+      RMSettings.ErrorLogLength = GUILayout.TextField(RMSettings.ErrorLogLength, GUILayout.Width(40));
+      GUILayout.Label("(lines)", GUILayout.Width(50));
+      GUILayout.EndHorizontal();
+
+      label = "Enable Kerbal Renaming";
+      var toolTip = "Allows renaming a Kerbal.";
+      RMSettings.EnableKerbalRename = GUILayout.Toggle(RMSettings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
+      var rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+
+      label = "Enable Kerbal Aging";
+      toolTip = "Your Kerbals will age and eventually die from old age.";
+      RMLifeSpan.Instance.RMGameSettings.EnableAging = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+
+      if (!RMLifeSpan.Instance.RMGameSettings.EnableAging)
+        GUI.enabled = false;
+      GUILayout.BeginHorizontal();
+      toolTip = "Average age of new Applicant Kerbals.";
+      GUILayout.Label(new GUIContent("Kerbal Minimum Age: ", toolTip), GUILayout.Width(140));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+      var strMinimumAge = RMLifeSpan.Instance.RMGameSettings.MinimumAge.ToString();
+      int minimumAge;
+      strMinimumAge = GUILayout.TextField(strMinimumAge, GUILayout.Width(40));
+      GUILayout.Label("(Years)", GUILayout.Width(50));
+      if (int.TryParse(strMinimumAge, out minimumAge))
+        RMLifeSpan.Instance.RMGameSettings.MinimumAge = minimumAge;
+      GUILayout.EndHorizontal();
+
+      GUILayout.BeginHorizontal();
+      toolTip = "Average Lifespan of Kerbals (how long they live).";
+      GUILayout.Label(new GUIContent("Kerbal Lifespan: ", toolTip), GUILayout.Width(140));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+      var strMaximumAge = RMLifeSpan.Instance.RMGameSettings.MaximumAge.ToString();
+      int maximumAge;
+      strMaximumAge = GUILayout.TextField(strMaximumAge, GUILayout.Width(40));
+      GUILayout.Label("(Years)", GUILayout.Width(50));
+      if (int.TryParse(strMaximumAge, out maximumAge))
+        RMLifeSpan.Instance.RMGameSettings.MaximumAge = maximumAge;
+      GUILayout.EndHorizontal();
+
+      GUI.enabled = true;
+      if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+        GUI.enabled = false;
+      label = "Enable Salaries (career game only)";
+      toolTip = "Kerbals must be paid Salaries.";
+      RMLifeSpan.Instance.RMGameSettings.EnableSalaries = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+
+      if (!RMLifeSpan.Instance.RMGameSettings.EnableSalaries)
+        GUI.enabled = false;
+      DisplaySelectSalaryPeriod();
+
+      GUILayout.BeginHorizontal();
+      toolTip = "Default salary for each Kerbal per each salary period.";
+      GUILayout.Label(new GUIContent("Default Kerbal Salary: ", toolTip), GUILayout.Width(140));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+      var strDefSalary = RMLifeSpan.Instance.RMGameSettings.DefaultSalary.ToString(CultureInfo.InvariantCulture);
+      double defaultSalary;
+      strDefSalary = GUILayout.TextField(strDefSalary, GUILayout.Width(70));
+      GUILayout.Label("(Funds/per salary period)", GUILayout.Width(120));
+      GUILayout.EndHorizontal();
+      if (double.TryParse(strDefSalary, out defaultSalary))
+        RMLifeSpan.Instance.RMGameSettings.DefaultSalary = defaultSalary;
+
+      GUI.enabled = true;
+      if (HighLogic.CurrentGame.Mode != Game.Modes.CAREER)
+        GUI.enabled = false;
+
+      label = "Charge funds for Profession Change (career game only)";
+      toolTip = "Charge funds for changing a Kerbal's profession.";
+      RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(320));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+
+      if (!RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge)
+        GUI.enabled = false;
+
+      GUILayout.BeginHorizontal();
+      toolTip = "Cost of changing a Kerbals Profession.";
+      GUILayout.Label(new GUIContent("Change Profession Cost: ", toolTip), GUILayout.Width(140));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+      var strChgProf = RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCost.ToString(CultureInfo.InvariantCulture);
+      double chgProf;
+      strChgProf = GUILayout.TextField(strChgProf, GUILayout.Width(70));
+      GUILayout.Label("(Funds)", GUILayout.Width(50));
+      GUILayout.EndHorizontal();
+      if (double.TryParse(strChgProf, out chgProf))
+        RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCost = chgProf;
+
+      GUI.enabled = true;
+    }
+
+    internal static void DisplaySelectSalaryPeriod()
+    {
+      GUILayout.BeginHorizontal();
+      GUILayout.Label("SalaryPeriod:", GUILayout.Width(80));
+      RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly, "Monthly", GUILayout.Width(70));
+      if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly)
+      {
+        RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly = false;
+      }
+      else
+      {
+        if (!RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
+        {
+          RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly = true;
+          RMLifeSpan.Instance.RMGameSettings.SalaryPeriod = "Monthly";
+        }
+      }
+      RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly, "Yearly", GUILayout.Width(80));
+      if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
+        RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly = false;
+      else
+      {
+        if (!RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisMonthly)
+        {
+          RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly = true;
+          RMLifeSpan.Instance.RMGameSettings.SalaryPeriod = "Yearly";
+        }
+      }
+      GUILayout.EndHorizontal();
+    }
+
+    private static void DisplayToolTips()
+    {
+      // Enable Tool Tips
+      GUI.enabled = true;
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+      GUILayout.Label("ToolTips");
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+      var label = "Enable Tool Tips";
+      RMSettings.ShowToolTips = GUILayout.Toggle(RMSettings.ShowToolTips, label, GUILayout.Width(300));
+
+      GUI.enabled = RMSettings.ShowToolTips;
+      label = "Settings Window Tool Tips";
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      ShowToolTips = GUILayout.Toggle(ShowToolTips, label, GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+      label = "Roster Window Tool Tips";
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      WindowRoster.ShowToolTips = GUILayout.Toggle(WindowRoster.ShowToolTips, label, GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+      label = "Debugger Window Tool Tips";
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      WindowDebugger.ShowToolTips = GUILayout.Toggle(WindowDebugger.ShowToolTips, label, GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+      label = "Contract Disputes Window Tool Tips";
+      GUILayout.BeginHorizontal();
+      GUILayout.Space(20);
+      WindowContracts.ShowToolTips = GUILayout.Toggle(WindowContracts.ShowToolTips, label, GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+      GUI.enabled = true;
+    }
+
+    private static void DisplayHighlighting()
+    {
+      GUI.enabled = true;
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+      GUILayout.Label("Highlighting");
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+      // EnableHighlighting Mode
+      GUILayout.BeginHorizontal();
+      var label = "Enable Highlighting";
+      RMSettings.EnableHighlighting = GUILayout.Toggle(RMSettings.EnableHighlighting, label, GUILayout.Width(300));
+      GUILayout.EndHorizontal();
+    }
+
+    private static void DisplayOptions()
+    {
+      GUI.enabled = true;
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+      GUILayout.Label(!RMSettings.LockSettings
+        ? "Settings / Options"
+        : "Settings / Options  (Locked.  Unlock in Config file)");
+      GUILayout.Label("-------------------------------------------------------------------", GUILayout.Height(16));
+
+      var isEnabled = !RMSettings.LockSettings;
+      // Realism Mode
+      GUI.enabled = isEnabled;
+      var guiLabel = new GUIContent("Enable Realism Mode", "Turns on/off Realism Mode.\r\nWhen ON, causes changes in the interface and limits\r\nyour freedom to things that would not be 'Realistic'.\r\nWhen Off, Allows Fills, Dumps, Repeating Science, instantaneous Xfers, Crew Xfers anywwhere, etc.");
+      RMSettings.RealismMode = GUILayout.Toggle(RMSettings.RealismMode, guiLabel, GUILayout.Width(300));
+      var rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+
+      // LockSettings Mode
+      GUI.enabled = isEnabled;
+      guiLabel = new GUIContent("Lock Settings  (If set ON, disable in config file)", "Locks the settings in this section so they cannot be altered in game.\r\nTo turn off Locking you MUST edit the Config.xml file.");
+      RMSettings.LockSettings = GUILayout.Toggle(RMSettings.LockSettings, guiLabel, GUILayout.Width(300));
+      rect = GUILayoutUtility.GetLastRect();
+      if (Event.current.type == EventType.Repaint && ShowToolTips)
+        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+    }
+
+    #endregion Settings Window (GUI)
+  }
 }

@@ -3,7 +3,7 @@ Thanks for downloading Roster Manager!
 Roster Manager manages your roster of kerbals.  It will add a great deal of gameplay improvements, and control over your kerbals.
 
 ----------------
-Current Version 0.2.0.0 - Release xx Nov, 2015 - Second Alpha Release.
+Current Version 0.2.0.0 - Release 06 Dec, 2015 - Second Alpha Release.
 ----------------
 
 ---------
@@ -29,6 +29,7 @@ What's New:
 ------------
 Age processing added.
 Salary processing added.
+Major refactor of code.  More coming.
 See changelog for further details.
 
 ----------
