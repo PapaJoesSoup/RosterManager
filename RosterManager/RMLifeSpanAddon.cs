@@ -46,6 +46,7 @@ namespace RosterManager
       Utilities.LogMessage("RosterManagerLifeSpanAddon Awake...", "info", RMSettings.VerboseLogging);
       GameEvents.onKerbalAdded.Add(OnKerbalAdded);
       GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
+      GameEvents.OnCrewmemberSacked.Add(OnKerbalSacked);
     }
 
     public void Start()
@@ -111,6 +112,7 @@ namespace RosterManager
       Utilities.LogMessage("RosterManagerLifeSpanAddon OnDestroy...", "info", RMSettings.VerboseLogging);
       GameEvents.onKerbalAdded.Remove(OnKerbalAdded);
       GameEvents.onKerbalRemoved.Remove(OnKerbalRemoved);
+      GameEvents.OnCrewmemberSacked.Remove(OnKerbalSacked);
     }
 
     private void OnKerbalAdded(ProtoCrewMember crew)
@@ -121,7 +123,13 @@ namespace RosterManager
 
     private void OnKerbalRemoved(ProtoCrewMember crew)
     {
-      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalAdded " + crew.name + " has been removed from the crew roster.", "info", RMSettings.VerboseLogging);
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalRemoved " + crew.name + " has been removed from the crew roster.", "info", RMSettings.VerboseLogging);
+      RemoveKerbal(crew);
+    }
+
+    private void OnKerbalSacked(ProtoCrewMember crew, int num)
+    {
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalSacked " + crew.name + " has been sacked from the crew roster.", "info", RMSettings.VerboseLogging);
       RemoveKerbal(crew);
     }
 
