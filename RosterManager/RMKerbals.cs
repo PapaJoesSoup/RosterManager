@@ -122,7 +122,7 @@ namespace RosterManager
         Timelastsalary = currentTime;
         TimeSalaryDue = SalaryNextDue(currentTime);
         Salary = RMLifeSpan.Instance.RMGameSettings.DefaultSalary;
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
           {
@@ -243,7 +243,7 @@ namespace RosterManager
         var lastUpdate = GetNodes.GetNodeValue(node, "lastUpdate", 0d);
         var crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
         //If Deepfreeze is installed add Unowned and Tourists to the list (could be frozen or comatose).
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           crewList = crewList.Concat(HighLogic.CurrentGame.CrewRoster.Unowned).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
         }

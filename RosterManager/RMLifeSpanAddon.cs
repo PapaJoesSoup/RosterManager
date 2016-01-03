@@ -87,7 +87,7 @@ namespace RosterManager
         //Update all known Crew, Applicants in any game scene.
          var crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
         //If Deepfreeze is installed add Unowned and Tourists to the list (could be frozen or comatose).
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           crewList = crewList.Concat(HighLogic.CurrentGame.CrewRoster.Unowned).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
         }
@@ -150,7 +150,7 @@ namespace RosterManager
       {
         UpdateKerbal(crew, true);
       }
-      if (!DFInterface.IsDFInstalled) return;
+      if (!Api.InstalledMods.IsDfInstalled) return;
       // Check the roster list for any unknown dead kerbals (IE: DeepFreeze Frozen Compatibility).
       var unknownkerbals = HighLogic.CurrentGame.CrewRoster.Unowned.ToList();
       foreach (var crew in unknownkerbals)
@@ -198,7 +198,7 @@ namespace RosterManager
     {
       //Calculate and update their age.
       //If they are DeepFreeze Frozen - They Don't Age, until they are thawed.
-      if (DFInterface.IsDFInstalled)
+      if (Api.InstalledMods.IsDfInstalled)
       {
         if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)
         {
