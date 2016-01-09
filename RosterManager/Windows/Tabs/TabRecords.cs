@@ -19,13 +19,22 @@ namespace RosterManager.Windows.Tabs
         GUILayout.Label(RMAddon.SaveMessage, RMStyle.ErrorLabelRedStyle);
       }
 
-      // Begin Tab contents.
+            // Begin Tab contents.
 
-      if (GUILayout.Button("Enter Notes", GUILayout.Width(100)))
-      {
-        // Let's do a modal window here.  child of parent, moves with parent window.
-        // DisplayNotesWindow()
-      }
+            //if (GUILayout.Button("Enter Notes", GUILayout.Width(100)))
+            //{
+            // Let's do a modal window here.  child of parent, moves with parent window.
+            // DisplayNotesWindow()
+            GUILayout.BeginVertical();
+            GUILayout.Label("Notes: ", RMStyle.LabelStyleBold, GUILayout.Width(500));
+            var base64EncodedBytes = System.Convert.FromBase64String(WindowRoster.SelectedKerbal.Notes);
+            string inputString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+        
+        inputString = GUILayout.TextArea(inputString, 2046, RMStyle.RichTextStyle, GUILayout.Width(660), GUILayout.Height(150));
+            var richTextBytes = System.Text.Encoding.UTF8.GetBytes(inputString);
+        WindowRoster.SelectedKerbal.Notes = System.Convert.ToBase64String(richTextBytes);
+            GUILayout.EndVertical();
+            //}
 
       //End Tab contents
       GUILayout.EndScrollView();
