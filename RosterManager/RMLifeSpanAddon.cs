@@ -46,6 +46,7 @@ namespace RosterManager
       GameEvents.onKerbalAdded.Add(OnKerbalAdded);
       GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
       GameEvents.OnCrewmemberSacked.Add(OnKerbalSacked);
+      GameEvents.OnCrewmemberHired.Add(OnKerbalHired);
     }
 
     public void Start()
@@ -132,6 +133,15 @@ namespace RosterManager
       RemoveKerbal(crew);
     }
 
+    private void OnKerbalHired(ProtoCrewMember crew, int num)
+    {
+      var currentTime = Planetarium.GetUniversalTime();
+      var rmkerbal = RMLifeSpan.Instance.RMKerbals.AllrmKerbals.FirstOrDefault(a => a.Key == crew.name);
+      rmkerbal.Value.Timelastsalary = currentTime;
+      rmkerbal.Value.TimeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalHired " + crew.name + " has been hired to the crew roster.", "info", RMSettings.VerboseLogging);
+    }
+
     private void CheckDatabase()
     {
       // Check the roster list of crew and applicants for KerbalLife settings.
@@ -181,7 +191,11 @@ namespace RosterManager
         }
         if (RMLifeSpan.Instance.RMGameSettings.EnableSalaries)
         {
-          CheckSalary(crew, kerbal, currentTime);
+                    //We only pay salaries to Crew or Dead/Unowned (frozen)
+                    if (kerbal.Value.Type == ProtoCrewMember.KerbalType.Crew || 
+                        kerbal.Value.Status == ProtoCrewMember.RosterStatus.Dead && kerbal.Value.Type == ProtoCrewMember.KerbalType.Unowned)
+
+                    CheckSalary(crew, kerbal, currentTime);
         }
         kerbal.Value.LastUpdate = currentTime;
         kerbal.Value.Trait = crew.trait;
