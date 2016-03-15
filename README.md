@@ -4,7 +4,7 @@ Kerbal Space Program Addon.  Manages all kerbals in a given save game.  Adds gam
 License:  CC-BY-NC-SA 4.0
 
 ============
-VVersion 0.2.1.0 15 Mar 2016
+Version 0.2.1.0 15 Mar 2016
  - Fix issue with Loading/Saving causing errors at space centre.
  - Fix issue when Kerbals are sacked.
  - Changed DeepFreeze Integration to use new DeepFreeze wrapper API (no more hard dependency on specific versions).
