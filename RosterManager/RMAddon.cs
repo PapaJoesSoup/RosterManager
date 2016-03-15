@@ -1,4 +1,3 @@
-using DF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace RosterManager
     internal static string AllCrewSort = "";
 
     // DeepFreeze Frozen Crew interface
-    internal static Dictionary<string, KerbalInfo> FrozenKerbals = new Dictionary<string, KerbalInfo>();
+    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals = new Dictionary<string, DFWrapper.KerbalInfo>();
 
     #endregion Properties
 

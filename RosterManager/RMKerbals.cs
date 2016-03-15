@@ -1,5 +1,4 @@
-﻿using DF;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -46,14 +45,22 @@ namespace RosterManager
 
     internal void Save(ConfigNode node)
     {
-      var kerbalLifeRecordNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
-
-      foreach (var entry in AllrmKerbals)
+      try
       {
-        var kerbalNode = entry.Value.Save(kerbalLifeRecordNode);
-        Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Saving kerbal = " + entry.Key, "info", RMSettings.VerboseLogging);
-        kerbalNode.AddValue("kerbalName", entry.Key);
+                var kerbalLifeRecordNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
+
+                foreach (var entry in AllrmKerbals)
+                {
+                    var kerbalNode = entry.Value.Save(kerbalLifeRecordNode);
+                    Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Saving kerbal = " + entry.Key, "info", RMSettings.VerboseLogging);
+                    kerbalNode.AddValue("kerbalName", entry.Key);
+                }
       }
+      catch (Exception ex)
+      {
+        Utilities.LogMessage("RosterManagerLifeSpan.RMKerbal Save error... " + ex, "Error", RMSettings.VerboseLogging);                
+      }
+       
       Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Saving Completed", "info", RMSettings.VerboseLogging);
     }
   }
@@ -122,7 +129,7 @@ namespace RosterManager
         Timelastsalary = currentTime;
         TimeSalaryDue = SalaryNextDue(currentTime);
         Salary = RMLifeSpan.Instance.RMGameSettings.DefaultSalary;
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Dead && kerbal.type == ProtoCrewMember.KerbalType.Unowned)  // if they are frozen store time frozen
           {
@@ -243,7 +250,7 @@ namespace RosterManager
         var lastUpdate = GetNodes.GetNodeValue(node, "lastUpdate", 0d);
         var crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
         //If Deepfreeze is installed add Unowned and Tourists to the list (could be frozen or comatose).
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           crewList = crewList.Concat(HighLogic.CurrentGame.CrewRoster.Unowned).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
         }
@@ -254,7 +261,7 @@ namespace RosterManager
           Status = GetNodes.GetNodeValue(node, "status", ProtoCrewMember.RosterStatus.Available),
           Type = GetNodes.GetNodeValue(node, "type", ProtoCrewMember.KerbalType.Crew),
           VesselId = GetNodes.GetNodeValue(node, "vesselID", Guid.Empty),
-          PartId = GetNodes.GetNodeValue(node, "partID", (uint) 0),
+          PartId = GetNodes.GetNodeValue(node, "partID", (uint)0),
           VesselName = GetNodes.GetNodeValue(node, "VesselName", " "),
           SeatIdx = GetNodes.GetNodeValue(node, "seatIdx", 0),
           SeatName = GetNodes.GetNodeValue(node, "seatName", ""),
@@ -265,6 +272,7 @@ namespace RosterManager
           Salary = GetNodes.GetNodeValue(node, "salary", 0d),
           TimeSalaryDue = GetNodes.GetNodeValue(node, "timeSalaryDue", lastUpdate),
           Timelastsalary = GetNodes.GetNodeValue(node, "timelastsalary", lastUpdate),
+          Notes = GetNodes.GetNodeValue(node, "notes", ""),
           SalaryContractDispute = GetNodes.GetNodeValue(node, "salaryContractDispute", false),
           OwedSalary = GetNodes.GetNodeValue(node, "owedSalary", 0d),
           SalaryContractDisputePeriods = GetNodes.GetNodeValue(node, "salaryContractDisputePeriods", 0),

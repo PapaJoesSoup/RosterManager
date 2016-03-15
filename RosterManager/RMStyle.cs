@@ -26,6 +26,7 @@ namespace RosterManager
     internal static GUIStyle LabelStyleHdrSort;
     internal static GUIStyle ToolTipStyle;
     internal static GUIStyle ScrollStyle;
+    internal static GUIStyle RichTextStyle;
 
     internal static void SetupGui()
     {
@@ -155,6 +156,13 @@ namespace RosterManager
       };
 
       ScrollStyle = new GUIStyle(GUI.skin.box);
+
+      RichTextStyle = new GUIStyle(GUI.skin.textArea)
+      {
+        wordWrap = true,
+        fontStyle = FontStyle.Normal,
+        richText = true        
+      };
     }
   }
 }

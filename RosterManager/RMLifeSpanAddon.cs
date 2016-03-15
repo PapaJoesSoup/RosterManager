@@ -1,5 +1,4 @@
-﻿using DF;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -46,6 +45,8 @@ namespace RosterManager
       Utilities.LogMessage("RosterManagerLifeSpanAddon Awake...", "info", RMSettings.VerboseLogging);
       GameEvents.onKerbalAdded.Add(OnKerbalAdded);
       GameEvents.onKerbalRemoved.Add(OnKerbalRemoved);
+      GameEvents.OnCrewmemberSacked.Add(OnKerbalSacked);
+      GameEvents.OnCrewmemberHired.Add(OnKerbalHired);
     }
 
     public void Start()
@@ -86,7 +87,7 @@ namespace RosterManager
         //Update all known Crew, Applicants in any game scene.
          var crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
         //If Deepfreeze is installed add Unowned and Tourists to the list (could be frozen or comatose).
-        if (DFInterface.IsDFInstalled)
+        if (Api.InstalledMods.IsDfInstalled)
         {
           crewList = crewList.Concat(HighLogic.CurrentGame.CrewRoster.Unowned).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
         }
@@ -111,6 +112,7 @@ namespace RosterManager
       Utilities.LogMessage("RosterManagerLifeSpanAddon OnDestroy...", "info", RMSettings.VerboseLogging);
       GameEvents.onKerbalAdded.Remove(OnKerbalAdded);
       GameEvents.onKerbalRemoved.Remove(OnKerbalRemoved);
+      GameEvents.OnCrewmemberSacked.Remove(OnKerbalSacked);
     }
 
     private void OnKerbalAdded(ProtoCrewMember crew)
@@ -121,8 +123,23 @@ namespace RosterManager
 
     private void OnKerbalRemoved(ProtoCrewMember crew)
     {
-      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalAdded " + crew.name + " has been removed from the crew roster.", "info", RMSettings.VerboseLogging);
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalRemoved " + crew.name + " has been removed from the crew roster.", "info", RMSettings.VerboseLogging);
       RemoveKerbal(crew);
+    }
+
+    private void OnKerbalSacked(ProtoCrewMember crew, int num)
+    {
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalSacked " + crew.name + " has been sacked from the crew roster.", "info", RMSettings.VerboseLogging);
+      RemoveKerbal(crew);
+    }
+
+    private void OnKerbalHired(ProtoCrewMember crew, int num)
+    {
+      var currentTime = Planetarium.GetUniversalTime();
+      var rmkerbal = RMLifeSpan.Instance.RMKerbals.AllrmKerbals.FirstOrDefault(a => a.Key == crew.name);
+      rmkerbal.Value.Timelastsalary = currentTime;
+      rmkerbal.Value.TimeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
+      Utilities.LogMessage("RosterManagerLifeSpanAddon.onKerbalHired " + crew.name + " has been hired to the crew roster.", "info", RMSettings.VerboseLogging);
     }
 
     private void CheckDatabase()
@@ -142,7 +159,7 @@ namespace RosterManager
       {
         UpdateKerbal(crew, true);
       }
-      if (!DFInterface.IsDFInstalled) return;
+      if (!Api.InstalledMods.IsDfInstalled) return;
       // Check the roster list for any unknown dead kerbals (IE: DeepFreeze Frozen Compatibility).
       var unknownkerbals = HighLogic.CurrentGame.CrewRoster.Unowned.ToList();
       foreach (var crew in unknownkerbals)
@@ -174,7 +191,11 @@ namespace RosterManager
         }
         if (RMLifeSpan.Instance.RMGameSettings.EnableSalaries)
         {
-          CheckSalary(crew, kerbal, currentTime);
+                    //We only pay salaries to Crew or Dead/Unowned (frozen)
+                    if (kerbal.Value.Type == ProtoCrewMember.KerbalType.Crew || 
+                        kerbal.Value.Status == ProtoCrewMember.RosterStatus.Dead && kerbal.Value.Type == ProtoCrewMember.KerbalType.Unowned)
+
+                    CheckSalary(crew, kerbal, currentTime);
         }
         kerbal.Value.LastUpdate = currentTime;
         kerbal.Value.Trait = crew.trait;
@@ -190,7 +211,7 @@ namespace RosterManager
     {
       //Calculate and update their age.
       //If they are DeepFreeze Frozen - They Don't Age, until they are thawed.
-      if (DFInterface.IsDFInstalled)
+      if (Api.InstalledMods.IsDfInstalled)
       {
         if (crew.rosterStatus == ProtoCrewMember.RosterStatus.Dead && crew.type == ProtoCrewMember.KerbalType.Unowned)
         {

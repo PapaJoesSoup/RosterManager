@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using DF;
+using RosterManager.Api;
 using RosterManager.Api;
 using RosterManager.Windows.Tabs;
 using UnityEngine;
@@ -235,7 +235,7 @@ namespace RosterManager.Windows
       isDispute = GUILayout.Toggle(isDispute, "Dispute", GUILayout.Width(80));
       if (isDispute)
         FilteredBy = FilterBy.Dispute;
-      if (DFInterface.IsDFInstalled)
+      if (Api.InstalledMods.IsDfInstalled)
       {
         var isFrozen = FilteredBy == FilterBy.Frozen;
         isFrozen = GUILayout.Toggle(isFrozen, "Frozen", GUILayout.Width(80));
@@ -756,11 +756,16 @@ namespace RosterManager.Windows
       }
     }
 
-    internal static Dictionary<string, KerbalInfo> GetFrozenKerbals()
+    internal static Dictionary<string, DFWrapper.KerbalInfo> GetFrozenKerbals()
     {
-      if (!DFInterface.IsDFInstalled) return new Dictionary<string, KerbalInfo>();
-      var idf = DFInterface.GetFrozenKerbals();
-      return idf.FrozenKerbals;
+      if (!Api.InstalledMods.IsDfInstalled) return new Dictionary<string, DFWrapper.KerbalInfo>();
+      if (!DFWrapper.InstanceExists)
+            {
+                DFWrapper.InitDFWrapper();
+            }
+      if (!DFWrapper.InstanceExists || !DFWrapper.APIReady) return new Dictionary<string, DFWrapper.KerbalInfo>();
+      var idf = DFWrapper.DeepFreezeAPI.FrozenKerbals;
+      return idf;
     }
 
     internal static void ResetKerbalProfessions()

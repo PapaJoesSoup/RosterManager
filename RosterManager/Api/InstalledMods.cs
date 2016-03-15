@@ -36,7 +36,7 @@ namespace RosterManager.Api
         {
             var assembly = (from a in Assemblies
                             where a.FullName.StartsWith(assemblyName)
-                            select a).SingleOrDefault();
+                            select a).FirstOrDefault();
             return assembly != null;
         }
     }
