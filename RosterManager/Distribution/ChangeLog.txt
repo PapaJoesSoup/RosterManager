@@ -1,8 +1,9 @@
-Version 0.2.1.0 xx Jan 2016
+Version 0.2.1.0 15 Mar 2016
  - Fix issue with Loading/Saving causing errors at space centre.
  - Fix issue when Kerbals are sacked.
  - Changed DeepFreeze Integration to use new DeepFreeze wrapper API (no more hard dependency on specific versions).
  - Added Notes function. There is now one Notes area for each kerbal (2k characters max) to record whatever notes you wish, accessed by selecting a kerbal in RM and selecting the Records tab.
+
 Version 0.2.0.0 06 Dec 2015 
  - Compatible with new KSP 1.0.5 Kerbal Traits/naming process.
  - Up to date with DeepFreeze Mod integration.
