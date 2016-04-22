@@ -4,6 +4,12 @@ Kerbal Space Program Addon.  Manages all kerbals in a given save game.  Adds gam
 License:  CC-BY-NC-SA 4.0
 
 ============
+<<<<<<< HEAD
+=======
+Version 0.2.2.0 24 Apr 2016
+ - Fix and re-compile for KSP 1.1 "Turbo Charged"
+ 
+>>>>>>> refs/remotes/origin/Dev
 Version 0.2.1.0 15 Mar 2016
  - Fix issue with Loading/Saving causing errors at space centre.
  - Fix issue when Kerbals are sacked.

@@ -106,8 +106,9 @@ namespace RosterManager
     public float Experience;
 
     private readonly Random _rnd = new Random();  // Random seed for setting Kerbals ages
+    internal static KSPUtil.DefaultDateTimeFormatter defaultDateTime = new KSPUtil.DefaultDateTimeFormatter();
 
-    public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
+        public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
     {
       LastUpdate = currentTime;
       Kerbal = kerbal;
@@ -373,17 +374,17 @@ namespace RosterManager
 
     public static double SalaryNextDue(double time)
     {
-      var salaryTimeMonthRealCalendar = KSPUtil.EarthYear / 12;
-      var salaryTimeMonthKerbalCalendar = KSPUtil.KerbinYear / 12;
+      var salaryTimeMonthRealCalendar = defaultDateTime.EarthYear / 12;
+      var salaryTimeMonthKerbalCalendar = defaultDateTime.KerbinYear / 12;
       double salaryTimeSpan = salaryTimeMonthRealCalendar;
       if (GameSettings.KERBIN_TIME)
       {
-        salaryTimeSpan = RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly ? KSPUtil.KerbinYear : salaryTimeMonthKerbalCalendar;
+        salaryTimeSpan = RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly ? defaultDateTime.KerbinYear : salaryTimeMonthKerbalCalendar;
       }
       else
       {
         if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
-          salaryTimeSpan = KSPUtil.EarthYear;
+          salaryTimeSpan = defaultDateTime.EarthYear;
       }
       var returnTime = time + salaryTimeSpan;
       return returnTime;
@@ -391,9 +392,9 @@ namespace RosterManager
 
     public static double BirthdayNextDue(double time)
     {
-      double birthdayTimeSpan = KSPUtil.KerbinYear;
+      double birthdayTimeSpan = defaultDateTime.KerbinYear;
       if (!GameSettings.KERBIN_TIME)
-        birthdayTimeSpan = KSPUtil.EarthYear;
+        birthdayTimeSpan = defaultDateTime.EarthYear;
       return time + birthdayTimeSpan;
     }
   }
