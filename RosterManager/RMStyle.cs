@@ -147,8 +147,10 @@ namespace RosterManager
 
       LabelStyleHdrSort = new GUIStyle(GUI.skin.label) {fontStyle = FontStyle.Bold};
 
-      ToolTipStyle = new GUIStyle(GUI.skin.label)
+      ToolTipStyle = new GUIStyle(GUI.skin.textArea)
       {
+        border = new RectOffset(4, 4, 4, 4),
+        padding = new RectOffset(5, 5, 5, 5),
         alignment = TextAnchor.MiddleLeft,
         wordWrap = false,
         fontStyle = FontStyle.Normal,

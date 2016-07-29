@@ -46,7 +46,6 @@ namespace RosterManager.Windows.Tabs
         WindowRoster.DisplaySelectProfession();
       }
       WindowRoster.DisplaySelectGender();
-      WindowRoster.SelectedKerbal.Gender = WindowRoster.Gender;
 
       GUILayout.Label("Courage");
       WindowRoster.SelectedKerbal.Courage = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Courage, 0, 1, GUILayout.Width(300));

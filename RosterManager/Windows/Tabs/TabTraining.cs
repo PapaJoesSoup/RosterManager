@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using RosterManager.InternalObjects;
 using UnityEngine;
 
 namespace RosterManager.Windows.Tabs
@@ -131,7 +132,7 @@ namespace RosterManager.Windows.Tabs
       WindowRoster.SelectedKerbal.Skill = (int)GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Skill, 0, 5, GUILayout.MaxWidth(300));
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.Label(WindowRoster.SelectedKerbal.Skill + " / 5");
       GUILayout.EndHorizontal();
 
@@ -142,7 +143,7 @@ namespace RosterManager.Windows.Tabs
       WindowRoster.SelectedKerbal.Experience = (int)GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Experience, 0, 99999, GUILayout.MaxWidth(300));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.Label(WindowRoster.SelectedKerbal.Experience + " / 99999");
       GUILayout.EndHorizontal();
 
@@ -161,7 +162,7 @@ namespace RosterManager.Windows.Tabs
         WindowRoster.SelectedKerbal.Salary = (int)GUILayout.HorizontalSlider((float)WindowRoster.SelectedKerbal.Salary, 0, 100000, GUILayout.Width(300));
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
-          ToolTip = Utilities.SetActiveTooltip(rect, WindowRoster.Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+          ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
         GUILayout.Label(WindowRoster.SelectedKerbal.Salary.ToString("###,##0") + " / 100,000 " + RMLifeSpan.Instance.RMGameSettings.SalaryPeriod);
         GUILayout.EndHorizontal();
       }

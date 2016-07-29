@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using RosterManager.Api;
 using RosterManager.Api;
+using RosterManager.InternalObjects;
 using RosterManager.Windows.Tabs;
 using UnityEngine;
 
@@ -34,6 +35,21 @@ namespace RosterManager.Windows
     internal static string KerbalProfession
     {
       get { return _typeOfProfession.ToString(); }
+    }
+
+    // Kerbal Type var
+    internal static ProtoCrewMember.KerbalType _kerbalType;
+    internal static string KerbalType
+    {
+      get { return _kerbalType.ToString(); }
+    }
+
+    // Kerbal state var
+    internal static ProtoCrewMember.RosterStatus _rosterStatus;
+
+    internal static string RosterStatus
+    {
+      get { return _rosterStatus.ToString(); }
     }
 
     // Gender var
@@ -117,7 +133,7 @@ namespace RosterManager.Windows
           ShowWindow = false;
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Ok, now lets render the window...
       try
@@ -167,13 +183,13 @@ namespace RosterManager.Windows
         SortRosterList("Name");
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (GUILayout.Button(new GUIContent("Gender", buttonToolTip), hdrlabelStyle, GUILayout.Width(50)))
         SortRosterList("Gender");
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (RMLifeSpan.Instance.RMGameSettings.EnableAging)
       {
@@ -181,32 +197,32 @@ namespace RosterManager.Windows
           SortRosterList("Age");
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+          ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       }
 
       if (GUILayout.Button(new GUIContent("Profession", buttonToolTip), hdrlabelStyle, GUILayout.Width(75)))
         SortRosterList("Profession");
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (GUILayout.Button(new GUIContent("Skill", buttonToolTip), hdrlabelStyle, GUILayout.Width(35)))
         SortRosterList("Skill");
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (GUILayout.Button(new GUIContent("Experience", buttonToolTip), hdrlabelStyle, GUILayout.Width(75)))
         SortRosterList("Experience");
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (GUILayout.Button(new GUIContent("Status", buttonToolTip), hdrlabelStyle, GUILayout.Width(200)))
         SortRosterList("Status");
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.EndHorizontal();
     }
@@ -265,16 +281,7 @@ namespace RosterManager.Windows
           var rosterDetails = "";
           if (kerbal.rosterStatus == ProtoCrewMember.RosterStatus.Assigned)
           {
-            foreach (var thisVessel in from thisVessel in FlightGlobals.Vessels let crew = thisVessel.GetVesselCrew() where crew.Any(crewMember => crewMember == kerbal) select thisVessel)
-            {
-              if (rmkerbal.Value.SalaryContractDispute)
-                if (rmkerbal.Value.Trait == "Tourist")
-                  rosterDetails = "Strike - " + thisVessel.GetName().Replace("(unloaded)", "");
-                else
-                  rosterDetails = "Dispute - " + thisVessel.GetName().Replace("(unloaded)", "");
-              else
-                rosterDetails = "Assigned - " + thisVessel.GetName().Replace("(unloaded)", "");
-            }
+            rosterDetails = RosterVesselDetails(rmkerbal.Value);
           }
           else if (InstalledMods.IsDfInstalled && kerbal.type == ProtoCrewMember.KerbalType.Unowned)
           {
@@ -303,11 +310,13 @@ namespace RosterManager.Windows
             {
               //Find the RMKerbal entry for the selected kerbal.
               SelectedKerbal = RMLifeSpan.Instance.RMKerbals.AllrmKerbals.FirstOrDefault(a => a.Key == kerbal.name).Value;
-              if (SelectedKerbal == null) //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
+              if (SelectedKerbal == null)
+                //Didn't find the RMKerbal entry? Should never happen? Create a new one just in case.
               {
                 SelectedKerbal = new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, false);
                 RMLifeSpan.Instance.RMKerbals.AllrmKerbals.Add(kerbal.name, SelectedKerbal);
               }
+              else SelectedKerbal.IsNew = false;
               SetProfessionFlag();
               Gender = SelectedKerbal.Gender;
               DisplayMode = DisplayModes.Edit;
@@ -321,7 +330,7 @@ namespace RosterManager.Windows
           }
           var rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50 - _scrollViewerPosition.y);
+            ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
           // Column Gender
           GUILayout.Label(kerbal.gender.ToString(), labelStyle, GUILayout.Width(50));
@@ -353,6 +362,54 @@ namespace RosterManager.Windows
       {
         Utilities.LogMessage(string.Format(" in RosterListViewer.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
       }
+    }
+
+    internal static string RosterVesselDetails(RMKerbal rmkerbal)
+    {
+      var rosterDetails = "";
+      var vessels = FlightGlobals.Vessels.GetEnumerator();
+      while (vessels.MoveNext())
+      {
+        if (vessels.Current == null) continue;
+        var crew = vessels.Current.GetVesselCrew().GetEnumerator();
+        while (crew.MoveNext())
+        {
+          if (crew.Current != rmkerbal.Kerbal) continue;
+          if (rmkerbal.SalaryContractDispute)
+            if (rmkerbal.Trait == "Tourist")
+              rosterDetails = "Strike - " + vessels.Current.GetName().Replace("(unloaded)", "");
+            else
+              rosterDetails = "Dispute - " + vessels.Current.GetName().Replace("(unloaded)", "");
+          else
+            rosterDetails = "Assigned - " + vessels.Current.GetName().Replace("(unloaded)", "");
+          break;
+        }
+      }
+      return rosterDetails;
+    }
+
+    internal static bool IsKerbalInDeepFreezePart(RMKerbal selectedKerbal)
+    {
+      var result = false;
+      var vessels = FlightGlobals.Vessels.GetEnumerator();
+      while (vessels.MoveNext())
+      {
+        if (vessels.Current == null) continue;
+        var crew = vessels.Current.GetVesselCrew().GetEnumerator();
+        while (crew.MoveNext())
+        {
+          if (crew.Current != selectedKerbal.Kerbal) continue;
+          if (crew.Current.KerbalRef.InPart != null)
+          {
+            if (crew.Current.KerbalRef.InPart.Modules.Contains("ModuleDeepFreeze"))
+            result = true;
+          }
+          break;
+        }
+      }
+
+
+      return result;
     }
 
     private static void DisplayTabButtons()
@@ -438,6 +495,67 @@ namespace RosterManager.Windows
       isScientist = GUILayout.Toggle(isScientist, "Scientist", GUILayout.Width(80));
       if (isScientist) _typeOfProfession = ProfessionType.Scientist;
 
+      var isTourist = KerbalProfession == ProfessionType.Tourist.ToString();
+      isTourist = GUILayout.Toggle(isTourist, "Tourist", GUILayout.Width(80));
+      if (isTourist) _typeOfProfession = ProfessionType.Tourist;
+
+      GUI.enabled = true;
+      GUILayout.EndHorizontal();
+    }
+
+    internal static void DisplaySelectType()
+    {
+      GUILayout.BeginHorizontal();
+      // at first initialization in Create Mode, Selected Kerbal is null...
+      _kerbalType = SelectedKerbal == null ?  ProtoCrewMember.KerbalType.Crew : SelectedKerbal.Type;
+      if (SelectedKerbal != null && SelectedKerbal.SalaryContractDispute) GUI.enabled = false;
+      GUILayout.Label("KerbalType:", GUILayout.Width(80));
+
+      var isApplicant = KerbalType == ProtoCrewMember.KerbalType.Applicant.ToString();
+      isApplicant = GUILayout.Toggle(isApplicant, ProtoCrewMember.KerbalType.Applicant.ToString(), GUILayout.Width(70));
+      if (isApplicant) _kerbalType = ProtoCrewMember.KerbalType.Applicant;
+
+      var isCrew = KerbalType == ProtoCrewMember.KerbalType.Crew.ToString();
+      isCrew = GUILayout.Toggle(isCrew, ProtoCrewMember.KerbalType.Crew.ToString(), GUILayout.Width(70));
+      if (isCrew) _kerbalType = ProtoCrewMember.KerbalType.Crew;
+
+      var isTourist = KerbalType == ProtoCrewMember.KerbalType.Tourist.ToString();
+      isTourist = GUILayout.Toggle(isTourist, ProtoCrewMember.KerbalType.Tourist.ToString(), GUILayout.Width(70));
+      if (isTourist) _kerbalType = ProtoCrewMember.KerbalType.Tourist;
+
+      var isUnowned = KerbalType == ProtoCrewMember.KerbalType.Unowned.ToString();
+      isUnowned = GUILayout.Toggle(isUnowned, ProtoCrewMember.KerbalType.Unowned.ToString(), GUILayout.Width(70));
+      if (isUnowned) _kerbalType = ProtoCrewMember.KerbalType.Unowned;
+
+      GUI.enabled = true;
+      GUILayout.EndHorizontal();
+    }
+
+    internal static void DisplaySelectState()
+    {
+      GUILayout.BeginHorizontal();
+      // at first initialization in Create Mode, Selected Kerbal is null...
+      _rosterStatus = SelectedKerbal == null ? ProtoCrewMember.RosterStatus.Available : SelectedKerbal.Status;
+      if (SelectedKerbal != null && SelectedKerbal.SalaryContractDispute)
+        GUI.enabled = false;
+      GUILayout.Label("Status:", GUILayout.Width(80));
+
+      var isAvailable = RosterStatus == ProtoCrewMember.RosterStatus.Available.ToString();
+      isAvailable = GUILayout.Toggle(isAvailable, ProtoCrewMember.RosterStatus.Available.ToString(), GUILayout.Width(70));
+      if (isAvailable) _rosterStatus = ProtoCrewMember.RosterStatus.Available;
+
+      var isAssigned = RosterStatus == ProtoCrewMember.RosterStatus.Assigned.ToString();
+      isAssigned = GUILayout.Toggle(isAssigned, ProtoCrewMember.RosterStatus.Assigned.ToString(), GUILayout.Width(70));
+      if (isAssigned) _rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
+
+      var isMissing = RosterStatus == ProtoCrewMember.RosterStatus.Missing.ToString();
+      isMissing = GUILayout.Toggle(isMissing, ProtoCrewMember.RosterStatus.Missing.ToString(), GUILayout.Width(70));
+      if (isMissing) _rosterStatus = ProtoCrewMember.RosterStatus.Missing;
+
+      var isDead = RosterStatus == ProtoCrewMember.RosterStatus.Dead.ToString();
+      isDead = GUILayout.Toggle(isDead, ProtoCrewMember.RosterStatus.Dead.ToString(), GUILayout.Width(70));
+      if (isDead) _rosterStatus = ProtoCrewMember.RosterStatus.Dead;
+
       GUI.enabled = true;
       GUILayout.EndHorizontal();
     }
@@ -496,7 +614,7 @@ namespace RosterManager.Windows
 
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 30 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       GUILayout.EndHorizontal();
     }
 
@@ -544,7 +662,7 @@ namespace RosterManager.Windows
       }
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 50);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       if (GUILayout.Button("Cancel", GUILayout.MaxWidth(50)))
       {
         SelectedKerbal = null;
@@ -598,8 +716,11 @@ namespace RosterManager.Windows
         case "Engineer":
           _typeOfProfession = ProfessionType.Engineer;
           break;
-        default:
+        case "Scientist":
           _typeOfProfession = ProfessionType.Scientist;
+          break;
+        default:
+          _typeOfProfession = ProfessionType.Tourist;
           break;
       }
     }

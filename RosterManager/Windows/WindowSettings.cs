@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using RosterManager.Api;
+using RosterManager.InternalObjects;
 using UnityEngine;
 
 namespace RosterManager.Windows
@@ -29,7 +30,7 @@ namespace RosterManager.Windows
         ShowWindow = false;
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // Store settings in case we cancel later...
       //RMSettings.StoreTempSettings();
@@ -153,14 +154,14 @@ namespace RosterManager.Windows
       RMSettings.EnableKerbalRename = GUILayout.Toggle(RMSettings.EnableKerbalRename, new GUIContent(label, toolTip), GUILayout.Width(300));
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       label = "Enable Kerbal Aging";
       toolTip = "Your Kerbals will age and eventually die from old age.";
       RMLifeSpan.Instance.RMGameSettings.EnableAging = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.EnableAging, new GUIContent(label, toolTip), GUILayout.Width(300));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (!RMLifeSpan.Instance.RMGameSettings.EnableAging)
         GUI.enabled = false;
@@ -169,7 +170,7 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent("Kerbal Minimum Age: ", toolTip), GUILayout.Width(140));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       var strMinimumAge = RMLifeSpan.Instance.RMGameSettings.MinimumAge.ToString();
       int minimumAge;
       strMinimumAge = GUILayout.TextField(strMinimumAge, GUILayout.Width(40));
@@ -183,7 +184,7 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent("Kerbal Lifespan: ", toolTip), GUILayout.Width(140));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       var strMaximumAge = RMLifeSpan.Instance.RMGameSettings.MaximumAge.ToString();
       int maximumAge;
       strMaximumAge = GUILayout.TextField(strMaximumAge, GUILayout.Width(40));
@@ -200,7 +201,7 @@ namespace RosterManager.Windows
       RMLifeSpan.Instance.RMGameSettings.EnableSalaries = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.EnableSalaries, new GUIContent(label, toolTip), GUILayout.Width(300));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (!RMLifeSpan.Instance.RMGameSettings.EnableSalaries)
         GUI.enabled = false;
@@ -211,7 +212,7 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent("Default Kerbal Salary: ", toolTip), GUILayout.Width(140));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       var strDefSalary = RMLifeSpan.Instance.RMGameSettings.DefaultSalary.ToString(CultureInfo.InvariantCulture);
       double defaultSalary;
       strDefSalary = GUILayout.TextField(strDefSalary, GUILayout.Width(70));
@@ -229,7 +230,7 @@ namespace RosterManager.Windows
       RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge = GUILayout.Toggle(RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge, new GUIContent(label, toolTip), GUILayout.Width(320));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       if (!RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCharge)
         GUI.enabled = false;
@@ -239,7 +240,7 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent("Change Profession Cost: ", toolTip), GUILayout.Width(140));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       var strChgProf = RMLifeSpan.Instance.RMGameSettings.ChangeProfessionCost.ToString(CultureInfo.InvariantCulture);
       double chgProf;
       strChgProf = GUILayout.TextField(strChgProf, GUILayout.Width(70));
@@ -347,7 +348,7 @@ namespace RosterManager.Windows
       RMSettings.RealismMode = GUILayout.Toggle(RMSettings.RealismMode, guiLabel, GUILayout.Width(300));
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       // LockSettings Mode
       GUI.enabled = isEnabled;
@@ -355,7 +356,7 @@ namespace RosterManager.Windows
       RMSettings.LockSettings = GUILayout.Toggle(RMSettings.LockSettings, guiLabel, GUILayout.Width(300));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 80, 0 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
 
     #endregion Settings Window (GUI)

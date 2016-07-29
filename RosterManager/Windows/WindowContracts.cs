@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using RosterManager.Api;
+using RosterManager.InternalObjects;
 using UnityEngine;
 
 namespace RosterManager.Windows
@@ -40,7 +41,7 @@ namespace RosterManager.Windows
         ShowWindow = false;
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
       DisplayRosterFilter();
@@ -75,7 +76,7 @@ namespace RosterManager.Windows
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+          ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
         buttonToolTip = "Decline All Payrises, All listed kerbals will become tourists until you can pay them.";
         if (GUILayout.Button(new GUIContent("Decline All", buttonToolTip), RMStyle.ButtonStyle))
@@ -90,7 +91,7 @@ namespace RosterManager.Windows
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+          ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       }
       if (_recontractFlag)
       {
@@ -107,7 +108,7 @@ namespace RosterManager.Windows
         }
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && ShowToolTips)
-          ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+          ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
       }
       GUILayout.EndHorizontal();
 
@@ -187,7 +188,7 @@ namespace RosterManager.Windows
           }
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+            ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
           GUI.enabled = true;
         }
         else
@@ -200,7 +201,7 @@ namespace RosterManager.Windows
           }
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+            ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
           buttonToolTip = "Decline Payrise. Kerbal will become a tourist until paid.";
           if (GUILayout.Button(new GUIContent("Decline", buttonToolTip), RMStyle.ButtonStyle, GUILayout.Width(80)))
@@ -210,7 +211,7 @@ namespace RosterManager.Windows
           }
           rect = GUILayoutUtility.GetLastRect();
           if (Event.current.type == EventType.Repaint && ShowToolTips)
-            ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+            ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
         }
         GUILayout.EndHorizontal();
       }
@@ -238,43 +239,43 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent("Crew Name", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(130));
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Crew Member's Current Salary.";
       GUILayout.Label(new GUIContent("Salary", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(55));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Crew Member's Current Outstanding/Owing Salary.";
       GUILayout.Label(new GUIContent("BackPay", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(60));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "How many Pay periods salary has been in dispute.";
       GUILayout.Label(new GUIContent("#", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(15));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Payrise Requested.";
       GUILayout.Label(new GUIContent("PayRise", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(55));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "kerbals usual profession when working.";
       GUILayout.Label(new GUIContent("Profession", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(75));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Next Salary payment is due at.";
       GUILayout.Label(new GUIContent("Salary Due", buttonToolTip), RMStyle.LabelStyleBold, GUILayout.Width(65));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.EndHorizontal();
     }
@@ -300,39 +301,39 @@ namespace RosterManager.Windows
       GUILayout.Label(new GUIContent(kerbal.Name, buttonToolTip), labelStyle, GUILayout.Width(130));
       var rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Crew Member's Current Salary.";
       GUILayout.Label(new GUIContent(kerbal.Salary.ToString("###,##0"), buttonToolTip), labelStyle, GUILayout.Width(55));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Crew Member's Current Outstanding/Owing Salary.";
       GUILayout.Label(new GUIContent(kerbal.OwedSalary.ToString("###,##0"), buttonToolTip), labelStyle, GUILayout.Width(60));
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "How many Pay periods salary has been in dispute.";
       GUILayout.Label(new GUIContent(kerbal.SalaryContractDisputePeriods.ToString("#0"), buttonToolTip), labelStyle, GUILayout.Width(15));
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Payrise Requested.";
       GUILayout.Label(new GUIContent(kerbal.PayriseRequired.ToString("###,##0"), buttonToolTip), labelStyle, GUILayout.Width(55));
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Kerbals usual Profession.";
       GUILayout.Label(new GUIContent(kerbal.RealTrait, buttonToolTip), labelStyle, GUILayout.Width(75));
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       buttonToolTip = "Next Salary payment is due on:";
       GUILayout.Label(new GUIContent(KSPUtil.PrintDate((int)kerbal.TimeSalaryDue, false), buttonToolTip), labelStyle, GUILayout.Width(65));
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 30, 5 - _scrollViewerPosition.y);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
     }
 
     private static void DeclineDispute(RMKerbal disputekerbal)
