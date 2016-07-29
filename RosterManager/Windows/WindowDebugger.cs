@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+using RosterManager.InternalObjects;
 using UnityEngine;
 
 namespace RosterManager.Windows
@@ -26,7 +27,7 @@ namespace RosterManager.Windows
         ToolTip = "";
       }
       if (Event.current.type == EventType.Repaint && ShowToolTips)
-        ToolTip = Utilities.SetActiveTooltip(rect, Position, GUI.tooltip, ref ToolTipActive, 0, 0);
+        ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
       Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));

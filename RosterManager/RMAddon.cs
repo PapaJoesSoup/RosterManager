@@ -5,6 +5,7 @@ using RosterManager.Api;
 using RosterManager.Windows;
 using UnityEngine;
 using KSP.UI.Screens;
+using RosterManager.InternalObjects;
 
 namespace RosterManager
 {
@@ -110,7 +111,7 @@ namespace RosterManager
       {
         Display();
 
-        Utilities.ShowToolTips();
+        RMToolTips.ShowToolTips();
       }
       catch (Exception ex)
       {

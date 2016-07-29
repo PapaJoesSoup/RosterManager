@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using RosterManager.Windows;
+using UnityEngine;
+using Random = System.Random;
 
 namespace RosterManager
 {
@@ -108,7 +111,7 @@ namespace RosterManager
     private readonly Random _rnd = new Random();  // Random seed for setting Kerbals ages
     internal static KSPUtil.DefaultDateTimeFormatter defaultDateTime = new KSPUtil.DefaultDateTimeFormatter();
 
-        public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
+    public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
     {
       LastUpdate = currentTime;
       Kerbal = kerbal;
@@ -232,6 +235,18 @@ namespace RosterManager
       Kerbal.isBadass = Badass;
       Kerbal.experienceLevel = Skill;
       Kerbal.experience = Experience;
+      Kerbal.type = Type;
+      Kerbal.rosterStatus = Status;
+
+      // Now let's do some validaton for Type and status
+      if (Type == ProtoCrewMember.KerbalType.Tourist && Trait != "Tourist")
+      {
+        Kerbal.trait = "Tourist";
+      }
+      if (Type != ProtoCrewMember.KerbalType.Tourist && Trait == "Tourist")
+      {
+        Kerbal.type = ProtoCrewMember.KerbalType.Tourist;
+      }
     }
 
     private bool NameExists()
