@@ -889,13 +889,13 @@ namespace RosterManager.Windows
       return idf;
     }
 
-    internal static void ResetKerbalProfessions()
-    {
-      foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew.Where(kerbal => kerbal.name.Contains(char.ConvertFromUtf32(1))))
-      {
-        kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
-      }
-    }
+    //internal static void ResetKerbalProfessions()
+    //{
+    //  foreach (var kerbal in HighLogic.CurrentGame.CrewRoster.Crew.Where(kerbal => kerbal.name.Contains(char.ConvertFromUtf32(1))))
+    //  {
+    //    kerbal.name = kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+    //  }
+    //}
 
     private static GUIStyle GetLabelStyle(ProtoCrewMember kerbal, KeyValuePair<string, RMKerbal> rmkerbal)
     {

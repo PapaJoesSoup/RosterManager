@@ -211,10 +211,10 @@ namespace RosterManager
 
     public void SyncKerbal()
     {
-      if (RMSettings.EnableKerbalRename)
-        Kerbal.name = Name;
+        if (RMSettings.EnableKerbalRename)
+            Kerbal.ChangeName(Name);
       // remove old save game hack for backwards compatability...
-      Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+      //Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
       if (!SalaryContractDispute)
       {
         if (Status == ProtoCrewMember.RosterStatus.Assigned)
@@ -389,27 +389,20 @@ namespace RosterManager
 
     public static double SalaryNextDue(double time)
     {
-      var salaryTimeMonthRealCalendar = defaultDateTime.EarthYear / 12;
-      var salaryTimeMonthKerbalCalendar = defaultDateTime.KerbinYear / 12;
-      double salaryTimeSpan = salaryTimeMonthRealCalendar;
-      if (GameSettings.KERBIN_TIME)
-      {
-        salaryTimeSpan = RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly ? defaultDateTime.KerbinYear : salaryTimeMonthKerbalCalendar;
-      }
-      else
-      {
-        if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
-          salaryTimeSpan = defaultDateTime.EarthYear;
-      }
+      var salaryTimeYear = defaultDateTime.Year;
+      var salaryTimeMonth = defaultDateTime.Year / 12;
+      double salaryTimeSpan = salaryTimeMonth;
+
+      if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
+        salaryTimeSpan = salaryTimeYear; 
+      
       var returnTime = time + salaryTimeSpan;
       return returnTime;
     }
 
     public static double BirthdayNextDue(double time)
     {
-      double birthdayTimeSpan = defaultDateTime.KerbinYear;
-      if (!GameSettings.KERBIN_TIME)
-        birthdayTimeSpan = defaultDateTime.EarthYear;
+      double birthdayTimeSpan = defaultDateTime.Year; 
       return time + birthdayTimeSpan;
     }
   }

@@ -50,7 +50,7 @@ namespace RosterManager
             HighLogic.LoadedScene != GameScenes.EDITOR && HighLogic.LoadedScene != GameScenes.TRACKSTATION) return;
         //DontDestroyOnLoad(this);
         RMSettings.ApplySettings();
-        WindowRoster.ResetKerbalProfessions();
+        //WindowRoster.ResetKerbalProfessions();
         Utilities.LogMessage("RosterManagerAddon.Awake Active...", "info", RMSettings.VerboseLogging);
 
         if (RMSettings.EnableBlizzyToolbar)
