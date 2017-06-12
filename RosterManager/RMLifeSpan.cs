@@ -35,7 +35,7 @@ namespace RosterManager
 
     public override void OnAwake()
     {
-      Utilities.LogMessage("RosterManagerLifeSpan.Awake Active...", "info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("RosterManagerLifeSpan.Awake Active...", "info", RMSettings.VerboseLogging);
       base.OnAwake();
       _instance = this;
       RMKerbals = new RMKerbals();
@@ -45,29 +45,29 @@ namespace RosterManager
       {
         case GameScenes.SPACECENTER:
         {
-          Utilities.LogMessage("RosterManagerLifeSpan.Awake adding SpaceCenterManager", "info", RMSettings.VerboseLogging);
-          var klMem = gameObject.AddComponent<RMLifeSpanAddon>();
+          RmUtils.LogMessage("RosterManagerLifeSpan.Awake adding SpaceCenterManager", "info", RMSettings.VerboseLogging);
+          RMLifeSpanAddon klMem = gameObject.AddComponent<RMLifeSpanAddon>();
           _children.Add(klMem);
         }
           break;
         case GameScenes.FLIGHT:
         {
-          Utilities.LogMessage("RosterManagerLifeSpan.Awake adding FlightManager", "info", RMSettings.VerboseLogging);
-          var klMem = gameObject.AddComponent<RMLifeSpanAddon>();
+          RmUtils.LogMessage("RosterManagerLifeSpan.Awake adding FlightManager", "info", RMSettings.VerboseLogging);
+          RMLifeSpanAddon klMem = gameObject.AddComponent<RMLifeSpanAddon>();
           _children.Add(klMem);
         }
           break;
         case GameScenes.EDITOR:
         {
-          Utilities.LogMessage("RosterManagerLifeSpan.Awake adding EditorManager", "info", RMSettings.VerboseLogging);
-          var klMem = gameObject.AddComponent<RMLifeSpanAddon>();
+          RmUtils.LogMessage("RosterManagerLifeSpan.Awake adding EditorManager", "info", RMSettings.VerboseLogging);
+          RMLifeSpanAddon klMem = gameObject.AddComponent<RMLifeSpanAddon>();
           _children.Add(klMem);
         }
           break;
         case GameScenes.TRACKSTATION:
         {
-          Utilities.LogMessage("RosterManagerLifeSpan.Awake adding TrackingStationManager", "info", RMSettings.VerboseLogging);
-          var klMem = gameObject.AddComponent<RMLifeSpanAddon>();
+          RmUtils.LogMessage("RosterManagerLifeSpan.Awake adding TrackingStationManager", "info", RMSettings.VerboseLogging);
+          RMLifeSpanAddon klMem = gameObject.AddComponent<RMLifeSpanAddon>();
           _children.Add(klMem);
         }
           break;
@@ -108,10 +108,10 @@ namespace RosterManager
 
     protected void OnDestroy()
     {
-      Utilities.LogMessage("RosterManagerLifeSpan.Awake OnDestroy...", "info", RMSettings.VerboseLogging);
-      foreach (var child in _children)
+      RmUtils.LogMessage("RosterManagerLifeSpan.Awake OnDestroy...", "info", RMSettings.VerboseLogging);
+      foreach (Component child in _children)
       {
-        Utilities.LogMessage("RosterManagerLifeSpan.Awake Destroying " + child.name, "info", RMSettings.VerboseLogging);
+        RmUtils.LogMessage($"RosterManagerLifeSpan.Awake Destroying {child.name}", "info", RMSettings.VerboseLogging);
         Destroy(child);
       }
       _children.Clear();

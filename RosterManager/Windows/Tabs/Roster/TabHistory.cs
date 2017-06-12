@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabHistory
   {
@@ -11,7 +11,7 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
       GUILayout.Label("Kerbal Flight History:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
       if (!string.IsNullOrEmpty(RMAddon.SaveMessage))
@@ -20,9 +20,9 @@ namespace RosterManager.Windows.Tabs
       }
 
       // Begin Tab contents.
-      var thisLog = WindowRoster.SelectedKerbal.Kerbal.flightLog;
+      FlightLog thisLog = WindowRoster.SelectedKerbal.Kerbal.flightLog;
 
-      foreach (var thisEntry in thisLog.Entries)
+      foreach (FlightLog.Entry thisEntry in thisLog.Entries)
       {
         GUILayout.Label(thisEntry.flight + " - " + thisEntry.target + " - " + thisEntry.type);
       }

@@ -1,1 +1,1 @@
-C:\Program Files (x86)\mono\lib\mono\4.5\pdb2mdb.exe
+D:\KSP\Mods\PJS\Tools\pdb2mdb\pdb2mdb.exe

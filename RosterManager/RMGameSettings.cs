@@ -46,7 +46,7 @@
     {
       if (node.HasNode(ConfigNodeName))
       {
-        var rmGamesettingsNode = node.GetNode(ConfigNodeName);
+        ConfigNode rmGamesettingsNode = node.GetNode(ConfigNodeName);
         EnableAging = GetNodes.GetNodeValue(rmGamesettingsNode, "EnableAging", EnableAging);
         MinimumAge = GetNodes.GetNodeValue(rmGamesettingsNode, "Minimum_Age", MinimumAge);
         MaximumAge = GetNodes.GetNodeValue(rmGamesettingsNode, "Maximum_Age", MaximumAge);
@@ -72,7 +72,7 @@
 
     internal void Save(ConfigNode node)
     {
-      var settingsNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
+      ConfigNode settingsNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
 
       settingsNode.AddValue("EnableAging", EnableAging);
       settingsNode.AddValue("Minimum_Age", MinimumAge);

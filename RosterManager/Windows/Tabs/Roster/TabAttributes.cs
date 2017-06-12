@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabAttributes
   {
@@ -11,7 +11,7 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
       GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Kerbal Attributes", RMStyle.LabelStyleBold);
 
       GUILayout.BeginHorizontal();

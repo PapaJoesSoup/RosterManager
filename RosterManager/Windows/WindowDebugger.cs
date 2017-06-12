@@ -20,7 +20,7 @@ namespace RosterManager.Windows
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
-      var rect = new Rect(496, 4, 16, 16);
+      Rect rect = new Rect(496, 4, 16, 16);
       if (GUI.Button(rect, new GUIContent("", "Close Window")))
       {
         ShowWindow = false;
@@ -30,10 +30,10 @@ namespace RosterManager.Windows
         ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
 
       GUILayout.BeginVertical();
-      Utilities.DebugScrollPosition = GUILayout.BeginScrollView(Utilities.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
+      RmUtils.DebugScrollPosition = GUILayout.BeginScrollView(RmUtils.DebugScrollPosition, GUILayout.Height(300), GUILayout.Width(500));
       GUILayout.BeginVertical();
 
-      foreach (var error in Utilities.ErrorList)
+      foreach (string error in RmUtils.ErrorList)
         GUILayout.TextArea(error, GUILayout.Width(460));
 
       GUILayout.EndVertical();
@@ -42,8 +42,8 @@ namespace RosterManager.Windows
       GUILayout.BeginHorizontal();
       if (GUILayout.Button("Clear log", GUILayout.Height(20)))
       {
-        Utilities.ErrorList.Clear();
-        Utilities.ErrorList.Add("Info:  Log Cleared at " + DateTime.UtcNow + " UTC.");
+        RmUtils.ErrorList.Clear();
+        RmUtils.ErrorList.Add("Info:  Log Cleared at " + DateTime.UtcNow + " UTC.");
       }
       if (GUILayout.Button("Save Log", GUILayout.Height(20)))
       {
@@ -59,7 +59,7 @@ namespace RosterManager.Windows
 
       GUILayout.EndVertical();
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
-      RMSettings.RepositionWindows("WindowDebugger");
+      RMSettings.RepositionWindow(ref Position);
     }
 
     internal static void Savelog()
@@ -67,9 +67,9 @@ namespace RosterManager.Windows
       try
       {
         // time to create a file...
-        var filename = "DebugLog_" + DateTime.Now.ToString(CultureInfo.InvariantCulture).Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
+        string filename = "DebugLog_" + DateTime.Now.ToString(CultureInfo.InvariantCulture).Replace(" ", "_").Replace("/", "").Replace(":", "") + ".txt";
 
-        var path = Directory.GetCurrentDirectory() + @"\GameData\RosterManager\";
+        string path = Directory.GetCurrentDirectory() + @"\GameData\RosterManager\";
         if (RMSettings.DebugLogPath.StartsWith(@"\"))
           RMSettings.DebugLogPath = RMSettings.DebugLogPath.Substring(2, RMSettings.DebugLogPath.Length - 2);
 
@@ -77,28 +77,28 @@ namespace RosterManager.Windows
           RMSettings.DebugLogPath += @"\";
 
         filename = path + RMSettings.DebugLogPath + filename;
-        Utilities.LogMessage("File Name = " + filename, "Info", true);
+        RmUtils.LogMessage("File Name = " + filename, "Info", true);
 
         try
         {
-          var sb = new StringBuilder();
-          foreach (var line in Utilities.ErrorList)
+          StringBuilder sb = new StringBuilder();
+          foreach (string line in RmUtils.ErrorList)
           {
             sb.AppendLine(line);
           }
 
           File.WriteAllText(filename, sb.ToString());
 
-          Utilities.LogMessage("File written", "Info", true);
+          RmUtils.LogMessage("File written", "Info", true);
         }
         catch (Exception ex)
         {
-          Utilities.LogMessage("Error Writing File:  " + ex, "Info", true);
+          RmUtils.LogMessage("Error Writing File:  " + ex, "Info", true);
         }
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in Savelog.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        RmUtils.LogMessage($" in Savelog.  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", "Error", true);
       }
     }
   }

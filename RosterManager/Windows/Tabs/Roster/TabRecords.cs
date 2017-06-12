@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabRecords
   {
@@ -11,7 +11,7 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
       GUILayout.Label("Kerbal Records:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
       if (!string.IsNullOrEmpty(RMAddon.SaveMessage))
@@ -27,11 +27,11 @@ namespace RosterManager.Windows.Tabs
             // DisplayNotesWindow()
             GUILayout.BeginVertical();
             GUILayout.Label("Notes: ", RMStyle.LabelStyleBold, GUILayout.Width(500));
-            var base64EncodedBytes = System.Convert.FromBase64String(WindowRoster.SelectedKerbal.Notes);
+            byte[] base64EncodedBytes = System.Convert.FromBase64String(WindowRoster.SelectedKerbal.Notes);
             string inputString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         
         inputString = GUILayout.TextArea(inputString, 2046, RMStyle.RichTextStyle, GUILayout.Width(660), GUILayout.Height(150));
-            var richTextBytes = System.Text.Encoding.UTF8.GetBytes(inputString);
+            byte[] richTextBytes = System.Text.Encoding.UTF8.GetBytes(inputString);
         WindowRoster.SelectedKerbal.Notes = System.Convert.ToBase64String(richTextBytes);
             GUILayout.EndVertical();
             //}

@@ -1,8 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using KSP.Localization;
 using RosterManager.InternalObjects;
 using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabTraining
   {
@@ -64,8 +66,8 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
-      GUILayout.Label("Kerbal Training:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
+      GUILayout.Label($"{Localizer.Format("#autoLOC_RM_1110")}  {WindowRoster.SelectedKerbal.Name} - ({WindowRoster.SelectedKerbal.Trait})", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
       DisplayTabButtons();
       DisplaySelectedTab();
@@ -80,18 +82,18 @@ namespace RosterManager.Windows.Tabs
     private static void DisplayTabButtons()
     {
       GUILayout.BeginHorizontal();
-      var experienceStyle = ShowExperienceTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-      if (GUILayout.Button("Experience", experienceStyle, GUILayout.Height(20)))
+      GUIStyle experienceStyle = ShowExperienceTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+      if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1111"), experienceStyle, GUILayout.Height(20)))		// #autoLOC_RM_1111 = Experience
       {
         ShowExperienceTab = true;
       }
-      var teamStyle = ShowTeamTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-      if (GUILayout.Button("Team", teamStyle, GUILayout.Height(20)))
+      GUIStyle teamStyle = ShowTeamTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+      if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1112"), teamStyle, GUILayout.Height(20)))		// #autoLOC_RM_1112 = Team
       {
         ShowTeamTab = true;
       }
-      var qualificationStyle = ShowQualificationTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
-      if (GUILayout.Button("Qualification", qualificationStyle, GUILayout.Height(20)))
+      GUIStyle qualificationStyle = ShowQualificationTab ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+      if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1113"), qualificationStyle, GUILayout.Height(20)))		// #autoLOC_RM_1113 = Qualification
       {
         ShowQualificationTab = true;
       }
@@ -125,18 +127,18 @@ namespace RosterManager.Windows.Tabs
       }
 
       //GUILayout.Label("", GUILayout.Width(10));
-      GUILayout.Label("Skill");
+      GUILayout.Label(Localizer.Format("#autoLOC_RM_1114"));		// #autoLOC_RM_1114 = Skill
       GUILayout.BeginHorizontal();
       GUILayout.Label("", GUILayout.Width(10));
       GUILayout.Label("0", GUILayout.Width(10));
       WindowRoster.SelectedKerbal.Skill = (int)GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Skill, 0, 5, GUILayout.MaxWidth(300));
-      var rect = GUILayoutUtility.GetLastRect();
+      Rect rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
         ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-      GUILayout.Label(WindowRoster.SelectedKerbal.Skill + " / 5");
+      GUILayout.Label($"{WindowRoster.SelectedKerbal.Skill} / 5");
       GUILayout.EndHorizontal();
 
-      GUILayout.Label("Experience");
+      GUILayout.Label(Localizer.Format("#autoLOC_RM_1115"));		// #autoLOC_RM_1115 = Experience
       GUILayout.BeginHorizontal();
       GUILayout.Label("", GUILayout.Width(10));
       GUILayout.Label("0", GUILayout.Width(10));
@@ -144,18 +146,18 @@ namespace RosterManager.Windows.Tabs
       rect = GUILayoutUtility.GetLastRect();
       if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
         ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-      GUILayout.Label(WindowRoster.SelectedKerbal.Experience + " / 99999");
+      GUILayout.Label($"{WindowRoster.SelectedKerbal.Experience} / 99999");
       GUILayout.EndHorizontal();
 
       if (RMLifeSpan.Instance.RMGameSettings.EnableSalaries && (WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Crew || WindowRoster.SelectedKerbal.Type == ProtoCrewMember.KerbalType.Unowned))
       {
-        var kerbal = RMLifeSpan.Instance.RMKerbals.AllrmKerbals.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
+        KeyValuePair<string, RMKerbal> kerbal = RMLifeSpan.Instance.RMKerbals.AllrmKerbals.FirstOrDefault(a => a.Key == WindowRoster.SelectedKerbal.Name);
         if (kerbal.Key != null)
         {
           if (kerbal.Value.SalaryContractDispute)
             GUI.enabled = false;
         }
-        GUILayout.Label("Salary");
+        GUILayout.Label(Localizer.Format("#autoLOC_RM_1116"));		// #autoLOC_RM_1116 = Salary
         GUILayout.BeginHorizontal();
         GUILayout.Label("", GUILayout.Width(10));
         GUILayout.Label("0", GUILayout.Width(10));
@@ -163,7 +165,7 @@ namespace RosterManager.Windows.Tabs
         rect = GUILayoutUtility.GetLastRect();
         if (Event.current.type == EventType.Repaint && RMSettings.ShowToolTips)
           ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
-        GUILayout.Label(WindowRoster.SelectedKerbal.Salary.ToString("###,##0") + " / 100,000 " + RMLifeSpan.Instance.RMGameSettings.SalaryPeriod);
+        GUILayout.Label($"{WindowRoster.SelectedKerbal.Salary:###,##0} / 100,000 " + RMLifeSpan.Instance.RMGameSettings.SalaryPeriod);
         GUILayout.EndHorizontal();
       }
       GUI.enabled = true;

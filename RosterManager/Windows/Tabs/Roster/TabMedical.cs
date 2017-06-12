@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using KSP.Localization;
+using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabMedical
   {
@@ -11,16 +12,17 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
-      GUILayout.Label("Kerbal Medical:  " + WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.Width(500));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
+      // #autoLOC_RM_1106 = Kerbal Medical:
+      GUILayout.Label($"{Localizer.Format("#autoLOC_RM_1106")}  {WindowRoster.SelectedKerbal.Name} - ({WindowRoster.SelectedKerbal.Trait})", RMStyle.LabelStyleBold, GUILayout.Width(500));
       GUILayout.Label("");
       WindowRoster.DisplaySelectType();
       WindowRoster.DisplaySelectState();
 
       DisplayAnyWarnings();
 
-      WindowRoster.SelectedKerbal.Type = WindowRoster._kerbalType;
-      WindowRoster.SelectedKerbal.Status = WindowRoster._rosterStatus;
+      WindowRoster.SelectedKerbal.Type = WindowRoster.Kerbal_Type;
+      WindowRoster.SelectedKerbal.Status = WindowRoster.Roster_Status;
 
 
       if (!string.IsNullOrEmpty(RMAddon.SaveMessage))
@@ -40,7 +42,7 @@ namespace RosterManager.Windows.Tabs
       {
         GUILayout.Label("");
         GUILayout.Label(
-          "DeepFreeze is installed,and the current settings will make the selected Kerbal appear Frozen.\r\nEnsure you have the kerbal assigned to a vessel and inside a deepFreze part.  \r\nIf you save, this kerbal will 'disappear' in game.",
+          Localizer.Format("#autoLOC_RM_1107"),		// #autoLOC_RM_1107 = DeepFreeze is installed,and the current settings will make the selected Kerbal appear Frozen.\nEnsure you have the kerbal assigned to a vessel and inside a deepFreze part.  \r\nIf you save, this kerbal will 'disappear' in game.
           RMStyle.LabelStyleYellow);
         GUILayout.Label("");
       }
@@ -48,7 +50,7 @@ namespace RosterManager.Windows.Tabs
       {
         GUILayout.Label("");
         GUILayout.Label(
-          "The Selected Kerbal is set to Unowned.  This removes them from the active kerbal list. \r\nIf you save, this kerbal will 'disappear' in game.",
+          Localizer.Format("#autoLOC_RM_1108"),		// #autoLOC_RM_1108 = The Selected Kerbal is set to Unowned.  This removes them from the active kerbal list. \nIf you save, this kerbal will 'disappear' in game.
           RMStyle.LabelStyleYellow);
         GUILayout.Label("");
       }
@@ -57,7 +59,7 @@ namespace RosterManager.Windows.Tabs
       {
         GUILayout.Label("");
         GUILayout.Label(
-          "The selected Kerbal is set to Tourist.\r\nIf you save, the Profession will be changed to Tourist.",
+          Localizer.Format("#autoLOC_RM_1109"),		// #autoLOC_RM_1109 = The selected Kerbal is set to Tourist.\nIf you save, the Profession will be changed to Tourist.
           RMStyle.LabelStyleYellow);
         GUILayout.Label("");
       }
