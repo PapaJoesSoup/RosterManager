@@ -4,6 +4,7 @@ using System.Linq;
 using RosterManager.Api;
 using RosterManager.Windows;
 using UnityEngine;
+using KSP.Localization;
 using KSP.UI.Screens;
 using RosterManager.InternalObjects;
 
@@ -25,17 +26,10 @@ namespace RosterManager
     private static ApplicationLauncherButton _rmRosterStock;
     internal static bool FrameErrTripped;
 
-    // Tooltip vars
-    internal static Vector2 ToolTipPos;
-
-    internal static string ToolTip;
-
     internal static List<KeyValuePair<string, RMKerbal>> AllCrew = new List<KeyValuePair<string, RMKerbal>>();
 
-    internal static string AllCrewSort = "";
-
     // DeepFreeze Frozen Crew interface
-    internal static Dictionary<string, DFWrapper.KerbalInfo> FrozenKerbals = new Dictionary<string, DFWrapper.KerbalInfo>();
+    internal static Dictionary<string, DfWrapper.KerbalInfo> FrozenKerbals = new Dictionary<string, DfWrapper.KerbalInfo>();
 
     #endregion Properties
 
@@ -50,13 +44,13 @@ namespace RosterManager
             HighLogic.LoadedScene != GameScenes.EDITOR && HighLogic.LoadedScene != GameScenes.TRACKSTATION) return;
         //DontDestroyOnLoad(this);
         RMSettings.ApplySettings();
-        WindowRoster.ResetKerbalProfessions();
-        Utilities.LogMessage("RosterManagerAddon.Awake Active...", "info", RMSettings.VerboseLogging);
+        //WindowRoster.ResetKerbalProfessions();
+        RmUtils.LogMessage("RosterManagerAddon.Awake Active...", "info", RMSettings.VerboseLogging);
 
         if (RMSettings.EnableBlizzyToolbar)
         {
           // Let't try to use Blizzy's toolbar
-          Utilities.LogMessage("RosterManagerAddon.Awake - Blizzy Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+          RmUtils.LogMessage("RosterManagerAddon.Awake - Blizzy Toolbar Selected.", "Info", RMSettings.VerboseLogging);
           if (!ActivateBlizzyToolBar())
           {
             // We failed to activate the toolbar, so revert to stock
@@ -66,13 +60,13 @@ namespace RosterManager
             }
             else
               GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-            Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+            RmUtils.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
           }
         }
         else
         {
           // Use stock Toolbar
-          Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+          RmUtils.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
           if (ApplicationLauncher.Ready)
           {
             OnGuiAppLauncherReady();
@@ -80,16 +74,18 @@ namespace RosterManager
           else
             GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
         }
+        // lets add our event handlers for kerbal actions
+        //GameEvents.onKerbalAdded.Add(OnKerbalAdded);
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.Awake.  Error:  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.Awake.  Error:  " + ex, "Error", true);
       }
     }
 
     internal void Start()
     {
-      Utilities.LogMessage("RosterManagerAddon.Start.", "Info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("RosterManagerAddon.Start.", "Info", RMSettings.VerboseLogging);
       try
       {
         if (WindowRoster.ResetRosterSize)
@@ -99,7 +95,7 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.Start.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.Start.  " + ex, "Error", true);
       }
     }
 
@@ -115,7 +111,7 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.OnGUI.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.OnGUI.  " + ex, "Error", true);
       }
     }
 
@@ -123,14 +119,13 @@ namespace RosterManager
     {
       try
       {
-        RefreshCrew(HighLogic.LoadedScene);
         CheckForToolbarTypeToggle();
       }
       catch (Exception ex)
       {
         if (!FrameErrTripped)
         {
-          Utilities.LogMessage(string.Format(" in Update (repeating error).  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+          RmUtils.LogMessage($" in Update (repeating error).  Error:  {ex.Message} \r\n\r\n{ex.StackTrace}", "Error", true);
           FrameErrTripped = true;
         }
       }
@@ -166,8 +161,7 @@ namespace RosterManager
         }
         else
         {
-          if (_rmRosterBlizzy != null)
-            _rmRosterBlizzy.Destroy();
+          _rmRosterBlizzy?.Destroy();
         }
         //Reset Roster Window data
         WindowRoster.DisplayMode = WindowRoster.DisplayModes.Index;
@@ -177,11 +171,11 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.OnDestroy.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.OnDestroy.  " + ex, "Error", true);
       }
     }
 
-    internal void RefreshCrew(GameScenes scene)
+    internal static void RefreshCrew(GameScenes scene)
     {
       if (scene != GameScenes.EDITOR && scene != GameScenes.FLIGHT && scene != GameScenes.SPACECENTER &&
           scene != GameScenes.TRACKSTATION) return;
@@ -198,12 +192,12 @@ namespace RosterManager
       if (RMSettings.EnableBlizzyToolbar && !RMSettings.PrevEnableBlizzyToolbar)
       {
         // Let't try to use Blizzy's toolbar
-        Utilities.LogMessage("CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+        RmUtils.LogMessage("CheckForToolbarToggle - Blizzy Toolbar Selected.", "Info", RMSettings.VerboseLogging);
         if (!ActivateBlizzyToolBar())
         {
           // We failed to activate the toolbar, so revert to stock
           GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-          Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+          RmUtils.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
           RMSettings.EnableBlizzyToolbar = RMSettings.PrevEnableBlizzyToolbar;
         }
         else
@@ -220,7 +214,7 @@ namespace RosterManager
       else if (!RMSettings.EnableBlizzyToolbar && RMSettings.PrevEnableBlizzyToolbar)
       {
         // Use stock Toolbar
-        Utilities.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
+        RmUtils.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
         {
           _rmRosterBlizzy.Visible = false;
@@ -234,7 +228,7 @@ namespace RosterManager
     // Stock Toolbar Startup and cleanup
     private void OnGuiAppLauncherReady()
     {
-      Utilities.LogMessage("RosterManagerAddon.OnGUIAppLauncherReady active...", "Info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("RosterManagerAddon.OnGUIAppLauncherReady active...", "Info", RMSettings.VerboseLogging);
       try
       {
         // Setup Roster Button
@@ -259,7 +253,7 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.OnGUIAppLauncherReady.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.OnGUIAppLauncherReady.  " + ex, "Error", true);
       }
     }
 
@@ -274,14 +268,14 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.OnGUIAppLauncherDestroyed.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.OnGUIAppLauncherDestroyed.  " + ex, "Error", true);
       }
     }
 
     //Toolbar button click handlers
     internal static void OnRMRosterToggle()
     {
-      //Debug.Log("[RosterManager]:  RosterManagerAddon.OnSMRosterToggleOn");
+      //Debug.Log("[RosterManager]:  RosterManagerAddon.OnRMRosterToggle");
       try
       {
         if (HighLogic.LoadedScene != GameScenes.SPACECENTER && HighLogic.LoadedScene != GameScenes.EDITOR &&
@@ -292,15 +286,16 @@ namespace RosterManager
         else
           _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
 
-        FrozenKerbals = WindowRoster.GetFrozenKerbals();
+        if (!WindowRoster.ShowWindow) return;
         WindowRoster.DisplayMode = WindowRoster.DisplayModes.Index;
+        WindowRoster.UpdateRosterList();
         //AllCrew.Clear();
         //if (RMLifeSpan.Instance != null)
         //    AllCrew = RMLifeSpan.Instance.rmkerbals.ALLRMKerbals.ToList();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("Error in:  RosterManagerAddon.OnSMRosterToggleOn.  " + ex, "Error", true);
+        RmUtils.LogMessage("Error in:  RosterManagerAddon.OnRMRosterToggle.  " + ex, "Error", true);
       }
     }
 
@@ -320,7 +315,7 @@ namespace RosterManager
             {
               _rmRosterBlizzy = ToolbarManager.Instance.add("RosterManager", "Roster");
               _rmRosterBlizzy.TexturePath = WindowSettings.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
-              _rmRosterBlizzy.ToolTip = "Roster Manager Roster Window";
+              _rmRosterBlizzy.ToolTip = Localizer.Format("#autoLOC_RM_1000");		// #autoLOC_RM_1000 = Roster Manager Roster Window
               _rmRosterBlizzy.Visibility = new GameScenesVisibility(GameScenes.SPACECENTER);
               _rmRosterBlizzy.Visible = true;
               _rmRosterBlizzy.OnClick += e =>
@@ -328,27 +323,27 @@ namespace RosterManager
                 OnRMRosterToggle();
               };
             }
-            Utilities.LogMessage("Blizzy Toolbar available!", "Info", RMSettings.VerboseLogging);
+            RmUtils.LogMessage("Blizzy Toolbar available!", "Info", RMSettings.VerboseLogging);
             return true;
           }
-          Utilities.LogMessage("Blizzy Toolbar not available!", "Info", RMSettings.VerboseLogging);
+          RmUtils.LogMessage("Blizzy Toolbar not available!", "Info", RMSettings.VerboseLogging);
           return false;
         }
         catch (Exception ex)
         {
           // Blizzy Toolbar instantiation error.
-          Utilities.LogMessage("Error in EnableBlizzyToolbar... Error:  " + ex, "Error", true);
+          RmUtils.LogMessage("Error in EnableBlizzyToolbar... Error:  " + ex, "Error", true);
           return false;
         }
       }
       // No Blizzy Toolbar
-      Utilities.LogMessage("Blizzy Toolbar not Enabled...", "Info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("Blizzy Toolbar not Enabled...", "Info", RMSettings.VerboseLogging);
       return false;
     }
 
     internal void Display()
     {
-      var step = "";
+      string step = "";
       try
       {
         step = "0 - Start";
@@ -357,7 +352,7 @@ namespace RosterManager
         if (WindowDebugger.ShowWindow)
         {
           step = "2 - Debugger";
-          WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, "Roster Manager -  Debug Console - Ver. " + RMSettings.CurVersion, GUILayout.MinHeight(20));
+          WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, $"{Localizer.Format("#autoLOC_RM_1001")} {RMSettings.CurVersion}", GUILayout.MinHeight(20));		// #autoLOC_RM_1001 = Roster Manager -  Debug Console - Ver. 
         }
 
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
@@ -365,13 +360,13 @@ namespace RosterManager
           if (WindowSettings.ShowWindow)
           {
             step = "3 - Show Settings";
-            WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, "Roster Manager Settings", GUILayout.MinHeight(20));
+            WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, Localizer.Format("#autoLOC_RM_1002"), GUILayout.MinHeight(20));		// #autoLOC_RM_1002 = Roster Manager Settings
           }
 
           if (WindowContracts.ShowWindow)
           {
             step = "4 - Roster Contracts";
-            WindowContracts.Position = GUILayout.Window(318987, WindowContracts.Position, WindowContracts.Display, "Roster Contracts", GUILayout.MinHeight(20));
+            WindowContracts.Position = GUILayout.Window(318987, WindowContracts.Position, WindowContracts.Display, Localizer.Format("#autoLOC_RM_1003"), GUILayout.MinHeight(20));		// #autoLOC_RM_1003 = Roster Contracts
           }
 
           if (WindowRoster.ShowWindow)
@@ -383,14 +378,14 @@ namespace RosterManager
             }
 
             step = "6 - Show Roster";
-            WindowRoster.Position = GUILayout.Window(318547, WindowRoster.Position, WindowRoster.Display, "Roster Manager", GUILayout.MinHeight(20));
+            WindowRoster.Position = GUILayout.Window(318547, WindowRoster.Position, WindowRoster.Display, Localizer.Format("#autoLOC_RM_1004"), GUILayout.MinHeight(20));		// #autoLOC_RM_1004 = Roster Manager
           }
         }
         step = "1 - Show Interface(s)";
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in drawGui at or near step:  " + step + ".  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        RmUtils.LogMessage($" in drawGui at or near step:  {step}.  Error:  {ex.Message} \n\n{ex.StackTrace}", "Error", true);
       }
     }
 
@@ -413,7 +408,7 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in  ClearPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        RmUtils.LogMessage($" in  ClearPartHighlight.  Error:  {ex.Message} \n\n{ex.StackTrace}", "Error", true);
       }
     }
 
@@ -428,7 +423,7 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage(string.Format(" in  SetPartHighlight.  Error:  {0} \r\n\r\n{1}", ex.Message, ex.StackTrace), "Error", true);
+        RmUtils.LogMessage($" in  SetPartHighlight.  Error:  {ex.Message} \n\n{ex.StackTrace}", "Error", true);
       }
     }
 
@@ -446,7 +441,7 @@ namespace RosterManager
 
     internal static Part FindKerbalPart(ProtoCrewMember pKerbal)
     {
-      var kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
+      Part kPart = FlightGlobals.ActiveVessel.Parts.Find(x => x.protoModuleCrew.Find(y => y == pKerbal) != null);
       return kPart;
     }
 
@@ -467,7 +462,7 @@ namespace RosterManager
 
     internal void FillVesselCrew(Vessel vessel)
     {
-      foreach (var part in vessel.parts.Where(part => part.CrewCapacity > 0))
+      foreach (Part part in vessel.parts.Where(part => part.CrewCapacity > 0))
       {
         FillPartCrew(part.CrewCapacity - part.protoModuleCrew.Count, part);
       }
@@ -476,9 +471,9 @@ namespace RosterManager
 
     internal void EmptyVesselCrew(Vessel vessel)
     {
-      foreach (var part in vessel.parts.Where(part => part.CrewCapacity > 0))
+      foreach (Part part in vessel.parts.Where(part => part.CrewCapacity > 0))
       {
-        for (var i = part.protoModuleCrew.Count - 1; i >= 0; i--)
+        for (int i = part.protoModuleCrew.Count - 1; i >= 0; i--)
         {
           RemoveCrewMember(part.protoModuleCrew[i], part);
         }
@@ -489,9 +484,9 @@ namespace RosterManager
     private static void FillPartCrew(int count, Part part)
     {
       if (CrewPartIsFull(part)) return;
-      for (var i = 0; i < part.CrewCapacity && i < count; i++)
+      for (int i = 0; i < part.CrewCapacity && i < count; i++)
       {
-        var kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
+        ProtoCrewMember kerbal = HighLogic.CurrentGame.CrewRoster.GetNextOrNewKerbal();
         part.AddCrewmember(kerbal);
 
         if (kerbal.seat != null)
@@ -501,7 +496,7 @@ namespace RosterManager
 
     internal static void AddCrewMember(ProtoCrewMember pKerbal, Vessel vessel)
     {
-      foreach (var part in vessel.parts.Where(part => part.CrewCapacity > 0 && !CrewPartIsFull(part)))
+      foreach (Part part in vessel.parts.Where(part => part.CrewCapacity > 0 && !CrewPartIsFull(part)))
       {
         part.AddCrewmember(pKerbal);
         pKerbal.rosterStatus = ProtoCrewMember.RosterStatus.Assigned;
@@ -538,7 +533,8 @@ namespace RosterManager
     {
       // Per suggestion by shaw (http://forum.kerbalspaceprogram.com/threads/62270?p=1033866&viewfull=1#post1033866)
       // and instructions for using CLS API by codepoet.
-      Utilities.LogMessage("FireEventTriggers:  Active.", "info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("FireEventTriggers:  Active.", "info", RMSettings.VerboseLogging);
+      WindowRoster.UpdateRosterList();
       GameEvents.onVesselChange.Fire(vessel);
     }
 

@@ -5,10 +5,10 @@ using UnityEngine;
 
 namespace RosterManager
 {
-  internal static class Utilities
+  internal static class RmUtils
   {
-    internal static String AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
-    internal static String PlugInPath = AppPath + "GameData/RosterManager/Plugins/PluginData/RosterManager/";
+    internal static string AppPath = KSPUtil.ApplicationRootPath.Replace("\\", "/");
+    internal static string PlugInPath = AppPath + "GameData/RosterManager/Plugins/PluginData/RosterManager/";
     internal static Vector2 DebugScrollPosition = Vector2.zero;
 
     private static readonly List<string> Errors = new List<string>();
@@ -18,10 +18,10 @@ namespace RosterManager
       get { return Errors; }
     }
 
-    internal static void LoadTexture(ref Texture2D tex, String fileName)
+    internal static void LoadTexture(ref Texture2D tex, string fileName)
     {
-      LogMessage(string.Format("Loading Texture - file://{0}{1}", PlugInPath, fileName), "Info", RMSettings.VerboseLogging);
-      var img1 = new WWW(string.Format("file://{0}{1}", PlugInPath, fileName));
+      LogMessage($"Loading Texture - file://{PlugInPath}{fileName}", "Info", RMSettings.VerboseLogging);
+      WWW img1 = new WWW($"file://{PlugInPath}{fileName}");
       img1.LoadImageIntoTexture(tex);
     }
 

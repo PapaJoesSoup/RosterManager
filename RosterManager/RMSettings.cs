@@ -25,12 +25,6 @@ namespace RosterManager
 
     internal static bool LockSettings;
 
-    //Highlighting Options
-    internal static bool EnableHighlighting = true;
-
-    internal static string SourcePartColor = "red";
-    internal static string TargetPartColor = "green";
-
     // Tooltip Options
     internal static bool ShowToolTips = true;
 
@@ -57,9 +51,6 @@ namespace RosterManager
     internal static bool PrevRealismMode;
 
     internal static bool PrevLockSettings;
-
-    // Highlighting Settings
-    internal static bool PrevEnableHighlighting = true;
 
     // Tooltip Settings
     internal static bool PrevShowToolTips = true;
@@ -97,7 +88,7 @@ namespace RosterManager
     internal static void LoadColors()
     {
       Colors = new Dictionary<string, Color>
-          {
+      {
             {"black", Color.black},
             {"blue", Color.blue},
             {"clea", Color.clear},
@@ -117,7 +108,6 @@ namespace RosterManager
       PrevRealismMode = RealismMode;
       PrevShowDebugger = WindowDebugger.ShowWindow;
       PrevVerboseLogging = VerboseLogging;
-      PrevEnableHighlighting = EnableHighlighting;
       PrevEnableKerbalRename = EnableKerbalRename;
       PrevEnableSalaries = RMLifeSpan.Instance.RMGameSettings.EnableSalaries;
       PrevSalaryPeriod = RMLifeSpan.Instance.RMGameSettings.SalaryPeriod;
@@ -148,7 +138,6 @@ namespace RosterManager
       RealismMode = PrevRealismMode;
       WindowDebugger.ShowWindow = PrevShowDebugger;
       VerboseLogging = PrevVerboseLogging;
-      EnableHighlighting = PrevEnableHighlighting;
       EnableKerbalRename = PrevEnableKerbalRename;
       RMLifeSpan.Instance.RMGameSettings.EnableSalaries = PrevEnableSalaries;
       RMLifeSpan.Instance.RMGameSettings.EnableAging = PrevEnableAging;
@@ -195,9 +184,9 @@ namespace RosterManager
       if (Settings == null)
         LoadSettingsFile();
       if (Settings == null) return;
-      var windowsNode = Settings.HasNode("RM_Windows") ? Settings.GetNode("RM_Windows") : Settings.AddNode("RM_Windows");
-      var settingsNode = Settings.HasNode("RM_Settings") ? Settings.GetNode("RM_Settings") : Settings.AddNode("RM_Settings");
-      var hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
+      ConfigNode windowsNode = Settings.HasNode("RM_Windows") ? Settings.GetNode("RM_Windows") : Settings.AddNode("RM_Windows");
+      ConfigNode settingsNode = Settings.HasNode("RM_Settings") ? Settings.GetNode("RM_Settings") : Settings.AddNode("RM_Settings");
+      ConfigNode hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
 
       // Lets get our window rectangles...
       WindowDebugger.Position = GetRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
@@ -210,9 +199,6 @@ namespace RosterManager
       // Realism Settings
       RealismMode = settingsNode.HasValue("RealismMode") ? bool.Parse(settingsNode.GetValue("RealismMode")) : RealismMode;
       LockSettings = settingsNode.HasValue("LockSettings") ? bool.Parse(settingsNode.GetValue("LockSettings")) : LockSettings;
-
-      // Highlighting settings
-      EnableHighlighting = settingsNode.HasValue("EnableHighlighting") ? bool.Parse(settingsNode.GetValue("EnableHighlighting")) : EnableHighlighting;
 
       // ToolTip Settings
       ShowToolTips = settingsNode.HasValue("ShowToolTips") ? bool.Parse(settingsNode.GetValue("ShowToolTips")) : ShowToolTips;
@@ -233,9 +219,6 @@ namespace RosterManager
 
       // Hidden Settings
       LifeInfoUpdatePeriod = hiddenNode.HasValue("LifeInfoUpdatePeriod") ? double.Parse(hiddenNode.GetValue("LifeInfoUpdatePeriod")) : LifeInfoUpdatePeriod;
-      // Hidden Highlighting
-      SourcePartColor = hiddenNode.HasValue("SourcePartColor") ? hiddenNode.GetValue("SourcePartColor") : SourcePartColor;
-      TargetPartColor = hiddenNode.HasValue("TargetPartColor") ? hiddenNode.GetValue("TargetPartColor") : TargetPartColor;
 
       //Hidden sound
 
@@ -248,12 +231,54 @@ namespace RosterManager
 
     internal static void SaveSettings()
     {
+      //If EnableAging has been turned ON when it was previously OFF, we reset age processing, otherwise they could all die instantly.
+      if (RMLifeSpan.Instance.RMGameSettings.EnableAging && PrevEnableAging == false)
+      {
+        RmUtils.LogMessage("RosterManagerWindowSettings.Display Save settings, aging has been enabled. Reset all birthdays.", "info", RMSettings.VerboseLogging);
+        double currentTime = Planetarium.GetUniversalTime();
+        foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+        {
+          rmkerbal.Value.TimelastBirthday = currentTime;
+          rmkerbal.Value.TimeNextBirthday = RMKerbal.BirthdayNextDue(currentTime);
+        }
+      }
+      //If EnableSalaries has been turned OFF when it was previously ON, reset any kerbals from tourist back to active.
+      if (!RMLifeSpan.Instance.RMGameSettings.EnableSalaries && PrevEnableSalaries)
+      {
+        RmUtils.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned off. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
+        foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+        {
+          if (rmkerbal.Value.Type == ProtoCrewMember.KerbalType.Tourist && rmkerbal.Value.Kerbal.rosterStatus != ProtoCrewMember.RosterStatus.Dead)
+          {
+            rmkerbal.Value.Type = ProtoCrewMember.KerbalType.Crew;
+            rmkerbal.Value.Kerbal.type = ProtoCrewMember.KerbalType.Crew;
+            rmkerbal.Value.Trait = rmkerbal.Value.RealTrait;
+            rmkerbal.Value.Kerbal.trait = rmkerbal.Value.RealTrait;
+            KerbalRoster.SetExperienceTrait(rmkerbal.Value.Kerbal, rmkerbal.Value.Trait);
+            RMKerbal.RegisterExperienceTrait(rmkerbal.Value);
+          }
+          rmkerbal.Value.SalaryContractDispute = false;
+          rmkerbal.Value.SalaryContractDisputePeriods = 0;
+          rmkerbal.Value.SalaryContractDisputeProcessed = true;
+        }
+      }
+      //If EnableSalaries has been turned ON when it was previously OFF, reset all kerbals salary time to now.
+      if (RMLifeSpan.Instance.RMGameSettings.EnableSalaries && PrevEnableSalaries == false)
+      {
+        RmUtils.LogMessage("RosterManagerWindowSettings.Display Save settings, salaries have been turned on. Reset all salary related fields for all kerbals.", "info", RMSettings.VerboseLogging);
+        double currentTime = Planetarium.GetUniversalTime();
+        foreach (KeyValuePair<string, RMKerbal> rmkerbal in RMLifeSpan.Instance.RMKerbals.AllrmKerbals)
+        {
+          rmkerbal.Value.Timelastsalary = currentTime;
+          rmkerbal.Value.TimeSalaryDue = RMKerbal.SalaryNextDue(currentTime);
+        }
+      }
       if (Settings == null)
         Settings = LoadSettingsFile();
 
-      var windowsNode = Settings.HasNode("RM_Windows") ? Settings.GetNode("RM_Windows") : Settings.AddNode("RM_Windows");
-      var settingsNode = Settings.HasNode("RM_Settings") ? Settings.GetNode("RM_Settings") : Settings.AddNode("RM_Settings");
-      var hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
+      ConfigNode windowsNode = Settings.HasNode("RM_Windows") ? Settings.GetNode("RM_Windows") : Settings.AddNode("RM_Windows");
+      ConfigNode settingsNode = Settings.HasNode("RM_Settings") ? Settings.GetNode("RM_Settings") : Settings.AddNode("RM_Settings");
+      ConfigNode hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
 
       // Write window positions
       WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
@@ -264,9 +289,6 @@ namespace RosterManager
       //Write settings...
       // Realism Settings
       WriteValue(settingsNode, "LockSettings", LockSettings);
-
-      // Highlighting Settings
-      WriteValue(settingsNode, "EnableHighlighting", EnableHighlighting);
 
       // ToolTip Settings
       WriteValue(settingsNode, "ShowToolTips", ShowToolTips);
@@ -287,8 +309,6 @@ namespace RosterManager
 
       // Hidden Settings
       WriteValue(hiddenNode, "LifeInfoUpdatePeriod", LifeInfoUpdatePeriod);
-      WriteValue(hiddenNode, "SourcePartColor", SourcePartColor);
-      WriteValue(hiddenNode, "TargetPartColor", TargetPartColor);
 
       if (!Directory.Exists(SettingsPath))
         Directory.CreateDirectory(SettingsPath);
@@ -297,8 +317,8 @@ namespace RosterManager
 
     private static Rect GetRectangle(ConfigNode windowsNode, string rectName, Rect defaultvalue)
     {
-      var thisRect = new Rect();
-      var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
+      Rect thisRect = new Rect();
+      ConfigNode rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
       thisRect.x = rectNode.HasValue("x") ? int.Parse(rectNode.GetValue("x")) : defaultvalue.x;
       thisRect.y = rectNode.HasValue("y") ? int.Parse(rectNode.GetValue("y")) : defaultvalue.y;
       thisRect.width = rectNode.HasValue("width") ? int.Parse(rectNode.GetValue("width")) : defaultvalue.width;
@@ -309,7 +329,7 @@ namespace RosterManager
 
     private static void WriteRectangle(ConfigNode windowsNode, string rectName, Rect rectValue)
     {
-      var rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
+      ConfigNode rectNode = windowsNode.HasNode(rectName) ? windowsNode.GetNode(rectName) : windowsNode.AddNode(rectName);
       WriteValue(rectNode, "x", rectValue.x);
       WriteValue(rectNode, "y", rectValue.y);
       WriteValue(rectNode, "width", rectValue.width);
@@ -323,39 +343,24 @@ namespace RosterManager
       configNode.AddValue(valueName, value.ToString());
     }
 
-    internal static void RepositionWindows(string window = "All")
+    internal static void RepositionWindows()
     {
-      if (window == "All" || window == "WindowDebugger")
-      {
-        if (WindowDebugger.Position.xMax > Screen.currentResolution.width)
-          WindowDebugger.Position.x = Screen.currentResolution.width - WindowDebugger.Position.width;
-        if (WindowDebugger.Position.yMax > Screen.currentResolution.height)
-          WindowDebugger.Position.y = Screen.currentResolution.height - WindowDebugger.Position.height;
-      }
+      RepositionWindow(ref WindowDebugger.Position);
+      RepositionWindow(ref WindowSettings.Position);
+      RepositionWindow(ref WindowContracts.Position);
+      RepositionWindow(ref WindowRoster.Position);
+    }
 
-      if (window == "All" || window == "WindowSettings")
-      {
-        if (WindowSettings.Position.xMax > Screen.currentResolution.width)
-          WindowSettings.Position.x = Screen.currentResolution.width - WindowSettings.Position.width;
-        if (WindowSettings.Position.yMax > Screen.currentResolution.height)
-          WindowSettings.Position.y = Screen.currentResolution.height - WindowSettings.Position.height;
-      }
+    internal static void RepositionWindow(ref Rect windowPosition)
+    {
+      // This method uses Gui point system.
+      if (windowPosition.x < 0) windowPosition.x = 0;
+      if (windowPosition.y < 0) windowPosition.y = 0;
 
-      if (window == "All" || window == "WindowRoster")
-      {
-        if (WindowRoster.Position.xMax > Screen.currentResolution.width)
-          WindowRoster.Position.x = Screen.currentResolution.width - WindowRoster.Position.width;
-        if (WindowRoster.Position.yMax > Screen.currentResolution.height)
-          WindowRoster.Position.y = Screen.currentResolution.height - WindowRoster.Position.height;
-      }
-
-      if (window == "All" || window == "WindowContracts")
-      {
-        if (WindowContracts.Position.xMax > Screen.currentResolution.width)
-          WindowContracts.Position.x = Screen.currentResolution.width - WindowContracts.Position.width;
-        if (WindowContracts.Position.yMax > Screen.currentResolution.height)
-          WindowContracts.Position.y = Screen.currentResolution.height - WindowContracts.Position.height;
-      }
+      if (windowPosition.xMax > Screen.width)
+        windowPosition.x = Screen.width - windowPosition.width;
+      if (windowPosition.yMax > Screen.height)
+        windowPosition.y = Screen.height - windowPosition.height;
     }
 
     #endregion Methods

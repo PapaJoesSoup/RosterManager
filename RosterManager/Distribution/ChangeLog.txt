@@ -1,3 +1,15 @@
+Version 0.2.5.0 12 Jun 2017
+ - Changes to re-compile for KSP 1.3
+ - Added localiztion based on KSP 1.3 localization.  English included to start.  Assistance welcome for other lanaguages.
+ - Code style cleanup.  standardized strings using string interpolation.
+ - Added some more tool tips where needed. Cleaned up Tooltip display code.
+ - Regorganized settings window to support tabbed sections.
+ - Rebuilt List management to improve performance, and revised filtering and sorting.
+ - Revised Rosterlist headers to display active sort field & sort direction.
+
+Version 0.2.4.0 30 Oct 2016
+ - Changes to re-compile for KSP 1.2
+
 Version 0.2.3.0 28 Jul 2016
  - Changes to re-compile for KSP 1.1.3
  - Added Items to Medical Tab:  Kerbal Type, and Roster Status. added validation and warnings to ensure user knows the impact of changing these settings.

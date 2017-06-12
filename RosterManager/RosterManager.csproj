@@ -52,24 +52,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Assembly-CSharp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
-    <Reference Include="KSPUtil">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPUtil.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Games\SteamLibrary\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\Games\SteamLibrary\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\..\..\..\..\SteamLibrary\SteamApps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Games\SteamLibrary\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -83,12 +77,15 @@
     <Compile Include="Modules\ModMedical.cs" />
     <Compile Include="Modules\ModRecords.cs" />
     <Compile Include="Modules\ModSchedule.cs" />
-    <Compile Include="Windows\Tabs\TabAttributes.cs" />
-    <Compile Include="Windows\Tabs\TabHistory.cs" />
-    <Compile Include="Windows\Tabs\TabMedical.cs" />
-    <Compile Include="Windows\Tabs\TabRecords.cs" />
-    <Compile Include="Windows\Tabs\TabScheduling.cs" />
-    <Compile Include="Windows\Tabs\TabTraining.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabAttributes.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabHistory.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabMedical.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabRecords.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabScheduling.cs" />
+    <Compile Include="Windows\Tabs\Roster\TabTraining.cs" />
+    <Compile Include="Windows\Tabs\Settings\TabConfig.cs" />
+    <Compile Include="Windows\Tabs\Settings\TabRealism.cs" />
+    <Compile Include="Windows\Tabs\Settings\TabToolTips.cs" />
     <Compile Include="Windows\WindowContracts.cs" />
     <Compile Include="Windows\WindowDebugger.cs" />
     <Compile Include="RMStyle.cs" />
@@ -98,7 +95,7 @@
     <Compile Include="RMAddon.cs" />
     <Compile Include="Api\ToolbarWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="RmUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="LocalDev\7za_dir.txt" />
@@ -115,6 +112,7 @@
     <Content Include="LocalDev\pdb2mdb_exe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Distribution\GameData\RosterManager\Localization\RosterManager.cfg" />
     <None Include="Distribution\GameData\RosterManager\Plugins\PluginData\RMSettings.dat" />
     <None Include="Distribution\GameData\RosterManager\RosterManager.version" />
   </ItemGroup>

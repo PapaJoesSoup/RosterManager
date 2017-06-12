@@ -1,5 +1,5 @@
 ﻿using RosterManager.Windows;
-using RosterManager.Windows.Tabs;
+using RosterManager.Windows.Tabs.Roster;
 using UnityEngine;
 
 namespace RosterManager.InternalObjects
@@ -18,7 +18,7 @@ namespace RosterManager.InternalObjects
     {
       if (!string.IsNullOrEmpty(ToolTip))
       {
-        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, SMToolTIps.ToolTipPos.ToString()), Utilities.LogType.Info, Settings.VerboseLogging);
+        //LogMessage(String.Format("ShowToolTips: \r\nToolTip: {0}\r\nToolTipPos:  {1}", SmAddon.toolTip, RMToolTips.ToolTipPos.ToString()), RmUtils.LogType.Info, Settings.VerboseLogging);
         ShowToolTip(ToolTipPos, ToolTip);
       }
 
@@ -28,14 +28,12 @@ namespace RosterManager.InternalObjects
 
     internal static void ShowToolTip(Vector2 toolTipPos, string toolTip)
     {
-      if (RMSettings.ShowToolTips && (toolTip != null) && (toolTip.Trim().Length > 0))
-      {
-        var size = RMStyle.ToolTipStyle.CalcSize(new GUIContent(toolTip));
-        Position = new Rect(toolTipPos.x, toolTipPos.y, size.x + 4, size.y + 4);
-        RepositionToolTip();
-        GUI.Window(0, Position, EmptyWindow, toolTip, RMStyle.ToolTipStyle);
-        GUI.BringWindowToFront(0);
-      }
+      if (!RMSettings.ShowToolTips || (toolTip == null) || (toolTip.Trim().Length <= 0)) return;
+      Vector2 size = RMStyle.ToolTipStyle.CalcSize(new GUIContent(toolTip));
+      Position = new Rect(toolTipPos.x, toolTipPos.y, size.x + 4, size.y + 4);
+      RepositionToolTip();
+      GUI.Window(0, Position, EmptyWindow, toolTip, RMStyle.ToolTipStyle);
+      GUI.BringWindowToFront(0);
     }
 
     internal static string SetActiveToolTip(Rect control, string toolTip, ref bool toolTipActive, float xOffset)
@@ -45,7 +43,7 @@ namespace RosterManager.InternalObjects
       {
         toolTipActive = true;
         // Note at this time controlPosition is in Gui Point system and is local position.  convert to screenpoint.
-        var newControl = new Rect
+        Rect newControl = new Rect
         {
           position = GUIUtility.GUIToScreenPoint(control.position),
           width = control.width,
@@ -77,7 +75,7 @@ namespace RosterManager.InternalObjects
     {
       // Only one of these values can be active at a time (onMouseOver), so this will trap it.
       // (Brute force, but functional)
-      var toolTip = "";
+      string toolTip = "";
       if (!string.IsNullOrEmpty(WindowRoster.ToolTip)) toolTip = WindowRoster.ToolTip;
       if (!string.IsNullOrEmpty(WindowContracts.ToolTip)) toolTip = WindowContracts.ToolTip;
       if (!string.IsNullOrEmpty(WindowDebugger.ToolTip)) toolTip = WindowDebugger.ToolTip;

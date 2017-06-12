@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using RosterManager.Windows;
-using UnityEngine;
 using Random = System.Random;
 
 namespace RosterManager
@@ -29,42 +27,42 @@ namespace RosterManager
 
       if (node.HasNode(ConfigNodeName))
       {
-        var kerbalLifeRecordNode = node.GetNode(ConfigNodeName);
+        ConfigNode kerbalLifeRecordNode = node.GetNode(ConfigNodeName);
 
-        var kerbalNodes = kerbalLifeRecordNode.GetNodes(RMKerbal.ConfigNodeName);
-        foreach (var kerbalNode in kerbalNodes)
+        List<ConfigNode>.Enumerator kerbalNodes = kerbalLifeRecordNode.GetNodes(RMKerbal.ConfigNodeName).ToList().GetEnumerator();
+        while (kerbalNodes.MoveNext())
         {
-          if (kerbalNode.HasValue("kerbalName"))
-          {
-            var id = kerbalNode.GetValue("kerbalName");
-            Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Loading kerbal = " + id, "info", RMSettings.VerboseLogging);
-            var kerballifeinfo = RMKerbal.Load(kerbalNode, id);
-            AllrmKerbals[id] = kerballifeinfo;
-          }
+          if (kerbalNodes.Current == null) continue;
+          if (!kerbalNodes.Current.HasValue("kerbalName")) continue;
+          string id = kerbalNodes.Current.GetValue("kerbalName");
+          RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbals Loading kerbal = " + id, "info", RMSettings.VerboseLogging);
+          RMKerbal kerballifeinfo = RMKerbal.Load(kerbalNodes.Current, id);
+          AllrmKerbals[id] = kerballifeinfo;
         }
+        kerbalNodes.Dispose();
       }
-      Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Loading Completed", "info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbals Loading Completed", "info", RMSettings.VerboseLogging);
     }
 
     internal void Save(ConfigNode node)
     {
       try
       {
-                var kerbalLifeRecordNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
-
-                foreach (var entry in AllrmKerbals)
-                {
-                    var kerbalNode = entry.Value.Save(kerbalLifeRecordNode);
-                    Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Saving kerbal = " + entry.Key, "info", RMSettings.VerboseLogging);
-                    kerbalNode.AddValue("kerbalName", entry.Key);
-                }
+        ConfigNode kerbalLifeRecordNode = node.HasNode(ConfigNodeName) ? node.GetNode(ConfigNodeName) : node.AddNode(ConfigNodeName);
+        Dictionary<string, RMKerbal>.Enumerator allRmKerbals = AllrmKerbals.GetEnumerator();
+        while (allRmKerbals.MoveNext())
+        {
+          ConfigNode kerbalNode = allRmKerbals.Current.Value.Save(kerbalLifeRecordNode);
+          RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbals Saving kerbal = " + allRmKerbals.Current.Key, "info", RMSettings.VerboseLogging);
+          kerbalNode.AddValue("kerbalName", allRmKerbals.Current.Key);
+        }
+        allRmKerbals.Dispose();
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("RosterManagerLifeSpan.RMKerbal Save error... " + ex, "Error", RMSettings.VerboseLogging);                
+        RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbal Save error... " + ex, "Error", RMSettings.VerboseLogging);
       }
-       
-      Utilities.LogMessage("RosterManagerLifeSpan.RMKerbals Saving Completed", "info", RMSettings.VerboseLogging);
+      RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbals Saving Completed", "info", RMSettings.VerboseLogging);
     }
   }
 
@@ -109,7 +107,7 @@ namespace RosterManager
     public float Experience;
 
     private readonly Random _rnd = new Random();  // Random seed for setting Kerbals ages
-    internal static KSPUtil.DefaultDateTimeFormatter defaultDateTime = new KSPUtil.DefaultDateTimeFormatter();
+    internal static KSPUtil.DefaultDateTimeFormatter DefaultDateTime = new KSPUtil.DefaultDateTimeFormatter();
 
     public RMKerbal(double currentTime, ProtoCrewMember kerbal, bool isnew, bool modKerbal)
     {
@@ -139,7 +137,7 @@ namespace RosterManager
           {
             if (RMAddon.FrozenKerbals.ContainsKey(kerbal.name))
             {
-              TimeDfFrozen = RMAddon.FrozenKerbals[kerbal.name].lastUpdate;
+              TimeDfFrozen = RMAddon.FrozenKerbals[kerbal.name].LastUpdate;
             }
           }
         }
@@ -152,40 +150,38 @@ namespace RosterManager
         Experience = kerbal.experience;
         Kerbal = kerbal;
       }
-      if (modKerbal)
+      if (!modKerbal) return;
+      Stupidity = kerbal.stupidity;
+      Courage = kerbal.courage;
+      Badass = kerbal.isBadass;
+      if (SalaryContractDispute)
       {
-        Stupidity = kerbal.stupidity;
-        Courage = kerbal.courage;
-        Badass = kerbal.isBadass;
-        if (SalaryContractDispute)
-        {
-          RealTrait = kerbal.trait;
-          Trait = "Tourist";
-          KerbalRoster.SetExperienceTrait(kerbal, Trait);
-        }
-        else
-        {
-          if (Status == ProtoCrewMember.RosterStatus.Assigned)
-          {
-            UnregisterExperienceTrait(this);
-          }
-          Trait = kerbal.trait;
-          RealTrait = kerbal.trait;
-          KerbalRoster.SetExperienceTrait(kerbal, Trait);
-          if (Status == ProtoCrewMember.RosterStatus.Assigned)
-          {
-            RegisterExperienceTrait(this);
-          }
-        }
-        Gender = kerbal.gender;
-        Skill = kerbal.experienceLevel;
-        Experience = kerbal.experience;
+        RealTrait = kerbal.trait;
+        Trait = "Tourist";
+        KerbalRoster.SetExperienceTrait(kerbal, Trait);
       }
+      else
+      {
+        if (Status == ProtoCrewMember.RosterStatus.Assigned)
+        {
+          UnregisterExperienceTrait(this);
+        }
+        Trait = kerbal.trait;
+        RealTrait = kerbal.trait;
+        KerbalRoster.SetExperienceTrait(kerbal, Trait);
+        if (Status == ProtoCrewMember.RosterStatus.Assigned)
+        {
+          RegisterExperienceTrait(this);
+        }
+      }
+      Gender = kerbal.gender;
+      Skill = kerbal.experienceLevel;
+      Experience = kerbal.experience;
     }
 
     public static RMKerbal CreateKerbal()
     {
-      var kerbal = CrewGenerator.RandomCrewMemberPrototype();
+      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
       return new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, false);
     }
 
@@ -198,23 +194,18 @@ namespace RosterManager
 
       SyncKerbal();
 
-      if (IsNew)
-      {
-        // Add to roster.
-        var dynMethod = HighLogic.CurrentGame.CrewRoster.GetType().GetMethod("AddCrewMember", BindingFlags.NonPublic | BindingFlags.Instance);
-        Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
-        dynMethod.Invoke(HighLogic.CurrentGame.CrewRoster, new object[] { Kerbal });
-      }
+      if (!IsNew) return string.Empty;
+      // Add to roster.
+      Kerbal.rosterStatus = ProtoCrewMember.RosterStatus.Available;
+      HighLogic.CurrentGame.CrewRoster.AddCrewMember(Kerbal);
 
+      WindowRoster.UpdateRosterList();
       return string.Empty;
     }
 
     public void SyncKerbal()
     {
-      if (RMSettings.EnableKerbalRename)
-        Kerbal.name = Name;
-      // remove old save game hack for backwards compatability...
-      Kerbal.name = Kerbal.name.Replace(char.ConvertFromUtf32(1), "");
+      if (RMSettings.EnableKerbalRename) Kerbal.ChangeName(Name);
       if (!SalaryContractDispute)
       {
         if (Status == ProtoCrewMember.RosterStatus.Assigned)
@@ -263,16 +254,16 @@ namespace RosterManager
     {
       try
       {
-        var lastUpdate = GetNodes.GetNodeValue(node, "lastUpdate", 0d);
-        var crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
+        double lastUpdate = GetNodes.GetNodeValue(node, "lastUpdate", 0d);
+        List<ProtoCrewMember> crewList = HighLogic.CurrentGame.CrewRoster.Crew.Concat(HighLogic.CurrentGame.CrewRoster.Applicants).ToList();
         //If Deepfreeze is installed add Unowned and Tourists to the list (could be frozen or comatose).
         if (Api.InstalledMods.IsDfInstalled)
         {
           crewList = crewList.Concat(HighLogic.CurrentGame.CrewRoster.Unowned).Concat(HighLogic.CurrentGame.CrewRoster.Tourist).ToList();
         }
         //var tmpvesselId = GetNodes.GetNodeValue(node, "vesselID", "");
-        var kerbal = crewList.FirstOrDefault(a => a.name == name);
-        var info = new RMKerbal(lastUpdate, kerbal, false, false)
+        ProtoCrewMember kerbal = crewList.FirstOrDefault(a => a.name == name);
+        RMKerbal info = new RMKerbal(lastUpdate, kerbal, false, false)
         {
           Status = GetNodes.GetNodeValue(node, "status", ProtoCrewMember.RosterStatus.Available),
           Type = GetNodes.GetNodeValue(node, "type", ProtoCrewMember.KerbalType.Crew),
@@ -308,14 +299,14 @@ namespace RosterManager
       }
       catch (Exception ex)
       {
-        Utilities.LogMessage("RosterManagerLifeSpan.RMKerbal Load error... " + ex, "Error", RMSettings.VerboseLogging);
+        RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbal Load error... " + ex, "Error", RMSettings.VerboseLogging);
         return null;
       }
     }
 
     public ConfigNode Save(ConfigNode config)
     {
-      var node = config.AddNode(ConfigNodeName);
+      ConfigNode node = config.AddNode(ConfigNodeName);
       node.AddValue("lastUpdate", LastUpdate);
       node.AddValue("Name", Name);
       node.AddValue("status", Status);
@@ -353,63 +344,61 @@ namespace RosterManager
 
     internal static void UnregisterExperienceTrait(RMKerbal rmkerbal)
     {
-      var vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.VesselId);
+      Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.VesselId);
       if (vsl == null) return;
       if (!vsl.loaded) return;
-      foreach (var part in vsl.parts)
+      List<Part>.Enumerator parts = vsl.parts.GetEnumerator();
+      while (parts.MoveNext())
       {
-        var found = false;
-        if (part.protoModuleCrew.Any(partcrew => partcrew == rmkerbal.Kerbal))
+        if (parts.Current == null) continue;
+        bool found = false;
+        if (parts.Current.protoModuleCrew.Any(partcrew => partcrew == rmkerbal.Kerbal))
         {
-          rmkerbal.Kerbal.UnregisterExperienceTraits(part);
+          rmkerbal.Kerbal.UnregisterExperienceTraits(parts.Current);
           found = true;
         }
-        if (found)
-          break;
+        if (found) break;
       }
+      parts.Dispose();
     }
 
     internal static void RegisterExperienceTrait(RMKerbal rmkerbal)
     {
-      var vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.VesselId);
+      Vessel vsl = FlightGlobals.Vessels.FirstOrDefault(a => a.id == rmkerbal.VesselId);
       if (vsl == null) return;
       if (!vsl.loaded) return;
-      foreach (var part in vsl.parts)
+      List<Part>.Enumerator parts = vsl.parts.GetEnumerator();
+      while (parts.MoveNext())
       {
-        var found = false;
-        if (part.protoModuleCrew.Any(partcrew => partcrew == rmkerbal.Kerbal))
+        if (parts.Current == null) continue;
+        bool found = false;
+        if (parts.Current.protoModuleCrew.Any(partcrew => partcrew == rmkerbal.Kerbal))
         {
-          rmkerbal.Kerbal.RegisterExperienceTraits(part);
+          rmkerbal.Kerbal.RegisterExperienceTraits(parts.Current);
           found = true;
         }
         if (found)
           break;
       }
+      parts.Dispose();
     }
 
     public static double SalaryNextDue(double time)
     {
-      var salaryTimeMonthRealCalendar = defaultDateTime.EarthYear / 12;
-      var salaryTimeMonthKerbalCalendar = defaultDateTime.KerbinYear / 12;
-      double salaryTimeSpan = salaryTimeMonthRealCalendar;
-      if (GameSettings.KERBIN_TIME)
-      {
-        salaryTimeSpan = RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly ? defaultDateTime.KerbinYear : salaryTimeMonthKerbalCalendar;
-      }
-      else
-      {
-        if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
-          salaryTimeSpan = defaultDateTime.EarthYear;
-      }
-      var returnTime = time + salaryTimeSpan;
+      int salaryTimeYear = DefaultDateTime.Year;
+      int salaryTimeMonth = DefaultDateTime.Year / 12;
+      double salaryTimeSpan = salaryTimeMonth;
+
+      if (RMLifeSpan.Instance.RMGameSettings.SalaryPeriodisYearly)
+        salaryTimeSpan = salaryTimeYear;
+
+      double returnTime = time + salaryTimeSpan;
       return returnTime;
     }
 
     public static double BirthdayNextDue(double time)
     {
-      double birthdayTimeSpan = defaultDateTime.KerbinYear;
-      if (!GameSettings.KERBIN_TIME)
-        birthdayTimeSpan = defaultDateTime.EarthYear;
+      double birthdayTimeSpan = DefaultDateTime.Year;
       return time + birthdayTimeSpan;
     }
   }
@@ -418,8 +407,7 @@ namespace RosterManager
   {
     internal static bool GetNodeValue(ConfigNode confignode, string fieldname, bool defaultValue)
     {
-      bool newValue;
-      if (confignode.HasValue(fieldname) && bool.TryParse(confignode.GetValue(fieldname), out newValue))
+      if (confignode.HasValue(fieldname) && bool.TryParse(confignode.GetValue(fieldname), out bool newValue))
       {
         return newValue;
       }
@@ -428,8 +416,7 @@ namespace RosterManager
 
     internal static int GetNodeValue(ConfigNode confignode, string fieldname, int defaultValue)
     {
-      int newValue;
-      if (confignode.HasValue(fieldname) && int.TryParse(confignode.GetValue(fieldname), out newValue))
+      if (confignode.HasValue(fieldname) && int.TryParse(confignode.GetValue(fieldname), out int newValue))
       {
         return newValue;
       }
@@ -438,8 +425,7 @@ namespace RosterManager
 
     internal static uint GetNodeValue(ConfigNode confignode, string fieldname, uint defaultValue)
     {
-      uint newValue;
-      if (confignode.HasValue(fieldname) && uint.TryParse(confignode.GetValue(fieldname), out newValue))
+      if (confignode.HasValue(fieldname) && uint.TryParse(confignode.GetValue(fieldname), out uint newValue))
       {
         return newValue;
       }
@@ -448,8 +434,7 @@ namespace RosterManager
 
     internal static float GetNodeValue(ConfigNode confignode, string fieldname, float defaultValue)
     {
-      float newValue;
-      if (confignode.HasValue(fieldname) && float.TryParse(confignode.GetValue(fieldname), out newValue))
+      if (confignode.HasValue(fieldname) && float.TryParse(confignode.GetValue(fieldname), out float newValue))
       {
         return newValue;
       }
@@ -458,8 +443,7 @@ namespace RosterManager
 
     internal static double GetNodeValue(ConfigNode confignode, string fieldname, double defaultValue)
     {
-      double newValue;
-      if (confignode.HasValue(fieldname) && double.TryParse(confignode.GetValue(fieldname), out newValue))
+      if (confignode.HasValue(fieldname) && double.TryParse(confignode.GetValue(fieldname), out double newValue))
       {
         return newValue;
       }
@@ -468,40 +452,31 @@ namespace RosterManager
 
     internal static string GetNodeValue(ConfigNode confignode, string fieldname, string defaultValue)
     {
-      if (confignode.HasValue(fieldname))
-      {
-        return confignode.GetValue(fieldname);
-      }
-      return defaultValue;
+      return confignode.HasValue(fieldname) ? confignode.GetValue(fieldname) : defaultValue;
     }
 
     internal static Guid GetNodeValue(ConfigNode confignode, string fieldname, Guid guid)
     {
-      if (confignode.HasValue(fieldname))
+      if (!confignode.HasValue(fieldname)) return Guid.Empty;
+      try
       {
-        try
-        {
-          var id = new Guid(confignode.GetValue(fieldname));
-          return id;
-        }
-        catch (Exception ex)
-        {
-          Utilities.LogMessage("RosterManagerLifeSpan.RMKerbal error loading vesselID " + ex, "Error", RMSettings.VerboseLogging);
-          return Guid.Empty;
-        }
+        Guid id = new Guid(confignode.GetValue(fieldname));
+        return id;
       }
-      return Guid.Empty;
+      catch (Exception ex)
+      {
+        RmUtils.LogMessage("RosterManagerLifeSpan.RMKerbal error loading vesselID " + ex, "Error", RMSettings.VerboseLogging);
+        return Guid.Empty;
+      }
     }
 
     internal static T GetNodeValue<T>(ConfigNode confignode, string fieldname, T defaultValue) where T : IComparable, IFormattable, IConvertible
     {
-      if (confignode.HasValue(fieldname))
+      if (!confignode.HasValue(fieldname)) return defaultValue;
+      string stringValue = confignode.GetValue(fieldname);
+      if (Enum.IsDefined(typeof(T), stringValue))
       {
-        var stringValue = confignode.GetValue(fieldname);
-        if (Enum.IsDefined(typeof(T), stringValue))
-        {
-          return (T)Enum.Parse(typeof(T), stringValue);
-        }
+        return (T)Enum.Parse(typeof(T), stringValue);
       }
       return defaultValue;
     }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace RosterManager.Windows.Tabs
+namespace RosterManager.Windows.Tabs.Roster
 {
   internal class TabScheduling
   {
@@ -11,7 +11,7 @@ namespace RosterManager.Windows.Tabs
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(680));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
       GUILayout.Label("Kerbal Scheduling", RMStyle.LabelStyleBold);
       GUILayout.Label(WindowRoster.SelectedKerbal.Name + " - (" + WindowRoster.SelectedKerbal.Trait + ")", RMStyle.LabelStyleBold, GUILayout.MaxWidth(300));
 

@@ -8,14 +8,15 @@ namespace RosterManager
     internal static GUIStyle IconStyle;
     internal static GUIStyle ButtonSourceStyle;
     internal static GUIStyle ButtonTargetStyle;
-    internal static GUIStyle ButtonToggledSourceStyle;
-    internal static GUIStyle ButtonToggledTargetStyle;
     internal static GUIStyle ButtonStyle;
     internal static GUIStyle ButtonToggledStyle;
     internal static GUIStyle ButtonStyleLeft;
     internal static GUIStyle ButtonToggledStyleLeft;
     internal static GUIStyle ErrorLabelRedStyle;
     internal static GUIStyle LabelStyle;
+    internal static GUIStyle LabelTabHeader;
+    internal static GUIStyle LabelStyleHdr;
+    internal static GUIStyle LabelStyleHardRule;
     internal static GUIStyle LabelStyleBold;
     internal static GUIStyle LabelStyleBoldCenter;
     internal static GUIStyle LabelStyleRed;
@@ -89,15 +90,6 @@ namespace RosterManager
         alignment = TextAnchor.UpperLeft
       };
 
-      ButtonToggledSourceStyle = new GUIStyle(GUI.skin.button)
-      {
-        normal = {textColor = RMSettings.Colors[RMSettings.SourcePartColor]},
-        fontSize = 14,
-        hover = {textColor = Color.blue},
-        fontStyle = FontStyle.Normal,
-        alignment = TextAnchor.UpperLeft
-      };
-      ButtonToggledSourceStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
 
       ButtonTargetStyle = new GUIStyle(GUI.skin.button)
       {
@@ -108,19 +100,34 @@ namespace RosterManager
         alignment = TextAnchor.UpperLeft
       };
 
-      ButtonToggledTargetStyle = new GUIStyle(GUI.skin.button)
-      {
-        fontSize = 14,
-        normal = {textColor = RMSettings.Colors[RMSettings.TargetPartColor]},
-        hover = {textColor = Color.blue},
-        fontStyle = FontStyle.Normal,
-        alignment = TextAnchor.UpperLeft
-      };
-      ButtonToggledTargetStyle.normal.background = ButtonToggledSourceStyle.onActive.background;
-
       ErrorLabelRedStyle = new GUIStyle(GUI.skin.label) {normal = {textColor = Color.red}};
 
       LabelStyle = new GUIStyle(GUI.skin.label);
+
+      LabelTabHeader = new GUIStyle(GUI.skin.label)
+      {
+        padding =
+        {
+          top = 10,
+          bottom = 6
+        },
+        wordWrap = false,
+        fontStyle = FontStyle.Bold,
+        margin = new RectOffset(0, 0, 0, 0)
+      };
+
+      LabelStyleHardRule = new GUIStyle(GUI.skin.label)
+      {
+        padding =
+        {
+          top = 0,
+          bottom = 6
+        },
+        wordWrap = false,
+        alignment = TextAnchor.LowerLeft,
+        fontStyle = FontStyle.Bold,
+        margin = new RectOffset(0, 0, 0, 0)
+      };
 
       LabelStyleBold = new GUIStyle(GUI.skin.label)
       {
@@ -145,7 +152,13 @@ namespace RosterManager
 
       LabelStyleCyan = new GUIStyle(LabelStyle) {normal = {textColor = Color.cyan}};
 
-      LabelStyleHdrSort = new GUIStyle(GUI.skin.label) {fontStyle = FontStyle.Bold};
+      LabelStyleHdr = new GUIStyle(GUI.skin.label) { fontStyle = FontStyle.Bold };
+
+      LabelStyleHdrSort = new GUIStyle(GUI.skin.label)
+      {
+        fontStyle = FontStyle.Bold,
+        normal = { textColor = Color.green }
+      };
 
       ToolTipStyle = new GUIStyle(GUI.skin.textArea)
       {
