@@ -179,9 +179,9 @@ namespace RosterManager
       Experience = kerbal.experience;
     }
 
-    public static RMKerbal CreateKerbal()
+    public static RMKerbal CreateKerbal(ProtoCrewMember.KerbalType kerbalType)
     {
-      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype();
+      ProtoCrewMember kerbal = CrewGenerator.RandomCrewMemberPrototype(kerbalType);
       return new RMKerbal(Planetarium.GetUniversalTime(), kerbal, true, false);
     }
 

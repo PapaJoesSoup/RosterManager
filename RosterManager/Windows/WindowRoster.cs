@@ -676,7 +676,7 @@ namespace RosterManager.Windows
         bool kerbalFound = false;
         while (!kerbalFound)
         {
-          SelectedKerbal = RMKerbal.CreateKerbal();
+          SelectedKerbal = RMKerbal.CreateKerbal(GetKerbalType(KerbalProfession));
           if (SelectedKerbal.Trait == KerbalProfession && SelectedKerbal.Gender == Gender)
             kerbalFound = true;
         }
@@ -949,6 +949,30 @@ namespace RosterManager.Windows
         return
           $"{Localizer.Format("#autoLOC_RM_1051")} - {RMAddon.FrozenKerbals[kerbal.name].VesselName.Replace("(unloaded)", "")}";		// #autoLOC_RM_1051 = Frozen - {0}
       return "Frozen";
+    }
+
+    private static ProtoCrewMember.KerbalType GetKerbalType(string profession)
+    {
+      ProtoCrewMember.KerbalType kerbalType;
+      switch (profession)
+      {
+        case "Pilot":
+          kerbalType = ProtoCrewMember.KerbalType.Crew;
+          break;
+        case "Engineer":
+          kerbalType = ProtoCrewMember.KerbalType.Crew;
+          break;
+        case "Scientist":
+          kerbalType = ProtoCrewMember.KerbalType.Crew;
+          break;
+        case "Tourist":
+          kerbalType = ProtoCrewMember.KerbalType.Tourist;
+          break;
+        default:
+          kerbalType = ProtoCrewMember.KerbalType.Unowned;
+            break;
+      }
+      return kerbalType;
     }
 
     private static void SetProfessionFlag()

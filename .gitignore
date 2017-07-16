@@ -190,3 +190,4 @@ ModelManifest.xml
 RosterManager/Distribution/GameData/RosterManager/Plugins/RosterManager.dll.mdb
 RosterManager.zip
 RosterManager.sln.DotSettings
+*.zip
