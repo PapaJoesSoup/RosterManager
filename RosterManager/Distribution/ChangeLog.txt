@@ -1,4 +1,6 @@
-Version 0.2.5.1 xx Jul 2017
+Version 0.2.5.1 17 Mar 2018
+ - Recompiled for KSP 1.4.1
+ - Fixed:  ApplicationLauncher textures no longer render correctly.  Increased image size to 128 x 128 to support Unity 2017 compression.
  - Fixed bug with creating Tourist profession kerbals.  Caused endless loop.
 
 Version 0.2.5.0 12 Jun 2017

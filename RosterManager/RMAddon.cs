@@ -235,7 +235,7 @@ namespace RosterManager
         if ((HighLogic.LoadedScene != GameScenes.SPACECENTER && HighLogic.LoadedScene != GameScenes.EDITOR &&
              HighLogic.LoadedScene != GameScenes.TRACKSTATION && HighLogic.LoadedScene != GameScenes.FLIGHT) ||
             _rmRosterStock != null || RMSettings.EnableBlizzyToolbar) return;
-        const string iconfile = "Icon_Off_38";
+        const string iconfile = "Icon_Off_128";
         _rmRosterStock = ApplicationLauncher.Instance.AddModApplication(
           OnRMRosterToggle,
           OnRMRosterToggle,
@@ -249,7 +249,7 @@ namespace RosterManager
           GameDatabase.Instance.GetTexture(TextureFolder + iconfile, false));
 
         if (WindowRoster.ShowWindow)
-          _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
+          _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_128" : TextureFolder + "Icon_Off_128", false));
       }
       catch (Exception ex)
       {
@@ -284,7 +284,7 @@ namespace RosterManager
         if (RMSettings.EnableBlizzyToolbar)
           _rmRosterBlizzy.TexturePath = WindowRoster.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
         else
-          _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_38" : TextureFolder + "Icon_Off_38", false));
+          _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_128" : TextureFolder + "Icon_Off_128", false));
 
         if (!WindowRoster.ShowWindow) return;
         WindowRoster.DisplayMode = WindowRoster.DisplayModes.Index;
