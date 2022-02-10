@@ -20,7 +20,7 @@ namespace RosterManager.Windows.Tabs.Settings
     private static bool _canShowToolTips = true;
     internal static Rect Position = WindowSettings.Position;
 
-    internal static void Display(Vector2 displayViewerPosition)
+    internal static void Display()
     {
       // Reset Tooltip active flag...
       ToolTipActive = false;

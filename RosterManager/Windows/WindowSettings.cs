@@ -10,9 +10,28 @@ namespace RosterManager.Windows
   {
     #region Settings Window (GUI)
 
-    internal static string Title = "Ship Manifest Settings";
-    internal static Rect Position = new Rect(0, 0, 0, 0);
-    internal static bool ShowWindow;
+    internal static string Title = "Roster Manager Settings";
+    internal static float WindowHeight = 380;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 300;
+    internal static float MinHeight = 300;
+    internal static bool ResizingWindow = false;
+    internal static Rect Position = RMSettings.DefaultPosition;
+    private static bool _inputLocked;
+    private static bool _showWindow;
+    internal static bool ShowWindow
+    {
+      get => _showWindow;
+      set
+      {
+        if (!value)
+        {
+          InputLockManager.RemoveControlLock("RM_Window");
+          _inputLocked = false;
+        }
+        _showWindow = value;
+      }
+    }
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static string ToolTip = "";
@@ -24,7 +43,7 @@ namespace RosterManager.Windows
     {
       //Title = SmUtils.Localize("#smloc_settings_001");
       // set input locks when mouseover window...
-      //_inputLocked = GuiUtils.PreventClickthrough(ShowWindow, Position, _inputLocked);
+      _inputLocked = RmUtils.PreventClickThrough(ShowWindow, Position, _inputLocked);
 
       // Reset Tooltip active flag...
       ToolTipActive = false;
@@ -45,10 +64,10 @@ namespace RosterManager.Windows
       DisplayTabButtons();
 
       _displayViewerPosition = GUILayout.BeginScrollView(_displayViewerPosition, RMStyle.ScrollStyle,
-        GUILayout.Height(300), GUILayout.Width(380));
+        GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(380));
       GUILayout.BeginVertical();
 
-      DisplaySelectedTab(_displayViewerPosition);
+      DisplaySelectedTab();
 
       GUILayout.EndVertical();
       GUILayout.EndScrollView();
@@ -57,7 +76,25 @@ namespace RosterManager.Windows
 
       GUILayout.EndVertical();
 
+      //resizing
+      Rect resizeRect =
+        new Rect(Position.width - 18, Position.height - 18, 16, 16);
+      GUI.DrawTexture(resizeRect, RmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+      if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+      {
+        ResizingWindow = true;
+      }
+      if (Event.current.type == EventType.Repaint && ResizingWindow)
+      {
+        if (Mouse.delta.y != 0)
+        {
+          float diff = Mouse.delta.y;
+          RmUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+        }
+      }
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+      //Account for resizing based on actions..
+      Position.height = WindowHeight + HeightScale;
       RMSettings.RepositionWindow(ref Position);
     }
 
@@ -99,18 +136,18 @@ namespace RosterManager.Windows
       GUILayout.EndHorizontal();
     }
 
-    internal static void DisplaySelectedTab(Vector2 displayViewerPosition)
+    internal static void DisplaySelectedTab()
     {
       switch (_selectedTab)
       {
         case Tab.Realism:
-          TabRealism.Display(displayViewerPosition);
+          TabRealism.Display();
           break;
         case Tab.Config:
-          TabConfig.Display(displayViewerPosition);
+          TabConfig.Display();
           break;
         case Tab.ToolTips:
-          TabToolTips.Display(displayViewerPosition);
+          TabToolTips.Display();
           break;
         default:
           throw new ArgumentOutOfRangeException();

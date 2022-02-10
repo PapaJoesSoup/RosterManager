@@ -11,7 +11,7 @@ namespace RosterManager.Windows.Tabs.Roster
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(WindowRoster.ViewerWidth));
       GUILayout.Label(WindowRoster.SelectedKerbal.IsNew ? "Create a Kerbal" : "Kerbal Attributes", RMStyle.LabelStyleBold);
 
       GUILayout.BeginHorizontal();
@@ -46,6 +46,8 @@ namespace RosterManager.Windows.Tabs.Roster
         WindowRoster.DisplaySelectProfession();
       }
       WindowRoster.DisplaySelectGender();
+
+      WindowRoster.DisplaySelectSuit(ref WindowRoster.SelectedKerbal.Suit);
 
       GUILayout.Label("Courage");
       WindowRoster.SelectedKerbal.Courage = GUILayout.HorizontalSlider(WindowRoster.SelectedKerbal.Courage, 0, 1, GUILayout.Width(300));

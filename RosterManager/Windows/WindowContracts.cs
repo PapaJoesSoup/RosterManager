@@ -14,8 +14,26 @@ namespace RosterManager.Windows
 
     internal static float WindowWidth = 700;
     internal static float WindowHeight = 330;
-    internal static Rect Position = new Rect(0, 0, 700, 330);
-    internal static bool ShowWindow;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 280;
+    internal static float MinHeight = 200;
+    internal static bool ResizingWindow = false;
+    internal static Rect Position = RMSettings.DefaultPosition;
+    private static bool _inputLocked;
+    private static bool _showWindow;
+    internal static bool ShowWindow
+    {
+      get => _showWindow;
+      set
+      {
+        if (!value)
+        {
+          InputLockManager.RemoveControlLock("RM_Window");
+          _inputLocked = false;
+        }
+        _showWindow = value;
+      }
+    }
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
     internal static string ToolTip = "";
@@ -31,6 +49,10 @@ namespace RosterManager.Windows
 
     internal static void Display(int windowId)
     {
+      
+      // set input locks when mouseover window...
+      _inputLocked = RmUtils.PreventClickThrough(ShowWindow, Position, _inputLocked);
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
@@ -48,7 +70,7 @@ namespace RosterManager.Windows
 
       DisplayHeadings();
 
-      _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(280), GUILayout.Width(680));
+      _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(680));
       GUILayout.BeginVertical();
       if (IsAll || IsDispute || IsStrike)
         DisplayDisputes();
@@ -114,7 +136,26 @@ namespace RosterManager.Windows
 
       GUILayout.EndVertical();
 
+      //resizing
+      Rect resizeRect =
+        new Rect(Position.width - 18, Position.height - 18, 16, 16);
+      GUI.DrawTexture(resizeRect, RmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+      if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+      {
+        ResizingWindow = true;
+      }
+
+      if (Event.current.type == EventType.Repaint && ResizingWindow)
+      {
+        if (Mouse.delta.y != 0)
+        {
+          float diff = Mouse.delta.y;
+          RmUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+        }
+      }
+      //ResetZoomKeys();
       GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+      Position.height = WindowHeight + HeightScale;
       RMSettings.RepositionWindow(ref Position);
     }
 

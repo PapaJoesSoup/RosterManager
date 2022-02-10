@@ -90,7 +90,7 @@ namespace RosterManager
       {
         if (WindowRoster.ResetRosterSize)
         {
-          WindowRoster.Position.height = 335; //reset height
+          WindowRoster.Position.height = WindowRoster.WindowHeight; //reset height
         }
       }
       catch (Exception ex)
@@ -103,6 +103,11 @@ namespace RosterManager
     internal void OnGUI()
     {
       //Debug.Log("[RosterManager]:  RosterManagerAddon.OnGUI");
+      if (Event.current.type == EventType.MouseUp)
+      {
+          // Turn off window resizing
+          RmUtils.ResetResize();
+      }
       try
       {
         Display();
@@ -142,7 +147,14 @@ namespace RosterManager
       {
         if (RMSettings.Loaded)
         {
-          RMSettings.SaveSettings();
+          try
+          {
+            RMSettings.SaveSettings();
+          }
+          catch
+          {
+            // Do nothing.
+          }
         }
 
         // Handle Toolbars
@@ -164,7 +176,7 @@ namespace RosterManager
           _rmRosterBlizzy?.Destroy();
         }
         //Reset Roster Window data
-        WindowRoster.DisplayMode = WindowRoster.DisplayModes.Index;
+        WindowRoster.DisplayMode = WindowRoster.DisplayModes.None;
         WindowRoster.SelectedKerbal = null;
         WindowRoster.ToolTip = "";
         //Settings.ShowRoster = false;
@@ -287,7 +299,7 @@ namespace RosterManager
           _rmRosterStock.SetTexture(GameDatabase.Instance.GetTexture(WindowRoster.ShowWindow ? TextureFolder + "Icon_On_128" : TextureFolder + "Icon_Off_128", false));
 
         if (!WindowRoster.ShowWindow) return;
-        WindowRoster.DisplayMode = WindowRoster.DisplayModes.Index;
+        WindowRoster.DisplayMode = WindowRoster.DisplayModes.None;
         WindowRoster.UpdateRosterList();
         //AllCrew.Clear();
         //if (RMLifeSpan.Instance != null)
@@ -371,10 +383,10 @@ namespace RosterManager
 
           if (WindowRoster.ShowWindow)
           {
-            if (WindowRoster.DisplayMode == WindowRoster.DisplayModes.Index)
+            if (WindowRoster.DisplayMode == WindowRoster.DisplayModes.None)
             {
               step = "5 - Reset Roster Size";
-              WindowRoster.Position.height = 335; //reset hight
+              WindowRoster.Position.height = WindowRoster.WindowHeight; //reset height
             }
 
             step = "6 - Show Roster";

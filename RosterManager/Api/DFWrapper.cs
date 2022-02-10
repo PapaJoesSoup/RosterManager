@@ -556,7 +556,7 @@ namespace RosterManager.Api
       }
 
       /// <summary>
-      /// Seat Index for Crew member
+      /// Seat None for Crew member
       /// </summary>
       public int SeatIdx;
 

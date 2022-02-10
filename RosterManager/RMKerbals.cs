@@ -103,6 +103,7 @@ namespace RosterManager
     public string Trait = "Pilot";
     public string RealTrait = "Pilot";
     public ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
+    public ProtoCrewMember.KerbalSuit Suit;
     public int Skill;
     public float Experience;
 
@@ -146,6 +147,7 @@ namespace RosterManager
         Courage = kerbal.courage;
         Badass = kerbal.isBadass;
         Gender = kerbal.gender;
+        Suit = kerbal.suit;
         Skill = kerbal.experienceLevel;
         Experience = kerbal.experience;
         Kerbal = kerbal;
@@ -175,6 +177,7 @@ namespace RosterManager
         }
       }
       Gender = kerbal.gender;
+      Suit = kerbal.suit;
       Skill = kerbal.experienceLevel;
       Experience = kerbal.experience;
     }
@@ -221,6 +224,7 @@ namespace RosterManager
         }
       }
       Kerbal.gender = Gender;
+      Kerbal.suit = Suit;
       Kerbal.stupidity = Stupidity;
       Kerbal.courage = Courage;
       Kerbal.isBadass = Badass;

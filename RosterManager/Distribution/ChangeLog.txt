@@ -1,3 +1,14 @@
+Version 0.3.0.0 07 Feb 2022
+ - New:  Recompiled for KSP 1.12.x
+ - New:  Added window resizing to all windows
+ - New:  Added kerbal suit selection
+ - New:  Added Click through blocking
+ - New:  Addded default window position (Persisted)  
+         Sets initial window position to a default of 50px from upper left of screen. 
+
+Version 0.2.5.2 02 May 2019
+ - Recompiled for KSP 1.7.x
+
 Version 0.2.5.1 17 Mar 2018
  - Recompiled for KSP 1.4.1
  - Fixed:  ApplicationLauncher textures no longer render correctly.  Increased image size to 128 x 128 to support Unity 2017 compression.

@@ -13,11 +13,34 @@ namespace RosterManager.Windows
   internal static class WindowRoster
   {
     // Standard Window vars
-    internal static float WindowWidth = 800;
-
-    internal static float WindowHeight = 335;
-    internal static Rect Position = new Rect(0, 0, 0, 0);
-    internal static bool ShowWindow;
+    internal static float WindowWidth = 810;
+    internal static float WindowHeight = 340;
+    internal static float CurrWindowHeight = 340;
+    internal static float HeightScale;
+    internal static float ViewerHeight = 230;
+    internal static float ViewerWidth = 780;
+    internal static float SuitHeight = 55;
+    internal static float EditHeight = 285;
+    internal static float CreateHeight = 75;
+    internal static float MinHeight = 230;
+    internal static bool ResizingWindow = false;
+    internal static Rect Position = RMSettings.DefaultPosition;
+    internal static Rect ViewBox = new Rect(0, 0, ViewerWidth, ViewerHeight);
+    private static bool _inputLocked;
+    private static bool _showWindow;
+    internal static bool ShowWindow
+    {
+        get => _showWindow;
+        set
+        {
+            if (!value)
+            {
+                InputLockManager.RemoveControlLock("RM_Window");
+                _inputLocked = false;
+            }
+            _showWindow = value;
+        }
+    }
     internal static string ToolTip = "";
     internal static bool ToolTipActive;
     internal static bool ShowToolTips = true;
@@ -56,11 +79,13 @@ namespace RosterManager.Windows
     // Gender var
     internal static ProtoCrewMember.Gender Gender = ProtoCrewMember.Gender.Male;
 
+
     internal static bool ResetRosterSize
     {
       get
       {
-        return DisplayMode == DisplayModes.Index;
+        //return DisplayMode == DisplayModes.None;
+        return DisplayMode != DisplayModes.Create && SelectedKerbal == null;
       }
     }
 
@@ -83,7 +108,7 @@ namespace RosterManager.Windows
     internal enum TabSelected
     {
       Attributes,
-      Scheduleing,
+      Scheduling,
       Training,
       History,
       Medical,
@@ -93,27 +118,31 @@ namespace RosterManager.Windows
     internal static TabSelected SelectedTab { get; set; } = TabSelected.Attributes;
 
     // DisplayMode
-    internal static DisplayModes DisplayMode = DisplayModes.Index;
+    internal static DisplayModes DisplayMode = DisplayModes.None;
 
     internal enum DisplayModes
     {
-      Index,
+      None,
       Edit,
-      Create
+      Create,
+      Suit
     }
 
     private static Vector2 _scrollViewerPosition = Vector2.zero;
     internal static void Display(int windowId)
     {
+        // set input locks when mouseover window...
+        _inputLocked = RmUtils.PreventClickThrough(ShowWindow, Position, _inputLocked);
+
       // Reset Tooltip active flag...
       ToolTipActive = false;
 
       // Close window button
       Rect rect = new Rect(Position.width - 20, 4, 16, 16);
       if (GUI.Button(rect, new GUIContent("", Localizer.Format("#autoLOC_RM_1005"))))		// #autoLOC_RM_1005 = Close Window
-      {
+      { 
+        DisplayMode = DisplayModes.None;
         SelectedKerbal = null;
-        DisplayMode = DisplayModes.Index;
         ToolTip = "";
         if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
           RMAddon.OnRMRosterToggle();
@@ -132,26 +161,48 @@ namespace RosterManager.Windows
 
         switch (DisplayMode)
         {
-          case DisplayModes.Index:
+          case DisplayModes.None:
             DisplayActionButtonsIndex();
             break;
           case DisplayModes.Edit:
-            GUILayout.Label(Localizer.Format("#autoLOC_RM_1006"), RMStyle.LabelStyleBoldCenter, GUILayout.Width(780));		// #autoLOC_RM_1006 = Kerbal Manager
+            GUILayout.Label(Localizer.Format("#autoLOC_RM_1006"), RMStyle.LabelStyleBoldCenter, GUILayout.Width(ViewerWidth));		// #autoLOC_RM_1006 = Kerbal Manager
             DisplayTabButtons();
             DisplaySelectedTab();
             break;
           case DisplayModes.Create:
-            GUILayout.Label(Localizer.Format("#autoLOC_RM_1007"), RMStyle.LabelStyleBoldCenter, GUILayout.Width(780));		// #autoLOC_RM_1007 = Create a Kerbal
+            GUILayout.Label(Localizer.Format("#autoLOC_RM_1007"), RMStyle.LabelStyleBoldCenter, GUILayout.Width(ViewerWidth));		// #autoLOC_RM_1007 = Create a Kerbal
             DisplaySelectProfession();
             DisplaySelectGender();
             DisplayActionButtonsCreate();
             break;
+          case DisplayModes.Suit:
+              EditSuitViewer();
+              break;
           default:
             DisplayActionButtonsIndex();
             break;
         }
         GUILayout.EndVertical();
+        //resizing
+        CurrWindowHeight = Position.height;
+        Rect resizeRect =
+            new Rect(Position.width - 18, Position.height - 18, 16, 16);
+        GUI.DrawTexture(resizeRect, RmUtils.resizeTexture, ScaleMode.StretchToFill, true);
+        if (Event.current.type == EventType.MouseDown && resizeRect.Contains(Event.current.mousePosition))
+        {
+            ResizingWindow = true;
+        }
+        if (Event.current.type == EventType.Repaint && ResizingWindow)
+        {
+            if (Mouse.delta.y != 0)
+            {
+                float diff = Mouse.delta.y;
+                RmUtils.UpdateScale(diff, ViewerHeight, ref HeightScale, MinHeight);
+            }
+        }
         GUI.DragWindow(new Rect(0, 0, Screen.width, 30));
+        //Account for resizing based on actions..
+        Position.height = WindowHeight + ActionHeight() + HeightScale;
         RMSettings.RepositionWindow(ref Position);
       }
       catch (Exception ex)
@@ -258,6 +309,32 @@ namespace RosterManager.Windows
         : "";
     }
 
+    internal static void DisplaySelectSuit(ref ProtoCrewMember.KerbalSuit suit)
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(Localizer.Format("#autoLOC_RM_1146"), GUILayout.Width(85)); // "Suit:"
+
+        // Always available
+        bool isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Default, Localizer.Format("#autoLOC_RM_1147"), GUILayout.Width(90)); // "Default"
+        if (isSet) suit = ProtoCrewMember.KerbalSuit.Default;
+
+        if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Vintage)) {
+            isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Vintage, Localizer.Format("#autoLOC_RM_1148"), GUILayout.Width(90)); // "Vintage"
+            if (isSet) suit = ProtoCrewMember.KerbalSuit.Vintage;
+        }
+        if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Future)) {
+            isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Future, Localizer.Format("#autoLOC_RM_1149"), GUILayout.Width(90)); // "Future"
+            if (isSet) suit = ProtoCrewMember.KerbalSuit.Future;
+        }
+        if (Expansions.ExpansionsLoader.IsExpansionKerbalSuitInstalled(ProtoCrewMember.KerbalSuit.Slim)) {
+            isSet = GUILayout.Toggle(suit == ProtoCrewMember.KerbalSuit.Slim, Localizer.Format("#autoLOC_RM_1150"), GUILayout.Width(90)); // "Slim"
+            if (isSet) suit = ProtoCrewMember.KerbalSuit.Slim;
+        }
+
+        GUILayout.EndHorizontal();
+        //DisplaySuitColor();
+    }
+
     private static void DisplayRosterFilter()
     {
       // store old value for comparison
@@ -305,7 +382,9 @@ namespace RosterManager.Windows
         //if (RMAddon.SortColumn == "") SortRosterList(RMAddon.SortColumn);
         DisplayRosterHeader();
 
-        _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, RMStyle.ScrollStyle, GUILayout.Height(230), GUILayout.Width(780));
+        _scrollViewerPosition = GUILayout.BeginScrollView(_scrollViewerPosition, RMStyle.ScrollStyle,
+            GUILayout.Height(ViewerHeight + HeightScale), GUILayout.Width(ViewBox.width));
+
         //foreach (ProtoCrewMember kerbal in RMAddon.AllCrew
         List<KeyValuePair<string, RMKerbal>>.Enumerator crewList = FilteredCrew.GetEnumerator();
         while (crewList.MoveNext())
@@ -341,7 +420,7 @@ namespace RosterManager.Windows
             else
             {
               SelectedKerbal = null;
-              DisplayMode = DisplayModes.Index;
+              DisplayMode = DisplayModes.None;
               Gender = ProtoCrewMember.Gender.Male;
             }
           }
@@ -480,10 +559,10 @@ namespace RosterManager.Windows
       {
         SelectedTab = TabSelected.Medical;
       }
-      GUIStyle professionStyle = SelectedTab == TabSelected.Scheduleing ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
+      GUIStyle professionStyle = SelectedTab == TabSelected.Scheduling ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
       if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1032"), professionStyle, GUILayout.Height(20)))		// #autoLOC_RM_1032 = Scheduling
       {
-        SelectedTab = TabSelected.Scheduleing;
+        SelectedTab = TabSelected.Scheduling;
       }
       GUIStyle historyStyle = SelectedTab == TabSelected.History ? RMStyle.ButtonToggledStyle : RMStyle.ButtonStyle;
       if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1033"), historyStyle, GUILayout.Height(20)))		// #autoLOC_RM_1033 = History
@@ -505,7 +584,7 @@ namespace RosterManager.Windows
         case TabSelected.Attributes:
           TabAttributes.Display();
           break;
-        case TabSelected.Scheduleing:
+        case TabSelected.Scheduling:
           TabScheduling.Display();
           break;
         case TabSelected.History:
@@ -687,7 +766,7 @@ namespace RosterManager.Windows
       if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1047"), GUILayout.MaxWidth(80)))		// #autoLOC_RM_1047 = Cancel
       {
         SelectedKerbal = null;
-        DisplayMode = DisplayModes.Index;
+        DisplayMode = DisplayModes.None;
       }
       GUILayout.EndHorizontal();
     }
@@ -707,7 +786,7 @@ namespace RosterManager.Windows
         if (string.IsNullOrEmpty(RMAddon.SaveMessage))
         {
           SelectedKerbal = null;
-          DisplayMode = DisplayModes.Index;
+          DisplayMode = DisplayModes.None;
         }
       }
       Rect rect = GUILayoutUtility.GetLastRect();
@@ -716,9 +795,15 @@ namespace RosterManager.Windows
       if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1050"), GUILayout.MaxWidth(50)))		// #autoLOC_RM_1050 = Cancel
       {
         SelectedKerbal = null;
-        DisplayMode = DisplayModes.Index;
+        DisplayMode = DisplayModes.None;
       }
       GUILayout.EndHorizontal();
+    }
+
+    internal static void EditSuitViewer()
+    {
+        GUILayout.Label(SelectedKerbal.IsNew ? Localizer.Format("#autoLOC_RM_1007") : Localizer.Format("#autoLOC_RM_1007a"));
+        SetKerbalSuit(SelectedKerbal);
     }
 
     internal static void UpdateRosterList()
@@ -1009,6 +1094,53 @@ namespace RosterManager.Windows
         labelStyle = RMStyle.LabelStyle;
       return labelStyle;
     }
+
+    private static void SetKerbalSuit(RMKerbal selectedKerbal)
+    {
+        DisplayMode = DisplayModes.Suit;
+        DisplaySelectSuit(ref selectedKerbal.Suit);
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1047"), GUILayout.MaxWidth(50))) // "Cancel"
+        {
+            SelectedKerbal = null;
+            DisplayMode = DisplayModes.None;
+        }
+
+        if (GUILayout.Button(Localizer.Format("#autoLOC_RM_1048"), GUILayout.MaxWidth(50)))
+        {
+            if (SelectedKerbal != null)
+            {
+                RMAddon.SaveMessage = SelectedKerbal.SubmitChanges();
+                UpdateRosterList();
+                if (string.IsNullOrEmpty(RMAddon.SaveMessage))
+                {
+                    SelectedKerbal = null;
+                }
+                DisplayMode = DisplayModes.None;
+            }
+        }
+        Rect rect = GUILayoutUtility.GetLastRect();
+        if (Event.current.type == EventType.Repaint && ShowToolTips)
+            ToolTip = RMToolTips.SetActiveToolTip(rect, GUI.tooltip, ref ToolTipActive, 10);
+        GUILayout.EndHorizontal();
+    }
+
+    internal static float ActionHeight()
+    {
+        switch (DisplayMode)
+        {
+            case DisplayModes.Edit:
+                return EditHeight;
+            case DisplayModes.Suit:
+                return SuitHeight;
+            case DisplayModes.Create:
+                return CreateHeight;
+            case DisplayModes.None:
+            default:
+                return 0;
+        }
+    }
+
 
     #region Enums
     internal enum FilterBy

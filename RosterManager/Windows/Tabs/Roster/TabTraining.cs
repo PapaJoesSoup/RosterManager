@@ -66,7 +66,7 @@ namespace RosterManager.Windows.Tabs.Roster
 
     internal static void Display()
     {
-      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(780));
+      _scrollDetailsPosition = GUILayout.BeginScrollView(_scrollDetailsPosition, RMStyle.ScrollStyle, GUILayout.Height(210), GUILayout.Width(WindowRoster.ViewerWidth));
       GUILayout.Label($"{Localizer.Format("#autoLOC_RM_1110")}  {WindowRoster.SelectedKerbal.Name} - ({WindowRoster.SelectedKerbal.Trait})", RMStyle.LabelStyleBold, GUILayout.Width(500));
 
       DisplayTabButtons();

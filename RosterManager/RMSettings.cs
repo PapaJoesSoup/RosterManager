@@ -15,6 +15,7 @@ namespace RosterManager
     internal static ConfigNode Settings;
     private static readonly string SettingsPath = KSPUtil.ApplicationRootPath + "GameData/RosterManager/Plugins/PluginData";
     private static readonly string SettingsFile = SettingsPath + "/RMSettings.dat";
+    internal static Rect DefaultPosition = new Rect(50, 50, 0, 0);
 
     // This value is assigned from AssemblyInfo.cs
     internal static string CurVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
@@ -189,6 +190,7 @@ namespace RosterManager
       ConfigNode hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
 
       // Lets get our window rectangles...
+      DefaultPosition = GetRectangle(windowsNode, "DefaultPosition", DefaultPosition);
       WindowDebugger.Position = GetRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
       WindowSettings.Position = GetRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
       WindowRoster.Position = GetRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
@@ -281,6 +283,7 @@ namespace RosterManager
       ConfigNode hiddenNode = Settings.HasNode("RM_Hidden") ? Settings.GetNode("RM_Hidden") : Settings.AddNode("RM_Hidden");
 
       // Write window positions
+      WriteRectangle(windowsNode, "DefaultPosition", DefaultPosition);
       WriteRectangle(windowsNode, "DebuggerPosition", WindowDebugger.Position);
       WriteRectangle(windowsNode, "SettingsPosition", WindowSettings.Position);
       WriteRectangle(windowsNode, "RosterPosition", WindowRoster.Position);
