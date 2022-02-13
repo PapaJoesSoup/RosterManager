@@ -40,8 +40,7 @@ namespace RosterManager
     {
       try
       {
-        if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.LoadedScene != GameScenes.SPACECENTER &&
-            HighLogic.LoadedScene != GameScenes.EDITOR && HighLogic.LoadedScene != GameScenes.TRACKSTATION) return;
+        if (!IsCorrectSceneLoaded()) return;
         //DontDestroyOnLoad(this);
         RMSettings.ApplySettings();
         //WindowRoster.ResetKerbalProfessions();
@@ -187,10 +186,9 @@ namespace RosterManager
       }
     }
 
-    internal static void RefreshCrew(GameScenes scene)
+    internal static void RefreshCrew()
     {
-      if (scene != GameScenes.EDITOR && scene != GameScenes.FLIGHT && scene != GameScenes.SPACECENTER &&
-          scene != GameScenes.TRACKSTATION) return;
+      if (!IsCorrectSceneLoaded()) return;
       //RMAddon.FrozenKerbals.Clear();
       AllCrew.Clear();
       FrozenKerbals = WindowRoster.GetFrozenKerbals();
@@ -217,7 +215,7 @@ namespace RosterManager
           OnGuiAppLauncherDestroyed();
           GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
           RMSettings.PrevEnableBlizzyToolbar = RMSettings.EnableBlizzyToolbar;
-          if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+          if (IsCorrectSceneLoaded())
           {
             _rmRosterBlizzy.Visible = true;
           }
@@ -227,7 +225,7 @@ namespace RosterManager
       {
         // Use stock Toolbar
         RmUtils.LogMessage("RosterManagerAddon.Awake - Stock Toolbar Selected.", "Info", RMSettings.VerboseLogging);
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+        if (IsCorrectSceneLoaded())
         {
           _rmRosterBlizzy.Visible = false;
         }
@@ -244,9 +242,7 @@ namespace RosterManager
       try
       {
         // Setup Roster Button
-        if ((HighLogic.LoadedScene != GameScenes.SPACECENTER && HighLogic.LoadedScene != GameScenes.EDITOR &&
-             HighLogic.LoadedScene != GameScenes.TRACKSTATION && HighLogic.LoadedScene != GameScenes.FLIGHT) ||
-            _rmRosterStock != null || RMSettings.EnableBlizzyToolbar) return;
+        if (!IsCorrectSceneLoaded() || _rmRosterStock != null || RMSettings.EnableBlizzyToolbar) return;
         const string iconfile = "Icon_Off_128";
         _rmRosterStock = ApplicationLauncher.Instance.AddModApplication(
           OnRMRosterToggle,
@@ -290,8 +286,7 @@ namespace RosterManager
       //Debug.Log("[RosterManager]:  RosterManagerAddon.OnRMRosterToggle");
       try
       {
-        if (HighLogic.LoadedScene != GameScenes.SPACECENTER && HighLogic.LoadedScene != GameScenes.EDITOR &&
-            HighLogic.LoadedScene != GameScenes.TRACKSTATION && HighLogic.LoadedScene != GameScenes.FLIGHT) return;
+        if (!IsCorrectSceneLoaded()) return;
         WindowRoster.ShowWindow = !WindowRoster.ShowWindow;
         if (RMSettings.EnableBlizzyToolbar)
           _rmRosterBlizzy.TexturePath = WindowRoster.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
@@ -323,7 +318,7 @@ namespace RosterManager
         {
           if (ToolbarManager.ToolbarAvailable)
           {
-            if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+            if (IsCorrectSceneLoaded())
             {
               _rmRosterBlizzy = ToolbarManager.Instance.add("RosterManager", "Roster");
               _rmRosterBlizzy.TexturePath = WindowSettings.ShowWindow ? TextureFolder + "Icon_On_24" : TextureFolder + "Icon_Off_24";
@@ -367,7 +362,7 @@ namespace RosterManager
           WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, $"{Localizer.Format("#autoLOC_RM_1001")} {RMSettings.CurVersion}", GUILayout.MinHeight(20));		// #autoLOC_RM_1001 = Roster Manager -  Debug Console - Ver. 
         }
 
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+        if (IsCorrectSceneLoaded())
         {
           if (WindowSettings.ShowWindow)
           {
@@ -386,7 +381,7 @@ namespace RosterManager
             if (WindowRoster.DisplayMode == WindowRoster.DisplayModes.None)
             {
               step = "5 - Reset Roster Size";
-              WindowRoster.Position.height = WindowRoster.WindowHeight; //reset height
+              WindowRoster.Position.height = WindowRoster.WindowHeight + WindowRoster.HeightScale; //reset height
             }
 
             step = "6 - Show Roster";
@@ -559,6 +554,13 @@ namespace RosterManager
         return false;
       }
     }
+
+    internal static bool IsCorrectSceneLoaded()
+    {
+      return HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR ||
+             HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT;
+    }
+
   }
 
   internal class RosterManagerModule : PartModule
@@ -579,5 +581,6 @@ namespace RosterManager
       else
         Events["Destroy Part"].active = false;
     }
+
   }
 }

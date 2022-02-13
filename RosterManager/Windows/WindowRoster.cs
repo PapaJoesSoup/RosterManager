@@ -144,7 +144,7 @@ namespace RosterManager.Windows
         DisplayMode = DisplayModes.None;
         SelectedKerbal = null;
         ToolTip = "";
-        if (HighLogic.LoadedScene == GameScenes.SPACECENTER || HighLogic.LoadedScene == GameScenes.EDITOR || HighLogic.LoadedScene == GameScenes.TRACKSTATION || HighLogic.LoadedScene == GameScenes.FLIGHT)
+        if (RMAddon.IsCorrectSceneLoaded())
           RMAddon.OnRMRosterToggle();
         else
           ShowWindow = false;
@@ -808,7 +808,7 @@ namespace RosterManager.Windows
 
     internal static void UpdateRosterList()
     {
-      RMAddon.RefreshCrew(HighLogic.LoadedScene);
+      RMAddon.RefreshCrew();
       FilterRosterList();
       SortRosterList();
     }
