@@ -2,10 +2,6 @@ Thanks for downloading Roster Manager!
 
 Roster Manager manages your roster of kerbals.  It will add a great deal of gameplay improvements, and control over your kerbals.
 
-----------------
-Current Version 0.3.0.0 - Release 08 Feb 2022 - KSP 1.12.x Compatible Alpha Release.
-----------------
-
 ---------
 Download: SpaceDock - http://spacedock.info/mod/191/RosterManager
           Github - https://github.com/PapaJoesSoup/RosterManager/releases
@@ -24,11 +20,6 @@ Installation steps:
 1.  Remove any previous installation of RosterManager from your GameData folder.
 2.  Overwrite your GameData folder with the contents of the archive.  
 
-------------
-What's New:
-------------
-Some quality of live improvements, KSP 1.12.x Compatible.
-See changelog for further details.
 
 ----------
 License:  CC BY-NC-SA 4.0

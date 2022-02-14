@@ -1,3 +1,9 @@
+Version 0.3.0.1 13 Feb 2022
+ - Fixed bug with Roster Window resizing when in editor. Scrollbox resized, but window did not.
+ - Changed:  Refactored loaded scene checking logic to simplify.
+ - Changed:  Trimmed Installation notes. Removed version and What's new sections.  Redundant with Change Log.
+
+
 Version 0.3.0.0 09 Feb 2022
  - New:  Recompiled for KSP 1.12.x
  - New:  Added window resizing to all windows
