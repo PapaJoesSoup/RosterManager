@@ -350,15 +350,12 @@ namespace RosterManager
 
     internal void Display()
     {
-      string step = "";
       try
       {
-        step = "0 - Start";
         RMStyle.SetupGui();
 
         if (WindowDebugger.ShowWindow)
         {
-          step = "2 - Debugger";
           WindowDebugger.Position = GUILayout.Window(318643, WindowDebugger.Position, WindowDebugger.Display, $"{Localizer.Format("#autoLOC_RM_1001")} {RMSettings.CurVersion}", GUILayout.MinHeight(20));		// #autoLOC_RM_1001 = Roster Manager -  Debug Console - Ver. 
         }
 
@@ -366,13 +363,11 @@ namespace RosterManager
         {
           if (WindowSettings.ShowWindow)
           {
-            step = "3 - Show Settings";
             WindowSettings.Position = GUILayout.Window(318546, WindowSettings.Position, WindowSettings.Display, Localizer.Format("#autoLOC_RM_1002"), GUILayout.MinHeight(20));		// #autoLOC_RM_1002 = Roster Manager Settings
           }
 
           if (WindowContracts.ShowWindow)
           {
-            step = "4 - Roster Contracts";
             WindowContracts.Position = GUILayout.Window(318987, WindowContracts.Position, WindowContracts.Display, Localizer.Format("#autoLOC_RM_1003"), GUILayout.MinHeight(20));		// #autoLOC_RM_1003 = Roster Contracts
           }
 
@@ -380,19 +375,16 @@ namespace RosterManager
           {
             if (WindowRoster.DisplayMode == WindowRoster.DisplayModes.None)
             {
-              step = "5 - Reset Roster Size";
               WindowRoster.Position.height = WindowRoster.WindowHeight + WindowRoster.HeightScale; //reset height
             }
 
-            step = "6 - Show Roster";
             WindowRoster.Position = GUILayout.Window(318547, WindowRoster.Position, WindowRoster.Display, Localizer.Format("#autoLOC_RM_1004"), GUILayout.MinHeight(20));		// #autoLOC_RM_1004 = Roster Manager
           }
         }
-        step = "1 - Show Interface(s)";
       }
       catch (Exception ex)
       {
-        RmUtils.LogMessage($" in drawGui at or near step:  {step}.  Error:  {ex.Message} \n\n{ex.StackTrace}", "Error", true);
+        RmUtils.LogMessage($" in drawGui.  Error:  {ex.Message} \n\n{ex.StackTrace}", "Error", true);
       }
     }
 
